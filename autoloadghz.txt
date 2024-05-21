@@ -7,10 +7,193 @@ function Autostart(){
   Orion.CharPrint(self, 906, 'Bom jogo !!!');
   Orion.Wait(100);
   Shared.AddVar('armamento', 0);
+  Shared.AddVar('CPCastActive', "");
+  Shared.AddVar('CPCastMSG', "");
+  Shared.AddVar('CPCastCast', "");
+  Shared.AddVar('CPCastDelay', 0);
+  Shared.AddVar('CPUseType', '');
+  Orion.Exec('loopCastPerfeito')
 }
 
+function teste(){
+  
+  function back_cast(lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay){
+    Orion.WaitJournal(lastCastCAST, Orion.Now(), Orion.Now() + 280);   // Aguarda aparecer no jornal a magia
+  }
+  castMagiaFunction(back_cast,'An Ex Por',"Paralyze",2800,'')
+}
 
+function castFSPreGHZ(){
+  castPreGHZ('Kal Vas Flam',"Flame Strike",3800,'0x1F5F')
+}
 
+function castPoisonPreGHZ(){
+  castPreGHZ('In Nox',"Poison",3000,'')
+}
+
+function castParalizePreGHZ(){
+  castPreGHZ('An Ex Por',"Paralyze",2800,'')
+}
+
+function castMAPreGHZ(){
+  castPreGHZ("In Por Y","Magic Arrow",1300,"")
+}
+
+function desativaCast(){
+  Shared.AddVar('CPCastActive', 0);
+  Shared.AddVar('CPUseType', '');
+  Shared.AddVar('CPCastActive', "");
+  Shared.AddVar('CPCastMSG', "");
+  Shared.AddVar('CPCastCast', "");
+  Shared.AddVar('CPCastDelay', 0);
+  Orion.ClearJournal();
+}
+
+function interromperCast(){
+  if (Player.WarMode()){
+    Orion.WarMode(0)
+    Orion.Wait(10)
+    Orion.WarMode(1)
+  }else{
+    Orion.WarMode(1)
+    Orion.Wait(10)
+    Orion.WarMode(0)
+  }
+}
+
+function castPreGHZ(MSG, CAST, DELAY, TYPE) {
+  var lastCastCAST = Shared.GetVar('CPCastCast');
+  if (lastCastCAST && lastCastCAST != ""){
+    if (lastCastCAST != CAST){
+      Shared.AddVar('CPCastActive', 1);
+      Shared.AddVar('CPCastMSG', MSG);
+      Shared.AddVar('CPCastCast', CAST);
+      Shared.AddVar('CPCastDelay', DELAY);
+      Shared.AddVar('CPUseType', TYPE);
+      Orion.ClearJournal();
+      interromperCast()
+      Orion.ClearJournal(CAST);
+      Orion.CharPrint(self, 906, 'Desativando '+lastCastCAST+' ativando '+CAST);
+    }else{
+      desativaCast();
+      interromperCast()
+      Orion.ClearJournal(CAST);
+      Orion.CharPrint(self, 906, 'Desativando '+CAST);
+    }
+  }else{
+    if (Shared.GetVar('CPCastActive') != 1){
+      Orion.ClearJournal();
+      Shared.AddVar('CPCastActive', 1);
+      Shared.AddVar('CPCastMSG', MSG);
+      Shared.AddVar('CPCastCast', CAST);
+      Shared.AddVar('CPCastDelay', DELAY);
+      Shared.AddVar('CPUseType', TYPE);
+      Orion.CharPrint(self, 906, 'Ativando '+CAST);
+    }else{
+      Orion.ClearJournal(CAST);
+      desativaCast();
+      interromperCast()
+      Orion.CharPrint(self, 906, 'Desativando '+CAST);
+      Orion.ClearJournal(CAST);
+    }
+  }
+  
+}
+
+function castMagiaFunction(funct_back, lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay){
+  var enemy= Orion.FindObject('lasttarget');
+  if (enemy){
+    Orion.ClearJournal('A magia falhou')
+    var scroll = undefined;
+    if (lastCastUse && lastCastUse != ''){
+      scroll = Orion.FindType(lastCastUse);
+    }
+    if (lastCastCAST != ''){
+      if (scroll && scroll.length > 0) {
+          Orion.UseObject(scroll[0]);
+          Orion.WaitTargetObject('lasttarget')
+      } else {
+          Orion.WaitTargetObject('lasttarget')
+          Orion.Cast(lastCastCAST);
+      }
+    }
+    Orion.AddDisplayTimer(100, lastCastDelay, 'UnderChar', 'Circle|Bar', 'DELAY', 0,0, '0x00FF', 0, 'white');
+    funct_back(lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay);
+    Orion.Wait(150);
+  }
+}
+
+function loopCastPerfeito(){
+  Orion.CharPrint(self, 906, 'Iniciando CP ..');
+  Shared.AddVar('CPUseType', '');
+  Shared.AddVar('CPCastActive', "");
+  Shared.AddVar('CPCastMSG', "");
+  Shared.AddVar('CPCastCast', "");
+  Shared.AddVar('CPCastDelay', 0);
+  Orion.ClearJournal('A magia falhou')
+  var castMagia = false
+  Orion.JournalIgnoreCase(true)
+  var last = ""
+  // Quando solta paralyze e ma em sequencia, ele entra em loop e tem q ver o pq 
+  while (true) {
+    var lastCastMSG = Shared.GetVar('CPCastMSG');
+    var lastCastCAST = Shared.GetVar('CPCastCast');
+    var lastCastDelay = Shared.GetVar('CPCastDelay');
+    var lastCastUse = Shared.GetVar('CPUseType');
+    if (Shared.GetVar('CPCastActive') == 1){
+      castMagia = true
+      if (Orion.InJournal(lastCastMSG+"|"+last,"cast") ){
+        Shared.AddVar('CPCastActive', 0);
+        Orion.Wait(25);
+        castMagia = false
+      }
+      if (castMagia){
+        function back_cast(lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay){
+          castMagia = false;
+          Orion.WaitJournal(lastCastCAST, Orion.Now(), Orion.Now() + 280);   // Aguarda aparecer no jornal a magia
+          last = lastCastMSG
+        }
+        /*if (last != lastCastMSG){
+          interromperCast()
+        }*/
+        castMagiaFunction(back_cast,lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay)
+      }
+    }
+    if (Orion.InJournal("A magia falhou",'sys')){
+      Shared.AddVar('CPCastActive', 0); // desativa o cast
+      Orion.ClearJournal("A magia falhou",'sys');
+      interromperCast()
+      Orion.RemoveDisplayTimer(100);
+      Orion.ShowJournal();
+      function back_cast(lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay){
+        castMagia = false;
+        Orion.WaitJournal(lastCastCAST, Orion.Now(), Orion.Now() + 280);   // Aguarda aparecer no jornal a magia
+        last = lastCastMSG
+      }
+      castMagiaFunction(back_cast,lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay)
+      Shared.AddVar('CPCastActive', 1); // Ativa novamente
+    }
+    Orion.Wait(15);
+  }
+ 
+}
+
+function PreFSTest(){ 
+  var enemy= Orion.FindObject('lasttarget');
+  Orion.ClearJournal('Kal Vas Flam');
+  while (true) {
+    if (Orion.InJournal('Kal Vas Flam')){
+      break;
+      Orion.Wait(25);
+    }else{
+      Orion.UseType ( '0x1F5F');
+      Orion.WaitTargetObject('lasttarget');
+      Orion.AddDisplayTimer(100, 3800, 'UnderChar', 'Circle|Bar', 'DELAY', 0,0, '0x00FF', 0, 'white');
+      Orion.Wait(15);
+    }
+    Orion.WaitJournal('Kal Vas Flam', Orion.Now(), Orion.Now() + 280);         
+  }
+ }
 
 
 function armamentoGHZ(){
@@ -92,11 +275,6 @@ function autobands() {
     }
 }
 
-function teste(){
-  Orion.CharPrint(self, 906,'teste'+Player.Poisoned());
-  //curarse()
-  //Orion.UseSkill("Meditation");
-}
 
 function atacaMonstros(){
 	OTrackingDefinitivo(2);
@@ -124,7 +302,7 @@ function ManaGHZ(){
         Orion.CharPrint(self, '0x0790',"Tomando refresh");
         tomarTotalManaRefresh();
       }else{
-        meditar();
+        //meditar();
       }
     }
     
