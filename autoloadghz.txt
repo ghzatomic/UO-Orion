@@ -134,6 +134,7 @@ function loopCastPerfeito(){
   var castMagia = false
   Orion.JournalIgnoreCase(true)
   var last = ""
+  var falha_magia = false
   // Quando solta paralyze e ma em sequencia, ele entra em loop e tem q ver o pq 
   while (true) {
     var lastCastMSG = Shared.GetVar('CPCastMSG');
@@ -150,7 +151,7 @@ function loopCastPerfeito(){
       if (castMagia){
         function back_cast(lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay){
           castMagia = false;
-          Orion.WaitJournal(lastCastCAST, Orion.Now(), Orion.Now() + 280);   // Aguarda aparecer no jornal a magia
+          Orion.WaitJournal(lastCastCAST, Orion.Now()-500, Orion.Now() + 280);  // Aguarda aparecer no jornal a magia
           last = lastCastMSG
         }
         /*if (last != lastCastMSG){
@@ -159,18 +160,35 @@ function loopCastPerfeito(){
         castMagiaFunction(back_cast,lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay)
       }
     }
-    if (Orion.InJournal("A magia falhou",'sys')){
+    if (Orion.InJournal("A magia falhou","cast")){
+      Orion.ClearJournal("A magia falhou","cast");
+      Orion.Wait(150);
+      while(Orion.InJournal("A magia falhou","cast")){
+        Orion.ClearJournal("A magia falhou","cast");
+      }
+      
+      falha_magia = true
+    }
+    if (falha_magia){
       Shared.AddVar('CPCastActive', 0); // desativa o cast
-      Orion.ClearJournal("A magia falhou",'sys');
-      interromperCast()
+      Orion.ClearJournal("A magia falhou");
+      //interromperCast()
+      Orion.Wait(15);
       Orion.RemoveDisplayTimer(100);
-      Orion.ShowJournal();
+      Orion.Wait(15);
+      //Orion.ShowJournal();
+      /*
       function back_cast(lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay){
         castMagia = false;
-        Orion.WaitJournal(lastCastCAST, Orion.Now(), Orion.Now() + 280);   // Aguarda aparecer no jornal a magia
+        //Orion.CharPrint(self, 906, 'Esperando: '+lastCastCAST);
+        Orion.ClearJournal(last,"cast");
+        Orion.WaitJournal(lastCastCAST, Orion.Now()-500, Orion.Now() + 280);   // Aguarda aparecer no jornal a magia
         last = lastCastMSG
       }
       castMagiaFunction(back_cast,lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay)
+      */
+      Orion.AddDisplayTimer(100, lastCastDelay, 'UnderChar', 'Circle|Bar', 'DELAY', 0,0, '0x00FF', 0, 'white');
+      falha_magia = false
       Shared.AddVar('CPCastActive', 1); // Ativa novamente
     }
     Orion.Wait(15);
