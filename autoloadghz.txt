@@ -6,8 +6,25 @@ function Autostart(){
   Orion.Wait(2000);
   Orion.CharPrint(self, 906, 'Bom jogo !!!');
   Orion.Wait(100);
+  Shared.AddVar('armamento', 0);
 }
 
+
+
+
+
+function armamentoGHZ(){
+  if(Shared.GetVar('armamento') == 0){
+    ArmarArma();
+    Shared.AddVar('armamento', 1);
+  }else if (Shared.GetVar('armamento') == 1){
+    ArmarBow();
+    Shared.AddVar('armamento', 2);
+  }else{
+    Orion.Say('.Disarm');
+    Shared.AddVar('armamento', 0);
+  }
+}
 
 function curarse(){
   if (Orion.Count("0x0F0E","0x002C",backpack)>0) {
@@ -79,6 +96,14 @@ function teste(){
   Orion.CharPrint(self, 906,'teste'+Player.Poisoned());
   //curarse()
   //Orion.UseSkill("Meditation");
+}
+
+function atacaMonstros(){
+	OTrackingDefinitivo(2);
+}
+
+function atacaPlayers(){
+	OTrackingDefinitivo(3);
 }
 
 function ManaGHZ(){
@@ -411,7 +436,8 @@ function LootAll() {
     Orion.Wait(50);
 }
 
-function OTrackingDefinitivo() {
+// Tipo 3 - humanos
+function OTrackingDefinitivo(tipo) {
 	 //#################################
 	 //Habilite aqui as fun  es que voce deseja adicionar ao macro ("= 1"   ON, "= 0"   OFF).
 	 var seguir_auto = 0;     
@@ -420,7 +446,7 @@ function OTrackingDefinitivo() {
 	 //#################################
     //Usa o tracking e conta quantos players estao na regiao.
     Orion.UseSkill('Tracking');
-    Orion.WaitMenu('Tracking', 3);
+    Orion.WaitMenu('Tracking', tipo);
     var menu = Orion.GetMenu(0);
     Orion.Wait('350');    
     Orion.GetMenu(0).Select('Players \n');
@@ -795,6 +821,7 @@ function ArmarArma() {
   	Orion.UseType('0x1404') // War Fork
   	Orion.UseType('0x13fe') // Katana
   	Orion.UseType('0x1400') // Kryss
+  	Orion.UseType('0x1406') // Kryss
 
  	Orion.Attack('lasttarget');
 }
@@ -2518,9 +2545,9 @@ function TargetNextEnemy_PvP() {
             Orion.CharPrint(lasttarget, notoColor, ' ');
             loop++;
         }
-        Orion.CharPrint(self, notoColor, ' Viadinho: ' + enemy.Name() );
+        Orion.CharPrint(self, notoColor, ' Inimigo: ' + enemy.Name() );
         Orion.CharPrint(serial, notoColor, ' *MATA EU* ');
-        Orion.Say('.gc Comendo o cu do: ' + Orion.RequestName(lasttarget, 500));
+        //Orion.Say('.gc Comendo o cu do: ' + Orion.RequestName(lasttarget, 500));
 }
         Orion.SetGlobal('global_enemy', serial);
         Orion.ClientLastTarget(serial);
