@@ -1,3 +1,4 @@
+
 function Autostart(){
   Orion.Print('Ancorp - GHZATOMIC')
   Orion.Exec('autobands')
@@ -15,13 +16,6 @@ function Autostart(){
   Orion.Exec('loopCastPerfeito')
 }
 
-function teste(){
-  
-  function back_cast(lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay){
-    Orion.WaitJournal(lastCastCAST, Orion.Now(), Orion.Now() + 280);   // Aguarda aparecer no jornal a magia
-  }
-  castMagiaFunction(back_cast,'An Ex Por',"Paralyze",2800,'')
-}
 
 function castFSPreGHZ(){
   castPreGHZ('Kal Vas Flam',"Flame Strike",3800,'0x1F5F')
@@ -3613,3 +3607,62 @@ function ageArrowExplo() {
     }
 }
 
+function teste(){
+  var tiles = Orion.GetTiles("any",Player.X,Player.Y);
+  if (tiles){
+    Orion.CharPrint(self, 906, "aaaa"+Orion.GetGraphic(tiles));
+  }
+  Orion.CharPrint(self, 906, "CanWalk -"+Player.X()+","+Player.Y()+" - "+Orion.CanWalk("North", Player.X()-1,Player.Y()-1,Player.Z()));
+
+  
+}
+
+function mapeiaTela(){
+  function callback(i, j) {
+    //console.log(`Célula em (${i}, ${j})`);
+  }
+  percorrerAteLimite(10, 10, 2, 2, 8, 8, callback);
+
+}
+
+function percorrerAteLimite(x, y, startX, startY, maxX, maxY, callback) {
+  var directions = [
+    [1, 0], // direita
+    [-1, 0], // esquerda
+    [0, 1], // abaixo
+    [0, -1], // acima
+    [1, 1], // diagonal direita abaixo
+    [-1, -1], // diagonal esquerda acima
+    [1, -1], // diagonal direita acima
+    [-1, 1] // diagonal esquerda abaixo
+  ];
+  var dl = directions.length
+  var visitados = [];
+  for (var i = 0; i < x; i++) {
+      visitados.push([]);
+      for (var j = 0; j < y; j++) {
+          visitados[i][j] = false;
+      }
+  }
+  var queue = [[startX, startY]];
+  var readIndex = 0; // Índice para leitura da fila
+    
+  while (readIndex < queue.length) {
+        var current = queue[readIndex++];
+        var curX = current[0];
+        var curY = current[1];
+        
+        if (curX < 0 || curX >= x || curY < 0 || curY >= y || visitados[curX][curY] || curX >= maxX || curY >= maxY) {
+            continue;
+        }
+
+        visitados[curX][curY] = true;
+        callback(curX, curY);
+        
+        for (var i = 0; i < directions.length; i++) {
+            var newX = curX + directions[i][0];
+            var newY = curY + directions[i][1];
+            queue.push([newX, newY]);
+        }
+    }
+}
