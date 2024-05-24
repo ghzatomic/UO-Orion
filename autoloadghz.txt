@@ -1,3 +1,7 @@
+var msg_curado = "O veneno em seu corpo foi curado";
+var msg_castando_heal = "An Nox";
+var msg_potion = "Greater Cure!";
+var envenenado = "envenenado"
 
 function Autostart(){
   Orion.Print('Ancorp - GHZATOMIC')
@@ -13,6 +17,7 @@ function Autostart(){
   Shared.AddVar('CPCastCast', "");
   Shared.AddVar('CPCastDelay', 0);
   Shared.AddVar('CPUseType', '');
+  Shared.AddVar('CPTarget', 'lasttarget');
   Orion.Exec('loopCastPerfeito')
 }
 
@@ -33,14 +38,22 @@ function castMAPreGHZ(){
   castPreGHZ("In Por Y","Magic Arrow",1300,"")
 }
 
+function castCurePreGHZ(){
+  castPreGHZ("An Nox","Cure",2300,"",'self',false)
+}
+
 function desativaCast(){
+  var lastCastMSG = Shared.GetVar('CPCastMSG');
+  var lastCastCAST = Shared.GetVar('CPCastCast');
   Shared.AddVar('CPCastActive', 0);
   Shared.AddVar('CPUseType', '');
   Shared.AddVar('CPCastActive', "");
   Shared.AddVar('CPCastMSG', "");
   Shared.AddVar('CPCastCast', "");
   Shared.AddVar('CPCastDelay', 0);
-  Orion.ClearJournal();
+  Shared.AddVar('CPTarget', 'lasttarget');
+  Orion.ClearJournal(lastCastMSG);
+  Orion.ClearJournal(lastCastCAST);
 }
 
 function interromperCast(){
@@ -55,7 +68,16 @@ function interromperCast(){
   }
 }
 
-function castPreGHZ(MSG, CAST, DELAY, TYPE) {
+function castPreGHZ(MSG, CAST, DELAY, TYPE, TARGET,DESATIVAVEL) {
+  if (!TARGET){
+    TARGET = "lasttarget"
+  }
+  if (DESATIVAVEL == undefined){
+    DESATIVAVEL = true
+  }else{
+    DESATIVAVEL = false
+  }
+  
   var lastCastCAST = Shared.GetVar('CPCastCast');
   if (lastCastCAST && lastCastCAST != ""){
     if (lastCastCAST != CAST){
@@ -64,15 +86,18 @@ function castPreGHZ(MSG, CAST, DELAY, TYPE) {
       Shared.AddVar('CPCastCast', CAST);
       Shared.AddVar('CPCastDelay', DELAY);
       Shared.AddVar('CPUseType', TYPE);
+      Shared.AddVar('CPTarget', TARGET);
       Orion.ClearJournal();
       interromperCast()
       Orion.ClearJournal(CAST);
       //Orion.CharPrint(self, 906, 'Desativando '+lastCastCAST+' ativando '+CAST);
     }else{
-      desativaCast();
-      interromperCast()
-      Orion.ClearJournal(CAST);
-      Orion.CharPrint(self, 906, 'Desativando '+CAST);
+      if (DESATIVAVEL){
+        desativaCast();
+        interromperCast()
+        Orion.ClearJournal(CAST);
+        Orion.CharPrint(self, 906, 'Desativando 2 '+CAST);
+      }
     }
   }else{
     if (Shared.GetVar('CPCastActive') != 1){
@@ -82,20 +107,27 @@ function castPreGHZ(MSG, CAST, DELAY, TYPE) {
       Shared.AddVar('CPCastCast', CAST);
       Shared.AddVar('CPCastDelay', DELAY);
       Shared.AddVar('CPUseType', TYPE);
-      //Orion.CharPrint(self, 906, 'Ativando '+CAST);
+      Shared.AddVar('CPTarget', TARGET);
+      Orion.CharPrint(self, 906, 'Ativando '+CAST);
     }else{
-      Orion.ClearJournal(CAST);
-      desativaCast();
-      interromperCast()
-      Orion.CharPrint(self, 906, 'Desativando '+CAST);
-      Orion.ClearJournal(CAST);
+      if (DESATIVAVEL){
+        Orion.ClearJournal(CAST);
+        desativaCast();
+        interromperCast()
+        Orion.CharPrint(self, 906, 'Desativando 1 '+CAST);
+        Orion.ClearJournal(CAST);
+      }
     }
   }
   
 }
 
-function castMagiaFunction(funct_back, lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay){
-  var enemy= Orion.FindObject('lasttarget');
+function castMagiaFunction(funct_back, lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay, target){
+  var enemy = true
+  if (target == 'lasttarget'){ // Aqui verifica se a magia é self, por exemplo o cure
+    enemy = Orion.FindObject('lasttarget');
+  }
+  
   if (enemy){
     Orion.ClearJournal('A magia falhou')
     var scroll = undefined;
@@ -105,15 +137,66 @@ function castMagiaFunction(funct_back, lastCastUse,lastCastCAST,lastCastMSG,last
     if (lastCastCAST != ''){
       if (scroll && scroll.length > 0) {
           Orion.UseObject(scroll[0]);
-          Orion.WaitTargetObject('lasttarget')
+          Orion.WaitTargetObject(target)
+          
       } else {
-          Orion.WaitTargetObject('lasttarget')
+          Orion.WaitTargetObject(target)
           Orion.Cast(lastCastCAST);
       }
     }
     Orion.AddDisplayTimer(100, lastCastDelay, 'UnderChar', 'Circle|Bar', lastCastCAST, 0,0, '0x00FF', 0, 'white');
     funct_back(lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay);
-    Orion.Wait(150);
+    Orion.Wait(15);
+  }
+}
+
+function curarse(callback_decide_cast, callback_is_envenenado, callback_is_curado){
+  if (!callback_is_curado){
+      callback_is_curado = function (){
+        //Orion.CharPrint(self, 906, 'Voce foi cur4do !!!');
+        return true;
+    }
+  }
+  if (!callback_is_envenenado){
+      callback_is_envenenado = function (){
+        //Orion.CharPrint(self, 906, 'Voce esta 3nv3n3nado !!!');
+        return true;
+    }
+  }
+  if (!callback_decide_cast){
+      callback_decide_cast = function (){
+        return true;
+    }
+  }
+  
+  if (Player.Poisoned()){
+    var curado = false;
+    callback_is_envenenado(msg_curado);
+    if (!Player.Poisoned()){
+      callback_is_curado()
+      Orion.ClearJournal(msg_curado);
+      Orion.ClearJournal(msg_castando_heal);
+      Orion.ClearJournal(msg_potion);
+      Orion.ClearJournal(envenenado);
+      curado = true;
+      Orion.CharPrint(self, 906, 'CUROU !!!');
+    }
+    if (!curado){
+    //if (!Orion.InJournal(msg_curado,'system') ){
+      Orion.CharPrint(self, 906, 'curando !!!');
+      if(callback_decide_cast() && Player.Poisoned()){
+        if (Orion.Count("0x0F0E","0x002C",backpack)>0) {
+          Orion.CharPrint(self, 906, "Socorro !! bebendo potion de cura")
+          Orion.UseType("0x0F0E","0x002C")
+        }else{
+          if (!Orion.InJournal(msg_castando_heal, 'cast')){
+            Orion.CharPrint(self, 906, "Nao encontrou potion, Curando c magia")
+            castCurePreGHZ();
+          }
+          Orion.WaitJournal(msg_castando_heal, Orion.Now()-500, Orion.Now() + 280);
+        }
+      }
+    }
   }
 }
 
@@ -124,6 +207,7 @@ function loopCastPerfeito(){
   Shared.AddVar('CPCastMSG', "");
   Shared.AddVar('CPCastCast', "");
   Shared.AddVar('CPCastDelay', 0);
+  Shared.AddVar('CPTarget', 'lasttarget');
   Orion.ClearJournal('A magia falhou')
   var castMagia = false
   Orion.JournalIgnoreCase(true)
@@ -135,10 +219,19 @@ function loopCastPerfeito(){
     var lastCastCAST = Shared.GetVar('CPCastCast');
     var lastCastDelay = Shared.GetVar('CPCastDelay');
     var lastCastUse = Shared.GetVar('CPUseType');
+    var target = Shared.GetVar('CPTarget');
     if (Shared.GetVar('CPCastActive') == 1){
       castMagia = true
       if (Orion.InJournal(lastCastMSG+"|"+last,"cast") ){
+        Orion.ClearJournal(lastCastCAST);
         Shared.AddVar('CPCastActive', 0);
+        Shared.AddVar('CPUseType', '');
+        Shared.AddVar('CPCastActive', "");
+        Shared.AddVar('CPCastMSG', "");
+        Shared.AddVar('CPCastCast', "");
+        Shared.AddVar('CPCastDelay', 0);
+        Shared.AddVar('CPTarget', 'lasttarget');
+        Orion.CharPrint(self, 906, 'Desativando loop '+lastCastCAST);
         Orion.Wait(25);
         castMagia = false
       }
@@ -148,15 +241,12 @@ function loopCastPerfeito(){
           Orion.WaitJournal(lastCastCAST, Orion.Now()-500, Orion.Now() + 280);  // Aguarda aparecer no jornal a magia
           last = lastCastMSG
         }
-        /*if (last != lastCastMSG){
-          interromperCast()
-        }*/
-        castMagiaFunction(back_cast,lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay)
+        castMagiaFunction(back_cast,lastCastUse,lastCastCAST,lastCastMSG,lastCastDelay,target)
       }
     }
     if (Orion.InJournal("A magia falhou","cast")){
       Orion.ClearJournal("A magia falhou","cast");
-      Orion.Wait(150);
+      Orion.Wait(15);
       while(Orion.InJournal("A magia falhou","cast")){
         Orion.ClearJournal("A magia falhou","cast");
       }
@@ -207,16 +297,6 @@ function armamentoGHZ(){
   }else{
     Orion.Say('.Disarm');
     Shared.AddVar('armamento', 0);
-  }
-}
-
-function curarse(){
-  if (Orion.Count("0x0F0E","0x002C",backpack)>0) {
-    Orion.CharPrint(self, 906, "Socorro !! bebendo potion de cura")
-    Orion.UseType("0x0F0E","0x002C")
-  }else{
-    Orion.CharPrint(self, 906, "Nao encontrou potion, Curando c magia")
-    Orion.Cast('Cure', 'self');
   }
 }
 
@@ -272,6 +352,8 @@ function autobands() {
         }
         if (Player.Poisoned()){
           curarse();
+        }else{
+          Orion.ClearJournal(msg_castando_heal);
         }
     }
 }
@@ -294,20 +376,20 @@ function ManaGHZ(){
         Orion.CharPrint(self, '0x0790',"Tomando Mana boost");
         tomarTotalManaRefiling();
     }
-  }else{
-    if (Orion.Count("0x0F82","0x0532",backpack)>0) {
-        Orion.CharPrint(self, '0x0790','Tomando Mana boost');
-        tomarTotalManaRefiling();
-    }else{
-      if (Orion.Count("0x0F0E","0x0480",backpack) > 0) { 
-        Orion.CharPrint(self, '0x0790',"Tomando refresh");
-        tomarTotalManaRefresh();
-      }else{
+  }//else{
+    //if (Orion.Count("0x0F82","0x0532",backpack)>0) {
+    //    Orion.CharPrint(self, '0x0790','Tomando Mana boost');
+    //    tomarTotalManaRefiling();
+   // }else{
+   //   if (Orion.Count("0x0F0E","0x0480",backpack) > 0) { 
+   //     Orion.CharPrint(self, '0x0790',"Tomando refresh");
+   //     tomarTotalManaRefresh();
+   //   }else{
         //meditar();
-      }
-    }
+   //   }
+    //}
     
-  }
+  //}
 }
 
 function tomarTotalManaRefresh(){
@@ -3607,22 +3689,35 @@ function ageArrowExplo() {
     }
 }
 
-function teste(){
-  var tiles = Orion.GetTiles("any",Player.X,Player.Y);
-  if (tiles){
-    Orion.CharPrint(self, 906, "aaaa"+Orion.GetGraphic(tiles));
-  }
-  Orion.CharPrint(self, 906, "CanWalk -"+Player.X()+","+Player.Y()+" - "+Orion.CanWalk("North", Player.X()-1,Player.Y()-1,Player.Z()));
-
-  
-}
-
 function mapeiaTela(){
   function callback(i, j) {
     //console.log(`Célula em (${i}, ${j})`);
   }
   percorrerAteLimite(10, 10, 2, 2, 8, 8, callback);
 
+}
+
+
+function writeFileLine(data){
+  var loc = 'E:/git/UO Orion Macros/teste.txt'
+  var file = Orion.NewFile(loc);
+  var create = file.Open(loc)
+  if (create){
+    file.WriteLine(data);
+    file.Close();
+  }
+}
+
+function create2DArray(x, y, initialValue) {
+    var array = [];
+    for (var i = 0; i < x; i++) {
+        var row = [];
+        for (var j = 0; j < y; j++) {
+            row.push(initialValue);
+        }
+        array.push(row);
+    }
+    return array;
 }
 
 function percorrerAteLimite(x, y, startX, startY, maxX, maxY, callback) {
@@ -3666,3 +3761,225 @@ function percorrerAteLimite(x, y, startX, startY, maxX, maxY, callback) {
         }
     }
 }
+
+
+function customFloor(value) {
+  return value - (value % 1);
+}
+
+function abs(value) {
+  return value < 0 ? -value : value;
+}
+
+function hasLineOfSight(grid, x1, y1, x2, y2) {
+  const dx = abs(x2 - x1);
+  const dy = abs(y2 - y1);
+  const sx = (x1 < x2) ? 1 : -1;
+  const sy = (y1 < y2) ? 1 : -1;
+  var err = dx - dy;
+
+  while (true) {
+    if (x1 === x2 && y1 === y2) return true;
+    if (grid[y1][x1] === 'P' || grid[y1][x1] === 'A') return false;
+
+    const e2 = err * 2;
+    if (e2 > -dy) {
+      err -= dy;
+      x1 += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      y1 += sy;
+    }
+  }
+}
+
+function countObstaclesBetween(grid, x1, y1, x2, y2) {
+  const dx = abs(x2 - x1);
+  const dy = abs(y2 - y1);
+  const sx = (x1 < x2) ? 1 : -1;
+  const sy = (y1 < y2) ? 1 : -1;
+  var err = dx - dy;
+  var count = 0;
+
+  while (!(x1 === x2 && y1 === y2)) {
+    if (grid[y1][x1] === 'P' || grid[y1][x1] === 'A') count++;
+
+    const e2 = err * 2;
+    if (e2 > -dy) {
+      err -= dy;
+      x1 += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      y1 += sy;
+    }
+  }
+
+  return count;
+}
+
+function findSafeSpot(grid, playerX, playerY) {
+  var bestSpot = null;
+  var maxObstacles = -1;
+
+  for (var y = 0; y < gridSize; y++) {
+    for (var x = 0; x < gridSize; x++) {
+      if (grid[y][x] === '.' || grid[y][x] === 'P' || grid[y][x] === 'A') {
+        var safe = true;
+        var totalObstacles = 0;
+        for (var ey = 0; ey < gridSize; ey++) {
+          for (var ex = 0; ex < gridSize; ex++) {
+            if (grid[ey][ex] === 'E') {
+              if (hasLineOfSight(grid, ex, ey, x, y)) {
+                safe = false;
+                break;
+              }
+              totalObstacles += countObstaclesBetween(grid, ex, ey, x, y);
+            }
+          }
+          if (!safe) break;
+        }
+        if (safe && totalObstacles > maxObstacles) {
+          bestSpot = { x: x, y: y };
+          maxObstacles = totalObstacles;
+        }
+      }
+    }
+  }
+  return bestSpot;
+}
+
+function findPath(grid, startX, startY, endX, endY) {
+  const path = [];
+  var x = startX, y = startY;
+  const dx = abs(endX - startX);
+  const dy = abs(endY - startY);
+  const sx = (startX < endX) ? 1 : -1;
+  const sy = (startY < endY) ? 1 : -1;
+  var err = dx - dy;
+
+  while (!(x === endX && y === endY)) {
+    path.push({ x: x, y: y });
+    const e2 = err * 2;
+    if (e2 > -dy) {
+      err -= dy;
+      x += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      y += sy;
+    }
+  }
+
+  path.push({ x: endX, y: endY });
+  return path;
+}
+
+
+function andarPara(){
+  Orion.WalkTo(4094, 323, 0, 0, 10, 2, 1);
+}
+
+function isTileAndavel(x,y){
+  var tilesAt = Orion.GetTiles('any', x, y)
+  if (tilesAt){
+    var ultimo = tilesAt.length - 1
+    if (tilesAt[0]){
+      var data = Orion.GetLandTiledata(tilesAt[0].Graphic())
+      return data.Flags() != 64 //nao passa por cima
+    }else{
+      return true
+    }
+  }
+  return true
+}
+
+function canWalk(x,y){
+  return Orion.CanWalk("North", x,y,Player.Z())
+}
+
+function get_object_at(list,x,y){
+  if (list){
+    for (var i = 0; i < list.length; i++) {
+      var obj = list[i];
+      if (obj && obj.X && obj.Y){
+        if (obj.X == x && obj.Y == y){
+        return obj
+      }
+      }
+
+    }
+  }
+  
+}
+
+function teste2(){
+  Orion.CharPrint(self, 906, ""+Orion.CanWalk("", Player.X(),Player.Y(),Player.Z()));
+  //Orion.WalkTo(4094, 323, 0, 0, 10, 2, 1);
+}
+function teste(){
+  var objetos_chao = Orion.FindTypeEx('any', '-1', ground, 'ignoreself', '18');
+  var inimigos = Orion.FindType('any', '-1', ground, 'ignoreself', '18');
+  Orion.CanWalk("North", 4093,321,Player.Z())
+  var obj = get_object_at(objetos_chao,4093,321)
+  //Orion.GetLandTiledata(graph)
+  //tileAt = Orion.GetTiles('any', 4091, 323, 0, 10);
+  //Orion.WalkTo(4091, 323, 0, 0, 10, 2, 1);
+  //Orion.CharPrint(self, 906, ""+data);
+  //var data = Orion.GetLandTiledata(Orion.GetTiles('any', 4093, 322, 0, 3)[0].Graphic())
+  //var fl = data.Flags()
+  //Orion.CharPrint(self, 906, ""+fl);
+  var onComplete = function (mapa, gradeX, gradeY){
+    
+    var loc = 'E:/git/UO Orion Macros/teste.txt'
+    var file = Orion.NewFile(loc);
+    var create = file.Open(loc)
+    if (create){
+      for (var i = 0; i < gradeX; i++) {
+          var row = "";
+          for (var j = 0; j < gradeY; j++) {
+              //Orion.CanWalk("North", mapa[i][j][0]-1,mapa[i][j][1],Player.Z())
+              var andavel = isTileAndavel(mapa[i][j][0],mapa[i][j][1])
+              row += '('+mapa[i][j][0]+','+mapa[i][j][1]+'-'+andavel+'),';
+          }
+          file.WriteLine(row);
+      }
+      file.Close();
+    }
+  }
+  //scanTela(onComplete);
+
+}
+
+function scanTela(onComplete){
+  //var tiles = Orion.GetTiles("any",Player.X,Player.Y);
+  //if (tiles){
+  //  Orion.CharPrint(self, 906, "aaaa"+Orion.GetGraphic(tiles));
+  //}
+  //Orion.CharPrint(self, 906, "CanWalk -"+Player.X()+","+Player.Y()+" - "+Orion.CanWalk("North", Player.X()-1,Player.Y()-1,Player.Z()));
+  var StartX = 4
+  var StartY = 4
+  var gradeX = 10
+  var gradeY = 10
+  var run = create2DArray(gradeX, gradeY, 0);
+  var count = 1
+  var callback = function(x,y){
+    var xPlayer = Player.X()
+    var yPlayer = Player.Y()
+    xPlayer = xPlayer+(x-StartX)
+    yPlayer = yPlayer+(y-StartY)
+    var can = Orion.CanWalk("North", xPlayer,yPlayer,Player.Z())
+    run[y][x] = [xPlayer,yPlayer] // Inverte o xy para se adequar ao jogo
+    
+    if (count>=gradeX*gradeY){
+      onComplete(run, gradeX, gradeY)
+    }
+
+    count = count+1
+  }
+  
+  percorrerAteLimite(gradeX,gradeY,StartX,StartY,gradeX,gradeY, callback)
+
+}
+

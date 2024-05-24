@@ -35,7 +35,7 @@ var idRunebook='0402eb15f'; //ID runebook - Comando .mostraruid
 var runaCaveStart=2, // Numero da primeira runa da mina.
 var runaCaveEnd=5, // Numero da ultima runa da mina.
 var runaHome=10; // Numero da runa da casa/banco.
-var pickaxe='0x0E85', hammer='0x0FB5'; // type da picareta e do martelo.
+var pickaxe='0x0E85', hammer='0x0FB4'; // type da picareta e do martelo.
 var bauBS='0x401DF280'; //ID bau de ingots/ores
 var bauJoias='0x401DF280'; // ID bau de joias
 var bauPic='0x401DF280'; //ID bau picareta
