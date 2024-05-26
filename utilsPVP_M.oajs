@@ -1,0 +1,121 @@
+function explosion() {
+  if (Orion.ObjAtLayer("Mount") != null && Orion.Count('0x0F02', '0x0015') != null) {
+    Orion.Cast('Magic Arrow');
+    Orion.WaitTargetType('0x0F0E', '0x0015')
+    Orion.Wait(350);
+    Orion.WaitTargetObject('self')
+  }
+  else {
+    if (Orion.Count('0x0F02', '0x0015') == 0) {
+      Orion.Cast('Magic Arrow', 'self')
+    }
+  }
+}
+
+function AttackLast() {
+  Orion.Attack('lastTarget');
+}
+
+function ArmarArma() {
+  Orion.UseType('0x1412')// Capacete
+  Orion.UseType('0x140E')// Capacete
+  Orion.UseType('0x1413')// Gorget
+  Orion.UseType('0x1DB9')// Gorget
+
+  // Shield
+  Orion.UseType('0x1B76') // Escudo
+  Orion.UseType('0x1BC4') // Escudo
+  Orion.UseType('0x1B77') // Escudo
+  Orion.UseType('0x1BC4') // Escudo
+  Orion.UseType('0x1BC3') // Escudo
+
+  // 2 Maos
+  //War Hammer
+  Orion.UseType('0xf4d') // Bardiche
+  Orion.UseType('0x143e') // Halberd
+  Orion.UseType('0xf47') // Battle Axe
+  Orion.UseType('0x1442') // Two Handed Axe
+  Orion.UseType('0x13b9') // War Axe
+  Orion.UseType('0xf4b') // Double Axe
+  Orion.UseType('0xf49') // Axe
+  Orion.UseType('0xe87') // Pitchfork
+  Orion.UseType('0xf45') // Executioner's Axe 
+  Orion.UseType('0x0F62') // Spear
+  Orion.UseType('0x1402') // Short Spear
+  Orion.UseType('0x0F49') // Short Spear
+  // 1 Mao
+  //	Orion.UseType('0x0FB4') //SMith Hammer
+  Orion.UseType('0x143c') //Hammer Pick
+  Orion.UseType('0x143a') // Maul
+  Orion.UseType('0x13af') // Maul
+  Orion.UseType('0x0F5C') // Mace
+  Orion.UseType('0x13b3') // Club
+  Orion.UseType('0xf60') // Long Sword
+  Orion.UseType('0xf5e') // BroadSword  
+  Orion.UseType('0xf51') // Dagger
+  Orion.UseType('0x1440') // Cutlass
+  Orion.UseType('0x13b5') // Scimitar
+  Orion.UseType('0x1404') // War Fork
+  Orion.UseType('0x13fe') // Katana
+  Orion.UseType('0x1400') // Kryss
+  Orion.UseType('0x1406') // Kryss
+
+  Orion.Attack('lasttarget');
+}
+
+function ArmarBow() {
+  Orion.UseType('0x140E') // Capacete
+  Orion.UseType('0x1412') // Capacete
+  Orion.UseType('0x1413') // Gorget
+  Orion.UseType('0x1DB9') // Gorget
+  // Heavy Crossbow
+  Orion.UseType('0x13fc')
+  Orion.UseType('0x13fd')
+  // Crossbow
+  Orion.UseType('0xf4f')
+  Orion.UseType('0x0F50')
+  // Bow    
+  Orion.UseType('0x13b1')
+  Orion.UseType('0x13b2')
+
+  Orion.Attack('lasttarget');
+}
+
+function Disarm() {
+  Orion.Say('.Disarm');
+  Orion.UseType('0x141B', 'any', 'backpack'); // Mask  
+  Orion.UseType('0x1545', 'any', 'backpack'); //Bear
+  Orion.UseType('0x1547', 'any', 'backpack'); //Deer
+  Orion.UseType('0x1549', 'any', 'backpack'); //Tribal
+  Orion.UseType('0x171C', 'any', 'backpack'); //palhaço
+  Orion.UseType('0x1713', 'any', 'backpack');
+  Orion.UseType('0x154B', 'any', 'backpack');
+  Orion.UseType('0x154A', 'any', 'backpack');
+  Orion.UseType('0x1451', 'any', 'backpack');
+  Orion.UseType('0x153F', 'any', 'backpack');
+  Orion.UseType('0x1413'); // Gorget
+}
+
+function poisonaArma() {
+  var arma = 'arma';
+  Orion.WarMode('off');
+  Orion.ClearJournal();
+  Orion.WaitTargetObject('arma');
+  if (!Orion.ObjAtLayer('arma')) {
+    if (!Orion.FindObject('arma')) {
+      setarArma();
+    }
+  }
+  Orion.SetTimer('poisonWeapon');
+  Orion.CancelWaitTarget();
+
+  Orion.AddWaitTargetType('0x0F0E', '0x0044', 'self', 'fast');
+  Orion.UseSkill('Poisoning');
+
+  do {
+    Orion.Wait(100);
+  }
+  while (!Orion.InJournal('Selecione') && Orion.Timer('poisonWeapon') < 800);
+
+  Orion.WaitTargetObject(arma);
+}

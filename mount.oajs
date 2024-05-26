@@ -1,0 +1,55 @@
+
+function AddMount() {
+  Orion.AddObject('myMount');
+  Orion.Print('-1', 'Target your mount')
+  Orion.Wait(200);
+  Orion.UseObject('myMount');
+}
+
+
+function MountAndDismountAllStay() {
+  if (!Orion.ObjAtLayer('Mount')) {
+    if (!Orion.FindObject('myMount')) {
+      AddMount();
+    } else {
+      Orion.Say('All Come')
+      Orion.UseObject('myMount');
+      Orion.Wait(100)
+    }
+  } else {
+    Orion.UseObject('self');
+    Orion.Wait(100)
+    Orion.Say('All Stay');
+    Orion.Wait(100)
+    Orion.Say('All Kill');
+  }
+}
+
+function MountAndDismountAllKill() {
+  if (!Orion.ObjAtLayer('Mount')) {
+    if (!Orion.FindObject('myMount'))
+      AddMount();
+    else
+      Orion.Say('All Come')
+    Orion.UseObject('myMount');
+  }
+  else
+    Orion.UseObject('self');
+  Orion.Wait(200);
+  Orion.Say('All kill');
+  if (Orion.WaitForTarget(200))
+    Orion.TargetObject('lasttarget');
+}
+
+function MountBand() {
+  var myMount2 = Orion.FindObject('myMount')
+
+  if (myMount2.Poisoned()) {
+    Orion.Cast('Cure', 'myMount');
+    Orion.Wait(3000);
+  }
+  if (myMount2.Frozen()) {
+    Orion.Cast('Dispel', 'myMount');
+  }
+  Orion.BandageTarget('MyMount');
+}

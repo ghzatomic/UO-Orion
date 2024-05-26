@@ -1,0 +1,69 @@
+function TargetNextEnemy_PvP() {
+    Orion.Terminate('tame');
+    if (Orion.HaveTarget()) {
+        //Orion.TargetObject(lasttarget);
+        Orion.TargetObject(Orion.GetGlobal('global_enemy'));
+    } else {
+        var serial = FindNearestEnemy_PvP();
+        if (!serial.length)
+            return;
+        var enemy = Orion.FindObject(serial);
+        var notoColor;
+        switch (enemy.Notoriety()) {
+            case 1:
+                notoColor = 2119;
+                break;
+            case 3:
+                notoColor = 906;
+                break;
+            case 6:
+                notoColor = 33;
+                break;
+            case 5:
+                notoColor = 33;
+                break;
+            default:
+                notoColor = 906;
+        }
+        var loop = 0;
+        while (loop < 5) {
+            Orion.CharPrint(self, notoColor, ' ');
+            Orion.CharPrint(lasttarget, notoColor, ' ');
+            loop++;
+        }
+        Orion.CharPrint(self, notoColor, ' Inimigo: ' + enemy.Name());
+        Orion.CharPrint(serial,notoColor, '>>> ' + enemy.Name() +  ' <<<');
+        //Orion.Say('.gc Comendo o cu do: ' + Orion.RequestName(lasttarget, 500));
+    }
+    Orion.SetGlobal('global_enemy', serial);
+    Orion.ClientLastTarget(serial);
+    Orion.ClientLastAttack(serial);
+    Orion.TargetSystemSerial(serial);
+    Orion.TargetObject(serial);
+    Orion.Attack(serial);
+    Orion.Ignore(serial);
+}
+
+function FindNearestEnemy_PvP(a) //subfunction
+{
+    //timer rest idea from Caleb
+    var resetTime = 800;
+    var currentTimeMs = Orion.Now();
+    var lastTimeMs = Orion.GetGlobal("FindNearestEnemy_PvP_LastTime");
+
+    var timeSpan = currentTimeMs - lastTimeMs;
+
+    if (timeSpan > resetTime) {
+        //Orion.Print('-1', 'TIMER RESET'); //debug
+        Orion.IgnoreReset();
+    }
+    Orion.Ignore('self');
+    var enemy = Orion.FindType("-1", "-1", "ground", "human|near|mobile|ignorefriends", 18, "gray|criminal|orange|red|blue");
+    if (!enemy.length) {
+        Orion.Print('-1', 'no enemy found, resetting ignore list');
+        Orion.IgnoreReset();
+        return '';
+    }
+    Orion.SetGlobal("FindNearestEnemy_PvP_LastTime", Orion.Now());
+    return enemy[0];
+}
