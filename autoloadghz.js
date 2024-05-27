@@ -23,11 +23,11 @@ function Autostart() {
 
 
 function teste() {
-    var x = 4480
-    var y = 1159
+    var x = 958
+    var y = 736
     var z = Player.Z()
-    //Orion.CharPrint(self, 906, 'aa'+ isTileAndavel(x,y,z));
-    testexx()
+    Orion.CharPrint(self, 906, 'aa'+ isTileAndavel(x,y,z));
+    //testexx()
     /*var enemy = Orion.FindObject('lasttarget');
     var x = Player.X()+10
     var y = Player.Y()+10

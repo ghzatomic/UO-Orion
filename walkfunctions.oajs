@@ -1,5 +1,5 @@
 
-const gridSize = 20;
+const gridSize = 30;
 
 function mapeiaTela(){
   function callback(i, j) {
@@ -75,118 +75,6 @@ function percorrerAteLimite(x, y, startX, startY, maxX, maxY, callback) {
 }
 
 
-function customFloor(value) {
-  return value - (value % 1);
-}
-
-function abs(value) {
-  return value < 0 ? -value : value;
-}
-
-function hasLineOfSight(grid, x1, y1, x2, y2) {
-  const dx = abs(x2 - x1);
-  const dy = abs(y2 - y1);
-  const sx = (x1 < x2) ? 1 : -1;
-  const sy = (y1 < y2) ? 1 : -1;
-  var err = dx - dy;
-
-  while (true) {
-    if (x1 === x2 && y1 === y2) return true;
-    if (grid[y1][x1] === 'P' || grid[y1][x1] === 'A') return false;
-
-    const e2 = err * 2;
-    if (e2 > -dy) {
-      err -= dy;
-      x1 += sx;
-    }
-    if (e2 < dx) {
-      err += dx;
-      y1 += sy;
-    }
-  }
-}
-
-function countObstaclesBetween(grid, x1, y1, x2, y2) {
-  const dx = abs(x2 - x1);
-  const dy = abs(y2 - y1);
-  const sx = (x1 < x2) ? 1 : -1;
-  const sy = (y1 < y2) ? 1 : -1;
-  var err = dx - dy;
-  var count = 0;
-
-  while (!(x1 === x2 && y1 === y2)) {
-    if (grid[y1][x1] === 'P' || grid[y1][x1] === 'A') count++;
-
-    const e2 = err * 2;
-    if (e2 > -dy) {
-      err -= dy;
-      x1 += sx;
-    }
-    if (e2 < dx) {
-      err += dx;
-      y1 += sy;
-    }
-  }
-
-  return count;
-}
-
-function findSafeSpot(grid, playerX, playerY) {
-  var bestSpot = null;
-  var maxObstacles = -1;
-
-  for (var y = 0; y < gridSize; y++) {
-    for (var x = 0; x < gridSize; x++) {
-      if (grid[y][x] === '.' || grid[y][x] === 'P' || grid[y][x] === 'A') {
-        var safe = true;
-        var totalObstacles = 0;
-        for (var ey = 0; ey < gridSize; ey++) {
-          for (var ex = 0; ex < gridSize; ex++) {
-            if (grid[ey][ex] === 'E') {
-              if (hasLineOfSight(grid, ex, ey, x, y)) {
-                safe = false;
-                break;
-              }
-              totalObstacles += countObstaclesBetween(grid, ex, ey, x, y);
-            }
-          }
-          if (!safe) break;
-        }
-        if (safe && totalObstacles > maxObstacles) {
-          bestSpot = { x: x, y: y };
-          maxObstacles = totalObstacles;
-        }
-      }
-    }
-  }
-  return bestSpot;
-}
-
-function findPath(grid, startX, startY, endX, endY) {
-  const path = [];
-  var x = startX, y = startY;
-  const dx = abs(endX - startX);
-  const dy = abs(endY - startY);
-  const sx = (startX < endX) ? 1 : -1;
-  const sy = (startY < endY) ? 1 : -1;
-  var err = dx - dy;
-
-  while (!(x === endX && y === endY)) {
-    path.push({ x: x, y: y });
-    const e2 = err * 2;
-    if (e2 > -dy) {
-      err -= dy;
-      x += sx;
-    }
-    if (e2 < dx) {
-      err += dx;
-      y += sy;
-    }
-  }
-
-  path.push({ x: endX, y: endY });
-  return path;
-}
 
 
 function andarPara(x,y){
@@ -230,10 +118,12 @@ function isTileAndavel(x,y,z){
     //Implementar o CanWalk
     pathOk = true
   }*/
-  var tilesAt = Orion.GetTiles('any', x, y,0,255)
+  var tilesAt = Orion.GetTiles('any', x, y,z,255)
   var tileAndavel = true
   if (tilesAt){
-    var ultimo = tilesAt.length - 1
+    if (tilesAt.length == 0){
+      return false
+    }
     for (var i = 0; i < tilesAt.length; i++) {
       var data = tilesAt[i]
       var strFlag = data.Flags().toString(16)
@@ -249,6 +139,16 @@ function isTileAndavel(x,y,z){
       }
     } 
     
+  }else{
+    return  ! containsObj // N tem tile eh pq nao existe nada
+  }
+  if (tileAndavel){
+    var testaTileNegra = Orion.GetTiles('land', x, y)
+    if (testaTileNegra && testaTileNegra.length > 0){
+      if (Orion.GetTiles('land', x, y)[0].Flags().toString() == '80'){
+        tileAndavel = false
+      }
+    }
   }
   //Orion.CharPrint(self, 906, 'eee '+pathOk+","+tileAndavel+","+containsObj);
   return tileAndavel && ! containsObj
@@ -274,13 +174,18 @@ function get_object_at(list,x,y){
   
 }
 
-function teste2xx(){
+function correr(){
 
   var target = Orion.FindObject('lasttarget');
   if (target){
+    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself", 10, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
     var simInimigoX = target.X()
     var simInimigoY = target.Y()
     var inimigoList = [[simInimigoX,simInimigoY]]
+    for(var i=0 ; i < enemyList.length; i++){
+      var inim = enemyList[i];
+      inimigoList.push(inim.X(),inim.Y())
+    }
     var inimigoListPosition = []
     var vazio = "."
     var impassavel = "A"
@@ -331,12 +236,16 @@ function teste2xx(){
           if (safeSpot){
             var xRun = mapa[safeSpot.x][safeSpot.y][0]
             var yRun = mapa[safeSpot.x][safeSpot.y][1]
-            //Orion.CharPrint(self, 906, "ee "+safeSpot.x,+" - "+safeSpot.y);
-            Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun);
-            andarPara(xRun,yRun)
+            Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun+" - "+inimigoList.length);
+            var callb = function(x,y){
+              andarPara(x,y)
+              //Orion.CharPrint(self, 906, "aaccc "+x+" - "+y);
+            }
+            //drawPath(mapeado, playerPosition.x, playerPosition.y, safeSpot.x, safeSpot.y, callb);
+            callb(xRun,yRun)
           }
         }
-      //  file.Close();
+        //file.Close();
       //}
 
     }
@@ -409,3 +318,200 @@ function scanTela(onComplete){
 
 }
 
+
+
+
+
+
+function abs(value) {
+  return value < 0 ? -value : value;
+}
+
+function distance(x1, y1, x2, y2) {
+  return abs(x2 - x1) + abs(y2 - y1);
+}
+
+function hasLineOfSight(grid, x1, y1, x2, y2) {
+  const dx = abs(x2 - x1);
+  const dy = abs(y2 - y1);
+  const sx = (x1 < x2) ? 1 : -1;
+  const sy = (y1 < y2) ? 1 : -1;
+  var err = dx - dy;
+
+  while (true) {
+    if (x1 === x2 && y1 === y2) return true;
+    if (grid[y1][x1] === 'P' || grid[y1][x1] === 'A') return false;
+
+    const e2 = err * 2;
+    if (e2 > -dy) {
+      err -= dy;
+      x1 += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      y1 += sy;
+    }
+
+    if (x1 === x2 && y1 === y2) break;
+  }
+  return true;
+}
+
+function countObstaclesBetween(grid, x1, y1, x2, y2) {
+  var dx = abs(x2 - x1);
+  var dy = abs(y2 - y1);
+  var sx = (x1 < x2) ? 1 : -1;
+  var sy = (y1 < y2) ? 1 : -1;
+  var err = dx - dy;
+  var count = 0;
+
+  while (!(x1 === x2 && y1 === y2)) {
+    if (grid[y1][x1] === 'P') count++;
+
+    var e2 = err * 2;
+    if (e2 > -dy) {
+      err -= dy;
+      x1 += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      y1 += sy;
+    }
+  }
+
+  return count;
+}
+
+function isAccessible(grid, startX, startY, endX, endY) {
+  var queue = [{ x: startX, y: startY }];
+  var visited = [];
+  for (var i = 0; i < gridSize; i++) {
+    visited[i] = [];
+    for (var j = 0; j < gridSize; j++) {
+      visited[i][j] = false;
+    }
+  }
+  visited[startY][startX] = true;
+
+  var directions = [
+    { dx: 1, dy: 0 },
+    { dx: -1, dy: 0 },
+    { dx: 0, dy: 1 },
+    { dx: 0, dy: -1 }
+  ];
+
+  while (queue.length > 0) {
+    var current = queue.shift();
+    var x = current.x;
+    var y = current.y;
+    if (x === endX && y === endY) return true;
+
+    for (var i = 0; i < directions.length; i++) {
+      var nx = x + directions[i].dx;
+      var ny = y + directions[i].dy;
+
+      if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize && !visited[ny][nx] && (grid[ny][nx] === '.' || grid[ny][nx] === 'T')) {
+        visited[ny][nx] = true;
+        queue.push({ x: nx, y: ny });
+      }
+    }
+  }
+
+  return false;
+}
+
+function findSafeSpot(grid, playerX, playerY) {
+  var bestSpot = null;
+  var maxDistance = -1;
+  var maxObstacles = -1;
+
+  for (var y = 0; y < gridSize; y++) {
+    for (var x = 0; x < gridSize; x++) {
+      if (grid[y][x] === '.' || grid[y][x] === 'P') {
+        var safe = true;
+        var totalObstacles = 0;
+        for (var ey = 0; ey < gridSize; ey++) {
+          for (var ex = 0; ex < gridSize; ex++) {
+            if (grid[ey][ex] === 'E') {
+              if (hasLineOfSight(grid, ex, ey, x, y)) {
+                safe = false;
+                break;
+              }
+              totalObstacles += countObstaclesBetween(grid, ex, ey, x, y);
+            }
+          }
+          if (!safe) break;
+        }
+        if (safe && isAccessible(grid, playerX, playerY, x, y)) {
+          var dist = distance(playerX, playerY, x, y);
+          if (dist > maxDistance || (dist === maxDistance && totalObstacles > maxObstacles)) {
+            bestSpot = { x: x, y: y };
+            maxDistance = dist;
+            maxObstacles = totalObstacles;
+          }
+        }
+      }
+    }
+  }
+  return bestSpot;
+}
+
+function findPath(grid, startX, startY, endX, endY) {
+  var path = [];
+  var x = startX, y = startY;
+  var dx = abs(endX - startX);
+  var dy = abs(endY - startY);
+  var sx = (startX < endX) ? 1 : -1;
+  var sy = (startY < endY) ? 1 : -1;
+  var err = dx - dy;
+
+  while (!(x === endX && y === endY)) {
+    // Verificar se o próximo passo é acessível
+    if (!isAccessible(grid, x, y, x + sx, y + sy)) {
+      return []; // Retorna um caminho vazio se um passo não for acessível
+    }
+
+    path.push({ x: x, y: y });
+    var e2 = err * 2;
+    if (e2 > -dy) {
+      err -= dy;
+      x += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      y += sy;
+    }
+  }
+
+  path.push({ x: endX, y: endY });
+  return path;
+}
+
+/*function drawPath(grid, startX, startY, endX, endY, callback) {
+  const path = [];
+  var x = startX, y = startY;
+  const dx = Math.abs(endX - startX);
+  const dy = Math.abs(endY - startY);
+  const sx = (startX < endX) ? 1 : -1;
+  const sy = (startY < endY) ? 1 : -1;
+  var err = dx - dy;
+
+  while (!(x === endX && y === endY)) {
+    path.push({ x, y });
+    const e2 = 2 * err;
+    if (e2 > -dy) {
+      err -= dy;
+      x += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      y += sy;
+    }
+  }
+
+  path.forEach(pos => {
+    const pathCell = gridElement.children[pos.y * gridSize + pos.x];
+    callback(x,y)
+  });
+  
+}*/
