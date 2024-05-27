@@ -23,8 +23,8 @@ function Autostart() {
 
 
 function teste() {
-    var x = 4095
-    var y = 322
+    var x = 4480
+    var y = 1159
     var z = Player.Z()
     //Orion.CharPrint(self, 906, 'aa'+ isTileAndavel(x,y,z));
     testexx()

@@ -1,4 +1,6 @@
 
+const gridSize = 20;
+
 function mapeiaTela(){
   function callback(i, j) {
     //console.log(`Célula em (${i}, ${j})`);
@@ -187,8 +189,13 @@ function findPath(grid, startX, startY, endX, endY) {
 }
 
 
-function andarPara(){
-  Orion.WalkTo(4094, 323, 0, 0, 10, 2, 1);
+function andarPara(x,y){
+  var isWalking = Orion.IsWalking()
+  if (isWalking) {
+      Orion.StopWalking()
+      Orion.ClearBadLocations();
+  }
+  Orion.WalkTo(x, y, Player.Z(), 1, Player.Z()+20, 1, 1);
 }
 
 function isOutsideRegion(x, y, x0, y0, r) {
@@ -204,35 +211,47 @@ function isOutsideRegion(x, y, x0, y0, r) {
 
 function isTileAndavel(x,y,z){
   Orion.ClearBadLocations();
-  var objList = Orion.FindType('any', 'any', 'ground', 'ignoreself', '5');
+  var objList = Orion.FindType('any', 'any', 'ground', 'ignoreself', 'xyz: '+x+','+y+','+z);
   var containsObj = false
   var objContains = undefined
   for(i=0; i < objList.length; i++){
       var o = Orion.FindObject(objList[i]);
-      if (o.X() == x && o.Y() == y && !o.IsMulti()){
+      if (o.X() == x && o.Y() == y && o.Z() <= z && !o.IsMulti()){
         containsObj = true
         objContains = o
       }
       //Orion.SetBadLocation(o.X(), o.Y());
   }
   
-  var arr = Orion.GetPathArray(x,y,z);
-  var pathOk = arr.length <= 0
-  if (isOutsideRegion(x, y, Player.X(), Player.Y(), 1)){
+  //var arr = Orion.GetPathArray(x,y,z);
+  //Orion.Wait(1000)
+  var pathOk = true//arr.length <= 0
+  /*if (isOutsideRegion(x, y, Player.X(), Player.Y(), 1)){
+    //Implementar o CanWalk
     pathOk = true
-  }
-  var tilesAt = Orion.GetTiles('any', x, y)
-  var tileAndavel = false
+  }*/
+  var tilesAt = Orion.GetTiles('any', x, y,0,255)
+  var tileAndavel = true
   if (tilesAt){
     var ultimo = tilesAt.length - 1
-    if (tilesAt[0]){
-      var data = Orion.GetLandTiledata(tilesAt[0].Graphic())
-      tileAndavel = data.Flags() != 64 //nao passa por cima
-    }else{
-      tileAndavel = true
-    }
+    for (var i = 0; i < tilesAt.length; i++) {
+      var data = tilesAt[i]
+      var strFlag = data.Flags().toString(16)
+      if (strFlag[strFlag.length-2]+strFlag[strFlag.length-1] === "40" || strFlag[strFlag.length-2]+strFlag[strFlag.length-1] === "50"){
+        tileAndavel = false
+        break
+      }else {
+        var strFlag = Orion.GetLandTiledata(data.Graphic()).Flags().toString(16)
+        if (strFlag[strFlag.length-2]+strFlag[strFlag.length-1] === "40"){
+          tileAndavel = false
+          break
+        }
+      }
+    } 
+    
   }
-  return pathOk && tileAndavel && ! containsObj
+  //Orion.CharPrint(self, 906, 'eee '+pathOk+","+tileAndavel+","+containsObj);
+  return tileAndavel && ! containsObj
 }
 
 function canWalk(x,y){
@@ -256,11 +275,74 @@ function get_object_at(list,x,y){
 }
 
 function teste2xx(){
-  var objetos_chao = Orion.FindTypeEx('any', '-1', ground, 'ignoreself', '18');
-  var obj = get_object_at(objetos_chao,944,810)
-  Orion.CharPrint(self, 906, "aa"+Orion.GetPathArrayEx(x,y,x+10,y+10));
-  //canWalk( 4093,321)
-  //Orion.WalkTo(4094, 323, 0, 0, 10, 2, 1);
+
+  var target = Orion.FindObject('lasttarget');
+  if (target){
+    var simInimigoX = target.X()
+    var simInimigoY = target.Y()
+    var inimigoList = [[simInimigoX,simInimigoY]]
+    var inimigoListPosition = []
+    var vazio = "."
+    var impassavel = "A"
+    var inimigo = "E"
+    var eu = "T"
+    var onComplete = function (mapa, gradeX, gradeY){
+      var playerPosition = undefined
+      //var loc = 'E:/git/UO Orion Macros/teste.txt'
+      //var file = Orion.NewFile(loc);
+      //var create = file.Open(loc)
+      //if (create){
+        var mapeado = []
+        for (var i = 0; i < gradeX; i++) {
+          var mapeadoRow = []
+          var row = "";
+          for (var j = 0; j < gradeY; j++) {
+            var strObj = vazio
+            if (mapa[i][j][0] == Player.X() && mapa[i][j][1] == Player.Y()){
+              strObj = eu
+              playerPosition = {x:i,y:j}
+            }else{
+              var achouInimigo = false
+              for(var inimIndex = 0; inimIndex < inimigoList.length; inimIndex++){
+                var inimigoX = inimigoList[inimIndex][0]
+                var inimigoY = inimigoList[inimIndex][1]
+                if (mapa[i][j][0] == inimigoX && mapa[i][j][1] == inimigoY){
+                  achouInimigo = true
+                  strObj = inimigo
+                  inimigoListPosition[inimigoListPosition.length] = {x:i,y:j}
+                  break
+                }
+              }
+              if (!achouInimigo){
+                var andavel = isTileAndavel(mapa[i][j][0],mapa[i][j][1],Player.Z())
+                if (!andavel){
+                  strObj = impassavel
+                }
+              }
+            }
+            mapeadoRow[j] = strObj
+            row += ''+strObj;
+          }
+          mapeado[i] = mapeadoRow
+          //file.Write(row+"\n");
+        }
+        if (playerPosition){
+          const safeSpot = findSafeSpot(mapeado, playerPosition.x, playerPosition.y)
+          if (safeSpot){
+            var xRun = mapa[safeSpot.x][safeSpot.y][0]
+            var yRun = mapa[safeSpot.x][safeSpot.y][1]
+            //Orion.CharPrint(self, 906, "ee "+safeSpot.x,+" - "+safeSpot.y);
+            Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun);
+            andarPara(xRun,yRun)
+          }
+        }
+      //  file.Close();
+      //}
+
+    }
+    //row += '('+mapa[i][j][0]+','+mapa[i][j][1]+'-'+andavel+'),';
+    scanTela(onComplete);
+  }
 }
 function testexx(){
   //var objetos_chao = Orion.FindTypeEx('any', '-1', ground, 'ignoreself', '18');
@@ -303,10 +385,10 @@ function scanTela(onComplete){
   //  Orion.CharPrint(self, 906, "aaaa"+Orion.GetGraphic(tiles));
   //}
   //Orion.CharPrint(self, 906, "CanWalk -"+Player.X()+","+Player.Y()+" - "+Orion.CanWalk("North", Player.X()-1,Player.Y()-1,Player.Z()));
-  var StartX = 4
-  var StartY = 4
-  var gradeX = 10
-  var gradeY = 10
+  var StartX = gridSize/2
+  var StartY = gridSize/2
+  var gradeX = gridSize
+  var gradeY = gridSize
   var run = create2DArray(gradeX, gradeY, 0);
   var count = 1
   var callback = function(x,y){
