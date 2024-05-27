@@ -23,4 +23,6 @@ function Autostart() {
 
 
 function teste() {
+    var a = Orion.FindObject("0x401EF3CD")
+    Orion.CharPrint(self, 906, 'a2'+a.Direction());
 }
