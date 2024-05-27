@@ -191,18 +191,48 @@ function andarPara(){
   Orion.WalkTo(4094, 323, 0, 0, 10, 2, 1);
 }
 
-function isTileAndavel(x,y){
+function isOutsideRegion(x, y, x0, y0, r) {
+  // Calcula o quadrado da distância euclidiana entre o ponto (x, y) e o ponto central (x0, y0)
+  const deltaX = x - x0;
+  const deltaY = y - y0;
+  const distanceSquared = deltaX * deltaX + deltaY * deltaY;
+  // Calcula o quadrado do raio
+  const rSquared = r * r;
+  // Retorna true se o quadrado da distância for maior que o quadrado do raio
+  return distanceSquared > rSquared;
+}
+
+function isTileAndavel(x,y,z){
+  Orion.ClearBadLocations();
+  var objList = Orion.FindType('any', 'any', 'ground', 'ignoreself', '5');
+  var containsObj = false
+  var objContains = undefined
+  for(i=0; i < objList.length; i++){
+      var o = Orion.FindObject(objList[i]);
+      if (o.X() == x && o.Y() == y && !o.IsMulti()){
+        containsObj = true
+        objContains = o
+      }
+      //Orion.SetBadLocation(o.X(), o.Y());
+  }
+  
+  var arr = Orion.GetPathArray(x,y,z);
+  var pathOk = arr.length <= 0
+  if (isOutsideRegion(x, y, Player.X(), Player.Y(), 1)){
+    pathOk = true
+  }
   var tilesAt = Orion.GetTiles('any', x, y)
+  var tileAndavel = false
   if (tilesAt){
     var ultimo = tilesAt.length - 1
     if (tilesAt[0]){
       var data = Orion.GetLandTiledata(tilesAt[0].Graphic())
-      return data.Flags() != 64 //nao passa por cima
+      tileAndavel = data.Flags() != 64 //nao passa por cima
     }else{
-      return true
+      tileAndavel = true
     }
   }
-  return true
+  return pathOk && tileAndavel && ! containsObj
 }
 
 function canWalk(x,y){
@@ -255,7 +285,7 @@ function testexx(){
           var row = "";
           for (var j = 0; j < gradeY; j++) {
               //Orion.CanWalk("North", mapa[i][j][0]-1,mapa[i][j][1],Player.Z())
-              var andavel = isTileAndavel(mapa[i][j][0],mapa[i][j][1])
+              var andavel = isTileAndavel(mapa[i][j][0],mapa[i][j][1],Player.Z())
               row += '('+mapa[i][j][0]+','+mapa[i][j][1]+'-'+andavel+'),';
           }
           file.WriteLine(row);

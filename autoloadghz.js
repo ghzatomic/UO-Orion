@@ -23,6 +23,22 @@ function Autostart() {
 
 
 function teste() {
-    var a = Orion.FindObject("0x401EF3CD")
-    Orion.CharPrint(self, 906, 'a2'+a.Direction());
+    var x = 4095
+    var y = 322
+    var z = Player.Z()
+    //Orion.CharPrint(self, 906, 'aa'+ isTileAndavel(x,y,z));
+    testexx()
+    /*var enemy = Orion.FindObject('lasttarget');
+    var x = Player.X()+10
+    var y = Player.Y()+10
+    var z = Player.Z()
+
+    //x = enemy.X()
+    //y = enemy.Y()
+    //z = enemy.Z()
+
+    var arr = Orion.GetPathArray(x,y,z);
+    Orion.CharPrint(self, 906, 'aa'+arr.length);
+    Orion.CharPrint(self, 906, 'bb'+Player.X()+"-"+Player.Y()+"-"+Player.Z());*/
 }
+

@@ -240,3 +240,52 @@ function loopCastPerfeito() {
   }
 
 }
+
+function autoSeguirInimigo() {
+  var isWalking = Orion.IsWalking()
+  if (isWalking) {
+      Orion.StopWalking()
+      Orion.ClearBadLocations();
+  }
+  var enemy = Orion.FindObject('lasttarget');
+  //walkToTarget(enemy)
+  if (enemy) {
+      Orion.WalkTo(enemy.X(), enemy.Y(), enemy.Z(), 1, enemy.Z() + 5, 1, 1);
+      Orion.Attack(enemy);
+  }
+
+}
+
+
+function walkToTarget(target){
+  if(!target)
+  {
+      return false;
+  }
+  var x = target.X();
+  var y = target.Y();
+  var z = target.Z();
+  var pathArray = Orion.GetPathArray(x, y, z);
+  while(pathArray.length>0)
+  {
+      Orion.ClearBadLocations();
+      var npcList = Orion.FindType('any', 'any', 'ground', 'ignoreself', '5');
+      for(i=0; i < npcList.length; i++)
+      {
+          var npc = Orion.FindObject(npcList[i]);
+          Orion.SetBadLocation(npc.X(), npc.Y());
+      }
+      var stepTarget = pathArray[0];
+      var check = Orion.WalkTo(stepTarget.X(),stepTarget.Y(),stepTarget.Z(),1,255,1,1);
+      if(!check)
+      {
+          Orion.Print('Não da para ir !');
+          return false;
+      }
+      x = target.X();
+      y = target.Y();
+      z = target.Z();
+      pathArray = Orion.GetPathArray(x, y, z);
+  }
+  return true;
+}
