@@ -1,0 +1,78 @@
+function fabricar_peixe_poison(){
+while (true){
+
+var quantidade=50; // Quantidade por ciclo
+var bau='0x401B817D'; // Bau com itens na proporcao abaixo:
+// 15 raw fish steak
+// 12 Nightshade
+// 1 frost log
+// 1 oak log
+
+var peixepoison='0x097B';
+var all='0x097A|0x0F88';
+var peixecru='0x097A';
+var panela='0x097F';
+var night='0x0F88';
+var log='0x1BDD';
+var time=500;
+
+var qpeixecru=(quantidade*15);
+var qnight=(quantidade*12);
+
+Orion.Wait(time);
+Orion.CharPrint(self, '70', 'Start');
+Orion.Wait(time);
+
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(panela, 'any', bau);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 92);Orion.Wait(time);
+
+var finditem=Orion.FindType(peixecru, 'any', bau);
+Orion.DragItem(finditem, qpeixecru);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 110);Orion.Wait(time);
+
+var finditem=Orion.FindType(log, '0x07DA', bau);
+Orion.DragItem(finditem, quantidade);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 63, 98);Orion.Wait(time);
+
+var finditem=Orion.FindType(log, '0x005B', bau);
+Orion.DragItem(finditem, quantidade);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 74, 96);Orion.Wait(time);
+
+var finditem=Orion.FindType(night, 'any', bau);
+Orion.DragItem(finditem, qnight);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 98, 93);Orion.Wait(time);
+
+Orion.UseType(panela);
+Orion.Wait(time);
+Orion.ClearJournal();
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(4));
+
+for(i=0; i<quantidade; i++){while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10105));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+4000);}Orion.ClearJournal();}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+
+Orion.Wait(time);
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(panela, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 18, 148);Orion.Wait(time);
+
+var finditem=Orion.FindType(peixepoison, '0x0795', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);
+
+var finditem=Orion.FindType(all, 'any', backpack);
+for(i=0; i<finditem.length; i++){
+Orion.DragItem(finditem[i], 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);}
+
+Orion.CharPrint(self, '40', 'End');}}

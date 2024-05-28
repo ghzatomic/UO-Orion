@@ -1,0 +1,5 @@
+function fazer_ultimo(){
+while (true){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5008));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);
+Orion.ClearJournal();}}

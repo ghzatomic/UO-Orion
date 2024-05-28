@@ -1,0 +1,88 @@
+function reparar_armas(){
+
+var bau='0x400747D3'; // ID bau perto da forge com itens
+// smith's hammer / Fletcher's tools / Iron / Logs
+
+var time=400;
+var logs='0x1BDD';
+var ingot='0x1BF2';
+var ftools='0x1022';
+var martelo='0x0FB4';
+var bow='0x13B1|0x0F50|0x13FC'; // Bow / Crossbow / Heavy Crossbow
+var arma='0x1400|0x13FE|0x1440|0x1404|0x1402|0x0F48|0x0F4C|0x1442';
+//Kryss/Katana/Cutlass/War Fork/Short Spear/Battle Axe/Double Axe/Two Handed Axe
+
+Orion.CharPrint(self, '70', 'Start');
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(martelo, 'any', bau);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 100, 100);Orion.Wait(time);
+
+var finditem=Orion.FindType(ingot, '0x0000', bau);
+Orion.DragItem(finditem, 100);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 100, 100);Orion.Wait(time);
+
+var finditem=Orion.FindType(ftools, 'any', bau);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 100, 100);Orion.Wait(time);
+
+var finditem=Orion.FindType(logs, 'any', bau);
+Orion.DragItem(finditem, 100);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 100, 100);Orion.Wait(time);
+
+Orion.EquipT(martelo);
+Orion.UseType(martelo);
+Orion.ClearJournal();
+
+while((!Orion.InJournal('Voce reparou|nao necessita|Target cancelado|Este item'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5006));
+if (Orion.WaitForTarget(1000))
+Orion.TargetType(arma);Orion.CancelTarget();
+Orion.WaitJournal('Voce|O item|Target cancelado|Este item', Orion.Now(), Orion.Now()+1000);}
+
+if (Orion.InJournal('Voce reparou')){Orion.CharPrint(self, '70', 'Arma reparada');}
+if (Orion.InJournal('nao necessita')){Orion.CharPrint(self, '50', 'Arma nao necessita reparo');}
+if (Orion.InJournal('Target cancelado')){Orion.CharPrint(self, '40', 'Arma nao encontrada');}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+
+Orion.Wait(time);
+Orion.Unequip('1');
+Orion.Wait(time);
+
+Orion.UseType(ftools);
+Orion.ClearJournal();
+
+while((!Orion.InJournal('Voce reparou|nao necessita|Target cancelado'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5006));
+if (Orion.WaitForTarget(1000))
+Orion.TargetType(bow);Orion.CancelTarget();
+Orion.WaitJournal('Voce|O item|Target cancelado', Orion.Now(), Orion.Now()+1000);}
+
+if (Orion.InJournal('Voce reparou')){Orion.CharPrint(self, '70', 'Bow reparado');}
+if (Orion.InJournal('nao necessita')){Orion.CharPrint(self, '50', 'Bow nao necessita reparo');}
+if (Orion.InJournal('Target cancelado')){Orion.CharPrint(self, '40', 'Bow nao encontrado');}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+
+Orion.Wait(time);
+
+var finditem=Orion.FindType(martelo, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 13, 51);Orion.Wait(time);
+
+var finditem=Orion.FindType(ingot, '0x0000', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);
+
+var finditem=Orion.FindType(ftools, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 140, 51);Orion.Wait(time);
+
+var finditem=Orion.FindType(logs, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);
+
+Orion.CharPrint(self, '40', 'End');}

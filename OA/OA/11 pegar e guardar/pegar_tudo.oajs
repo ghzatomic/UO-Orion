@@ -1,0 +1,162 @@
+function pegar_tudo(){
+
+//-----------------------------------------------------
+var placa='0x4007E32E'; // ID placa da casa
+var bau1='0x4022A82F'; // Gray Horse
+var bau2='0x40288E86'; // Potes
+var bau3='0x40288E87'; // Robe / sash / capa / Mask
+var bau4='0x4022DF39'; // Flechas / Comidas
+var bau5='0x4027B7C6'; // Plate
+//-----------------------------------------------------
+
+var qbands=100 ;
+var qheal=10 ;
+var qmana=10 ;
+var qrefresh=5 ;
+var qinvis=5 ;
+var qcure=5 ;
+var qshrink=3 ;
+var qdeadly=3;
+var qpoison=10;
+var qlight=10;
+var qpara=10;
+var qreflection=10
+var qfs=15
+var qabobora=5;
+
+//-----------------------------------------------------
+
+var pote='0x0F0E';
+var bands='0x0E21';
+var abobora='0x0C6A'
+var poison='0x1F40';
+var light='0x1F4A';
+var para='0x1F52';
+var reflection='0x1F50';
+var fs='0x1F5F';
+var anel='0x108A';
+var bracelet='0x1086';
+var brinco='0x1087';
+var robe='0x1F03';
+var capa='0x1515';
+var sash='0x1541';
+var plate1='0x1415';
+var plate2='0x1411';
+var plate3='0x1414';
+var plate4='0x1413';
+var plate5='0x1410';
+var plate6='0x1412';
+var horse='0x211F';
+var time=400;
+
+Orion.CharPrint(self, '70', 'start');Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x00FF', bau2);
+Orion.DragItem(finditem, qheal);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x0480', bau2);
+Orion.DragItem(finditem, qmana);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 57, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x0021', bau2);
+Orion.DragItem(finditem, qrefresh);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 70, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x01F7', bau2);
+Orion.DragItem(finditem, qinvis);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 83, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x002C', bau2);
+Orion.DragItem(finditem, qcure);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 96, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x07FD', bau2);
+Orion.DragItem(finditem, qshrink);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 109, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x0044', bau2);
+Orion.DragItem(finditem, qdeadly);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 122, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(light, 'any', bau2);
+Orion.DragItem(finditem, qlight);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(poison, 'any', bau2);
+Orion.DragItem(finditem, qpoison);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(para, 'any', bau2);
+Orion.DragItem(finditem, qpara);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(reflection, 'any', bau2);
+Orion.DragItem(finditem, qreflection);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(fs, 'any', bau2);
+Orion.DragItem(finditem, qfs);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(abobora, '0x082E', bau4);
+Orion.DragItem(finditem, qabobora);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 107);Orion.Wait(time);
+
+var finditem=Orion.FindType(anel, '0x09B7', bau2);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(bracelet, 'any', bau2);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(brinco, 'any', bau2);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(robe, 'any', bau3);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(sash, 'any', bau3);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(capa, 'any', bau3);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate1, 'any', bau5);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate2, 'any', bau5);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate3, 'any', bau5);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate4, 'any', bau5);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate5, 'any', bau5);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate6, 'any', bau5);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(horse, 'any', bau1);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 91);Orion.Wait(time);
+
+var finditem=Orion.FindType(bands, 'any', bau2);
+Orion.DragItem(finditem, qbands);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+Orion.CharPrint(self, '40', 'end');}

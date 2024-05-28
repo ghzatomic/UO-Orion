@@ -1,0 +1,81 @@
+function keg_totalrefresh(){
+
+var quantidade=8; // Quantidade de keg pronto que quer fazer
+
+for (i=0; i<quantidade; i++){
+
+var placa='0x4007E32E'; // ID placa da casa
+var bau1='0x40127D29'; // ID bau primario se houver
+var bauregs='0x4022A833'; // ID bau bank com itens (Mortar / keg / Regs / Pote vazio)
+var baupotes='0x40288E86'; // ID bau bank para guardar potes prontos
+
+var mortar='0x0E9B';
+var black='0x0F7A';
+var pote='0x0F0E';
+var keg='0x1940';
+var time=500;
+
+Orion.Wait(time);
+Orion.CharPrint(self, '70', 'Start');
+Orion.Wait(time);
+
+Orion.UseObject(placa);Orion.Say('banker bank');
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(6));
+
+Orion.UseObject(bau1);
+Orion.UseObject(bauregs);
+Orion.UseObject(baupotes);
+
+Orion.Wait(time);
+
+var finditem=Orion.FindType(mortar, 'any', bauregs);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(keg, 'any', bauregs);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 90);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x0000', bauregs);
+Orion.DragItem(finditem, 100);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 52, 92);Orion.Wait(time);
+
+var finditem=Orion.FindType(black, 'any', bauregs);
+Orion.DragItem(finditem, 500);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 66, 93);Orion.Wait(time);
+
+Orion.UseType(mortar);
+Orion.Wait(time);
+
+Orion.UseObject('0x402D3483');
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(1));
+
+Orion.ClearJournal();	
+while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10104));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);
+
+if (Orion.InJournal('Voce falhou', 'my|sys')){
+var count=Orion.Count(black, 'any', backpack);
+var falta=(500-count);Orion.Wait(time);
+
+var finditem=Orion.FindType(black, 'any', bauregs);
+Orion.DragItem(finditem, falta);Orion.Wait(time);
+Orion.DropDraggedItem(backpack);Orion.Wait(time);
+Orion.ClearJournal();}}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+	
+Orion.Wait(time);
+Orion.UseType(keg, '0x0021');
+Orion.Wait(time);
+	
+var finditem=Orion.FindType(mortar, 'any', backpack);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(bauregs, 26, 51);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x0021', backpack);
+Orion.DragItem(finditem, 100);Orion.Wait(time);
+Orion.DropDraggedItem(baupotes);Orion.Wait(time);
+
+}Orion.CharPrint(self, '40', 'End');}

@@ -1,0 +1,4 @@
+function spell_mana_drain(){
+Orion.Cast('31', lasttarget);
+Orion.AddDisplayTimer(100, 3000, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.CancelTarget();}

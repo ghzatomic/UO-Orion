@@ -1,0 +1,59 @@
+function guardar_plate(){
+
+var bau='0x400480B6';
+var placa='0x4022577B';
+var plate1='0x1415';
+var plate2='0x1411';
+var plate3='0x1410';
+var plate4='0x1414';
+var plate5='0x1413';
+var plate6='0x1412';
+var plate7='0x1BC4';
+var time=400;
+
+Orion.CharPrint(self, '70', 'Start');
+
+Orion.Say('.disarm');
+Orion.Unequip('6');Orion.Wait(700); // CABECA
+Orion.Unequip('13');Orion.Wait(700); // PEITO
+Orion.Unequip('4');Orion.Wait(700); // PERNA
+Orion.Unequip('19');Orion.Wait(700); // ARMS
+Orion.Unequip('7');Orion.Wait(700); // LUVA
+Orion.Unequip('10');Orion.Wait(700); // GORGET
+
+Orion.UseObject(placa);
+Orion.Wait(200);Orion.Say('banker bank');
+var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(6));
+
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(plate1, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 60, 60);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate2, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 60, 60);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate3, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 60, 60);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate4, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 60, 60);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate5, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 60, 60);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate6, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 60, 60);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate7, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 60, 60);Orion.Wait(time);
+
+Orion.CharPrint(self, '40', 'End');}

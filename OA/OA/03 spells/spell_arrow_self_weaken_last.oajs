@@ -1,0 +1,7 @@
+function spell_arrow_self_weaken_last(){
+if(Player.Paralyzed()){Orion.Cast('5', self);
+Orion.AddDisplayTimer(100, 1600, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.CancelTarget();}
+else{Orion.Cast('8', lasttarget);
+Orion.AddDisplayTimer(100, 2000, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.CancelTarget();}}

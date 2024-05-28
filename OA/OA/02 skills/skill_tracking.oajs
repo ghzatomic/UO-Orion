@@ -1,0 +1,48 @@
+function skill_tracking(){
+Orion.CharPrint(self, '70', 'Tracking On');
+while (true){
+//-----------------------------------------------------------------
+var amigos=0; // QUANTIDADE DE AMIGOS PROXIMOS
+var recalar=0; // 0 = NAO / 1 = SIM
+//-----------------------------------------------------------------
+Orion.ClearJournal();
+Orion.WarMode(0);
+Orion.UseSkill('38');
+
+if (Orion.WaitForMenu(1000))	{var menu0 = Orion.GetMenu('last');
+if (menu0 !== null){if (menu0.Name() === "Tracking")
+menu0.Select('Jogadores');}}
+Orion.Wait(100);
+if(Orion.InJournal('Voce nao ve nenhuma evidencia')){
+Orion.Attack('lasttarget');}
+
+else{
+
+if(Orion.WaitForMenu(1000)){
+var menu1 = Orion.GetMenu('last');
+if (menu1 !== null){	
+var count=menu1.ItemsCount();
+var names=[];
+Orion.CloseMenu('all');
+
+if(count>amigos){
+for (var i=0; i<count; i++){
+names.push(menu1.ItemName(i));
+Orion.CharPrint(self, 50, 'Player '+names[i]+' encontrado');}
+
+if(recalar==1){
+Orion.WarMode(0);
+Orion.Cast('32');
+if (Orion.WaitForTarget(1000))
+Orion.TargetType('0x100E', '0xFFFF');
+Orion.AddDisplayTimer(100, 7700, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.UseSkill('21');
+Orion.AddDisplayTimer(800, 3700, 'underChar', 'line|bar', '', 0, 35, '0x0058', 0, 'white');
+}
+Orion.CharPrint(self, '40', 'Tracking Off');
+return 0;
+}
+else{Orion.Attack('lasttarget');}
+}}}
+Orion.Wait(8000);
+}}

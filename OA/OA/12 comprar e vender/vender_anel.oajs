@@ -1,0 +1,12 @@
+function vender_anel(){
+while (true){
+
+for(i=0; i<30; i++){
+Orion.Wait(200);var gump=Orion.GetGump('last');
+gump.Select(Orion.CreateGumpHook(5008));Orion.Wait(3800);}
+
+Orion.UseObject('0x002F91BC');
+Orion.Wait(2000);
+Orion.Say('sell');
+Orion.Wait(2000);
+}}

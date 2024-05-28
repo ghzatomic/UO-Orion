@@ -1,0 +1,4 @@
+function comer_abobora(){
+Orion.UseType('0x0C6A', '0x082E');
+Orion.AddDisplayTimer(333, 120000, 'RightTop', 'line|bar', '', -30, 15, '0', 0, 'blue');
+}

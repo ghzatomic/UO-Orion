@@ -1,0 +1,10 @@
+function combat_disarm(){
+Orion.Terminate('combat_bow');
+Orion.Say('.disarm');
+Orion.UseType('0x1547', '0x0386'); // Deer Mask
+Orion.UseType('0x1545', '0x0386'); // Bear Mask
+Orion.UseType('0x1413'); // Gorget
+if (Player.Hits()<=45){Orion.Say('.drinkheal');
+if (Orion.WaitJournal('Total Heal!', Orion.Now(), Orion.Now()+100)){
+Orion.AddDisplayTimer(300, 19000, 'top', 'circle|bar', 'Potion', 0, 40, '0x0058', 0, 'red');}
+Orion.Wait(500);}}

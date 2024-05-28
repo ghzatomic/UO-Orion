@@ -1,0 +1,4 @@
+function spell_dispel_last(){
+Orion.Cast('41', lasttarget);
+Orion.AddDisplayTimer(100, 3600, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.CancelTarget();}

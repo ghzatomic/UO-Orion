@@ -1,0 +1,19 @@
+function buy_all_regs(){
+while (true){
+
+var bau='0x4022A833'; // BAU BANK
+
+Orion.UseObject('0x0025A196');
+Orion.Wait(1000);
+Orion.Say('Tadi buy');
+Orion.Wait(2000);
+Orion.Say('banker bank');
+Orion.Wait(500);
+
+var itens='0x0F87|0x0F7A|0x0F88|0x0F8D|0x0F8C|0x0F7B|0x0F85|0x0F86|0x0F84|0x0F78';
+var itens=Orion.FindType(itens, 'any', backpack);
+for(i=0; i<itens.length; i++){
+Orion.DragItem(itens[i], 0);
+Orion.Wait(400);
+Orion.DropDraggedItem(bau); 
+Orion.Wait(400);}}}

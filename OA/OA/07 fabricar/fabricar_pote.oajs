@@ -1,0 +1,55 @@
+// Macro de fazer 1000 potes (minimo 3k ceramic)
+
+function fabricar_pote(){
+while (true){
+
+var bau='0x40079F2B'; // ID do bau
+
+var tinkertools='0x1EB8';
+var ingot='0x1BF2';
+var potes='0x0F0E';
+var time=400;
+
+Orion.Wait(time);
+Orion.CharPrint(self, '70', 'Start');
+Orion.Wait(time);
+
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(tinkertools, 'any', bau);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(ingot, '0x09B0', bau);
+Orion.DragItem(finditem, 3000);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 97);Orion.Wait(time);
+
+Orion.UseType(tinkertools);
+Orion.Wait(time);
+Orion.ClearJournal();
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(7));
+
+for(i=0; i<10; i++){while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10109));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(tinkertools, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 18, 146);Orion.Wait(time);
+
+var finditem=Orion.FindType(ingot, '0x09B0', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);
+
+var finditem=Orion.FindType(potes, '0x0000', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);
+
+Orion.CharPrint(self, '40', 'End');}}

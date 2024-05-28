@@ -1,0 +1,25 @@
+function skill_hiding_stealth(){
+while (true){Orion.CharPrint(self, '70', 'Ninja On');
+
+if (!Player.Hidden()){
+Orion.UseSkill('21'); 
+Orion.AddDisplayTimer(800, 3700, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'white');
+Orion.Unequip('13');
+Orion.Wait('700');
+Orion.Unequip('19');
+Orion.ClearJournal();
+Orion.WaitJournal('Voce ficou invisivel', Orion.Now(), Orion.Now()+5000);
+Orion.UseSkill('47');
+Orion.AddDisplayTimer(900, 3700, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'black');
+Orion.WaitJournal('Voce comeca a se mover em silencio', Orion.Now(), Orion.Now()+4000);}
+
+while (Player.Hidden()){
+Orion.UseSkill('47');
+Orion.AddDisplayTimer(900, 3700, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'black');
+Orion.WaitJournal('Voce comeca a se mover em silencio', Orion.Now(), Orion.Now()+4000);}
+
+Orion.CharPrint(self, '40', 'Ninja Off');
+Orion.UseType('0x1415');
+Orion.UseType('0x1410');
+return 0;
+}}

@@ -1,0 +1,9 @@
+function bandage(){
+Orion.CharPrint(self, '70', 'Bands On');
+while(true){Orion.Wait(50);
+if (Player.Hits()<Player.MaxHits() && !Player.Poisoned() && !Player.Paralyzed()){
+Orion.BandageSelf();
+if (Orion.WaitJournal('aplicar', Orion.Now(), Orion.Now()+1000, 'my|sys')){
+Orion.AddDisplayTimer(200, 5000, 'LeftTop', 'line|bar', '', 225, 15, '0', 0, 'white');
+Orion.WaitJournal('Voce curou|Seus dedos', Orion.Now(), Orion.Now()+5500, 'my|sys');
+}}}}

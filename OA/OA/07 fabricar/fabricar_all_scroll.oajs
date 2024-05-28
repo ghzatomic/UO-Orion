@@ -1,0 +1,173 @@
+// MACRO DE FABRICAR SCROLL
+//------------------------------------------------------------------------------
+var qlight=5; // Quantidade (usar me=10) 
+var qpoison=5; // Quantidade (usar me=10)
+var qparalyze=5; // Quantidade (usar me=10)
+var qreflection=5; // Quantidade (usar me=10)
+var qflamestrike=20; // Quantidade (usar mefs = 2 x quantidade)
+var qearthquake=20; // Quantidade (usar meeq= 4 x quantidade)
+//------------------------------------------------------------------------------
+var me=10; // Margem de erro (min=1)
+var mefs=40; // Margem Flamestrike (min=1)
+var meeq=80; // Margem earthquake (min=1)
+
+var placa='0x4007E32E'; // ID da placa da casa
+var bau1='0x40127D29'; // Bau primario se houver
+var bau='0x4022A833'; // ID bau no bank com os itens (Pen / Blank Scrolls / Regs)
+var bauscroll='0x40288E86'; // Bau para guardar scroll prontos
+//------------------------------------------------------------------------------
+var qnight=(qpoison+me);
+var qblood=(qearthquake+meeq);
+var qginseng=(qearthquake+meeq);
+var qgarlic=(qparalyze+qreflection+me);
+var qspider=(qparalyze+qflamestrike+qreflection+me+mefs);
+var qsulfurous=(qlight+qflamestrike+qearthquake+me+mefs+meeq);
+var qmandrake=(qlight+qparalyze+qreflection+qearthquake+me+meeq);
+var qblank=(qlight+qpoison+qparalyze+qflamestrike+qreflection+qearthquake+me+mefs+meeq);
+
+function Autostart(){Orion.Exec('fabricar_all_scroll', true);}
+
+function fabricar_all_scroll(){
+while (true){Orion.Wait(1000);
+Orion.CharPrint(self, '70', 'start');
+guardar();pegar();fabricar();guardar();
+Orion.CharPrint(self, '40', 'end');
+Orion.Wait(1000);}}
+
+function pegar(){
+
+var night='0x0F88';
+var blank='0x0E34';
+var garlic='0x0F84';
+var blood='0x0F7B';
+var spider='0x0F8D';
+var ginseng='0x0F85';
+var sulfurous='0x0F8C';
+var mandrake='0x0F86';
+var pen='0x0FBF|0x0FC0';
+var time=400;
+
+Orion.Wait(time);
+Orion.CharPrint(self, '50', 'pegando itens');
+Orion.Wait(time);
+
+Orion.UseObject(placa);
+Orion.Wait(100);Orion.Say('banker bank');
+var gump=Orion.GetGump('last');
+gump.Select(Orion.CreateGumpHook(6));
+
+Orion.Wait(time);
+Orion.UseObject(bau1);
+Orion.Wait(time);
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(pen, 'any', bau);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 91);Orion.Wait(time);
+
+var finditem=Orion.FindType(blank, 'any', bau);
+Orion.DragItem(finditem, qblank);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(night, 'any', bau);
+Orion.DragItem(finditem, qnight);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 66, 87);Orion.Wait(time);
+
+var finditem=Orion.FindType(garlic, 'any', bau);
+Orion.DragItem(finditem, qgarlic);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 99, 94);Orion.Wait(time);
+
+var finditem=Orion.FindType(sulfurous, 'any', bau);
+Orion.DragItem(finditem, qsulfurous);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 100, 110);Orion.Wait(time);
+
+var finditem=Orion.FindType(mandrake, 'any', bau);
+Orion.DragItem(finditem, qmandrake);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 75, 135);Orion.Wait(time);
+
+var finditem=Orion.FindType(spider, 'any', bau);
+Orion.DragItem(finditem, qspider);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 51, 111);Orion.Wait(time);
+
+var finditem=Orion.FindType(blood, 'any', bau);
+Orion.DragItem(finditem, qblood);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 103, 129);Orion.Wait(time);
+
+var finditem=Orion.FindType(ginseng, 'any', bau);
+Orion.DragItem(finditem, qginseng);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 69, 115);Orion.Wait(time);}
+
+function fabricar(){
+Orion.Wait(500);
+Orion.CharPrint(self, '70', 'fabricando');
+Orion.Wait(500);
+var pen='0x0FBF|0x0FC0'; 
+Orion.UseType(pen);
+Orion.ClearJournal();
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(4));
+for(i=0; i<qlight; i++){while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10106));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(3));
+for(i=0; i<qpoison; i++){while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10104));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5));
+for(i=0; i<qparalyze; i++){while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10106));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5));
+for(i=0; i<qreflection; i++){while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10104));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(7));
+for(i=0; i<qflamestrike; i++){while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10103));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(8));
+for(i=0; i<qearthquake; i++){while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10101));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));}
+
+function guardar(){
+
+var scroll='0x1F4A|0x1F40|0x1F52|0x1F5F|0x1F50|0x1F65';
+var all='0x0F88|0x0F84|0x0F8C|0x0F86|0x0F8D|0x0E34|0x0F7B|0x0F85';
+var pen='0x0FBF|0x0FC0';
+var time=400;
+
+Orion.Wait(time);
+Orion.CharPrint(self, '50', 'guardando');
+Orion.Wait(time);
+
+Orion.UseObject(placa);
+Orion.Wait(100);Orion.Say('banker bank');
+var gump=Orion.GetGump('last');
+gump.Select(Orion.CreateGumpHook(6));
+
+Orion.Wait(time);
+Orion.UseObject(bau1);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(scroll, 'any', backpack);
+for(i=0; i<finditem.length; i++){
+Orion.DragItem(finditem[i], 0);Orion.Wait(time);
+Orion.DropDraggedItem(bauscroll);Orion.Wait(time);}
+
+var finditem=Orion.FindType(all, 'any', backpack);
+for(i=0; i<finditem.length; i++){
+Orion.DragItem(finditem[i], 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);}
+
+var finditem=Orion.FindType(pen, 'any', backpack);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 47, 91);Orion.Wait(time);}

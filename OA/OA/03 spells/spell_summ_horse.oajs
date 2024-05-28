@@ -1,0 +1,9 @@
+function summ_horse(){
+Orion.Cast('40');
+if (Orion.WaitForMenu(1000))	{
+var menu0 = Orion.GetMenu('last');
+if (menu0 !== null){
+if (menu0.Name() === "O que voce deseja invocar?")
+menu0.Select('Horse');}}
+Orion.AddDisplayTimer(100, 11000, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.CancelTarget();}

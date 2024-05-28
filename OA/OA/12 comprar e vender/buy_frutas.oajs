@@ -1,0 +1,16 @@
+function buy_frutas(){
+while (true){
+
+var bau='0x4022A833'; // BAU BANK
+
+for (i=0; i<3; i++){
+Orion.UseObject('0x0025A0DC');Orion.Wait(1000);
+Orion.Say('Randall buy');Orion.Wait(2000);}
+
+Orion.Say('banker bank');Orion.Wait(500);
+
+var itens='0x171F|0x09D0|0x0994|0x09D1';
+var itens=Orion.FindType(itens, 'any', backpack);
+for(i=0; i<itens.length; i++){
+Orion.DragItem(itens[i], 0);Orion.Wait(400);
+Orion.DropDraggedItem(bau);Orion.Wait(400);}}}

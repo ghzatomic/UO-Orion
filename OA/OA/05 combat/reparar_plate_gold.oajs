@@ -1,0 +1,107 @@
+function reparar_plate_gold(){
+
+var bau='0x400747D3';
+var martelo='0x0FB4';
+var ingot='0x1BF2';
+var plate1='0x1415';
+var plate2='0x1411';
+var plate3='0x1410';
+var plate4='0x1414';
+var plate5='0x1413';
+var plate6='0x1412';
+//var plate7='0x1B76'; // Heater Shield
+var plate7='0x1BC4'; // Order Shield
+var time=400;
+
+Orion.CharPrint(self, '70', 'Start');
+
+Orion.Unequip('13');Orion.Wait(700); // PEITO
+Orion.Unequip('4');Orion.Wait(700); // PERNA
+Orion.Unequip('19');Orion.Wait(700); // ARMS
+Orion.Unequip('7');Orion.Wait(700); // LUVA
+Orion.Unequip('10');Orion.Wait(700); // GORGET
+
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(martelo, 'any', bau);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 45, 90);Orion.Wait(time);
+
+var finditem=Orion.FindType(ingot, '0x09B5', bau);
+Orion.DragItem(finditem, 200);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 80, 95);Orion.Wait(time);
+
+Orion.EquipT(martelo);
+Orion.UseType(martelo);
+
+Orion.ClearJournal();
+while((!Orion.InJournal('Voce reparou|nao necessita|Target cancelado|Este item'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5006));
+if (Orion.WaitForTarget(1000))
+Orion.TargetType(plate1);Orion.CancelTarget();
+Orion.WaitJournal('Voce|O item|Target cancelado|Este item', Orion.Now(), Orion.Now()+1000);}
+
+Orion.ClearJournal();
+while((!Orion.InJournal('Voce reparou|nao necessita|Target cancelado|Este item'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5006));
+if (Orion.WaitForTarget(1000))
+Orion.TargetType(plate2);Orion.CancelTarget();
+Orion.WaitJournal('Voce|O item|Target cancelado|Este item', Orion.Now(), Orion.Now()+1000);}
+
+Orion.ClearJournal();
+while((!Orion.InJournal('Voce reparou|nao necessita|Target cancelado|Este item'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5006));
+if (Orion.WaitForTarget(1000))
+Orion.TargetType(plate3);Orion.CancelTarget();
+Orion.WaitJournal('Voce|O item|Target cancelado|Este item', Orion.Now(), Orion.Now()+1000);}
+
+Orion.ClearJournal();
+while((!Orion.InJournal('Voce reparou|nao necessita|Target cancelado|Este item'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5006));
+if (Orion.WaitForTarget(1000))
+Orion.TargetType(plate4);Orion.CancelTarget();
+Orion.WaitJournal('Voce|O item|Target cancelado|Este item', Orion.Now(), Orion.Now()+1000);}
+
+Orion.ClearJournal();
+while((!Orion.InJournal('Voce reparou|nao necessita|Target cancelado|Este item'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5006));
+if (Orion.WaitForTarget(1000))
+Orion.TargetType(plate5);Orion.CancelTarget();
+Orion.WaitJournal('Voce|O item|Target cancelado|Este item', Orion.Now(), Orion.Now()+1000);}
+
+Orion.ClearJournal();
+while((!Orion.InJournal('Voce reparou|nao necessita|Target cancelado|Este item'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5006));
+if (Orion.WaitForTarget(1000))
+Orion.TargetType(plate6);Orion.CancelTarget();
+Orion.WaitJournal('Voce|O item|Target cancelado|Este item', Orion.Now(), Orion.Now()+1000);}
+
+Orion.ClearJournal();
+while((!Orion.InJournal('Voce reparou|nao necessita|Target cancelado|Este item'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5006));
+if (Orion.WaitForTarget(1000))
+Orion.TargetType(plate7);Orion.CancelTarget();
+Orion.WaitJournal('Voce|O item|Target cancelado|Este item', Orion.Now(), Orion.Now()+1000);}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+
+Orion.Wait(time);
+Orion.Unequip('1');
+Orion.Wait(700);
+
+var finditem=Orion.FindType(martelo, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 13, 51);Orion.Wait(time);
+
+var finditem=Orion.FindType(ingot, '0x09B5', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);
+
+Orion.UseType('0x1415');
+Orion.UseType('0x1411');
+Orion.UseType('0x1410');
+Orion.UseType('0x1414');
+Orion.UseType('0x1413');
+
+Orion.CharPrint(self, '40', 'End');}

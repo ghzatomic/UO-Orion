@@ -1,0 +1,63 @@
+function Autostart(){Orion.Exec('vender_crossbow', true);}
+function vender_crossbow(){while (true){
+
+// Deixar fletcher's tools na bag
+// Antes de dar start, fazer um crossbow
+
+var baubank='0x40294165'; // ID bau bank com logs e para guardar gold
+var quantidade=5; // Quantidade de produção por ciclo
+
+var qlogs=(quantidade*7);
+var vendor='0x0025A95C';
+var ftools='0x1022';
+var gold='0x0EED';
+var logs='0x1BDD';
+var time=500;
+
+Orion.Wait(time);
+while ((Player.X()!=986) || (Player.Y()!=517)){
+Orion.WalkTo(986, 517, -50, 0, 5, 1, 1);}
+Orion.Wait(time);
+
+Orion.Say('banker bank');Orion.Wait(time);
+Orion.UseObject(baubank);Orion.Wait(time);
+
+var finditem=Orion.FindType(logs, 'any', baubank);
+Orion.DragItem(finditem, qlogs);Orion.Wait('400');
+Orion.DropDraggedItem(backpack, 44, 121); Orion.Wait(time);
+
+Orion.UseType(ftools);
+Orion.Wait(time);
+
+for(i=1; i<=quantidade; i++){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(5008));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);
+Orion.PrintFast(self, '0', 0, i);}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+
+var serial=Orion.GetSerial(vendor);
+Orion.AddObject('player', serial);
+var player=Orion.FindObject('player');
+
+while ((Player.X()!=978) || (Player.Y()!=515)){
+Orion.WalkTo(978, 515, -50, 0, 5, 1, 1);}
+Orion.UseObject(vendor);Orion.Wait(2000);
+
+Orion.WalkTo(player.X(), player.Y(), player.Z(), 1, 20, 1, 1);
+Orion.Say('Giles sell');
+Orion.WaitJournal('Aqui esta', Orion.Now(), Orion.Now()+5000);
+
+while ((Player.X()!=986) || (Player.Y()!=517)){
+Orion.WalkTo(986, 517, -50, 0, 5, 1, 1);}
+Orion.Wait(time);Orion.Say('banker bank');Orion.Wait(time);
+
+var finditem=Orion.FindType(gold, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(baubank);Orion.Wait(time);
+
+var finditem=Orion.FindType(logs, 'any', backpack);
+Orion.DragItem(finditem, 500);Orion.Wait(time);
+Orion.DropDraggedItem(baubank);Orion.Wait(time);
+
+}}

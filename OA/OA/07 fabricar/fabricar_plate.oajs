@@ -1,0 +1,133 @@
+// MACRO DE FABRICAR PLATES
+
+// ANTES DE DAR START
+
+// ESCOLHER A PLATE NO MENU BS
+// CONFIGURAR PLACA DA CASA E BAUS
+// CONFIGURAR PLATE E COLOR DA PLATE QUE VAI FAZER
+// DEIXAR NO MINIMO 500 INGOTS DA PLATE NO BAU
+
+function fabricar_plate(){
+while (true){
+
+var baucasa='0x4007B9F8'; // ID BAU CASA
+var placa='0x4007E32E'; // ID PLACA DA CASA
+var bau0='0x40127D29'; // ID BAU PRIMARIO DE PLATES NO BANK
+
+//-------------------PLATES------------------------
+//var bauplate='0x401B80EB'; // Infernal
+//var bauplate='0x401B80EB'; // Celestial
+var bauplate='0x401272D0'; // Chaos
+//var bauplate='0x4027B7C9'; // Order
+//var bauplate='0x4022A834'; // Radioactive
+//var bauplate='0x4022A831'; // Gold
+
+//------------------COLOR--------------------------
+//var color='0x09BC'; // Infernal
+//var color='0x09BD'; // Celestial
+//var color='0x09BA'; // Chaos
+var color='0x09B9'; // Order
+//var color='0x09B7'; // Radioactive
+//var color='0x09B5'; // Gold
+//----------------------------------------------------
+
+var ingot='0x1BF2';
+var plate1='0x1415';
+var plate2='0x1411';
+var plate3='0x1414';
+var plate4='0x1413';
+var plate5='0x1410';
+var plate6='0x1412';
+var time=400;
+
+Orion.Wait(time);
+Orion.CharPrint(self, '50', 'Pegando materia prima');
+Orion.Wait(time);
+
+Orion.UseObject(baucasa);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(ingot, color, baucasa);
+Orion.DragItem(finditem, 500);Orion.Wait(time);
+Orion.DropDraggedItem(backpack);Orion.Wait(time);
+
+Orion.CharPrint(self, '70', 'Fabricando Plate');
+Orion.Wait(time);
+
+Orion.UseType('0x0FB4');
+Orion.Wait(time);
+Orion.ClearJournal();
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(1));
+
+while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10101));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();
+
+while((!Orion.InJournal('Voce pos'))){	
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10102));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();
+	
+while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10103));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();
+	
+while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10104));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();
+	
+while((!Orion.InJournal('Voce pos'))){	
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10105));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();
+	
+while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10106));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();
+	
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+
+Orion.Wait(time);
+Orion.CharPrint(self, '50', 'Guardando');
+Orion.Wait(time);
+
+Orion.UseObject(placa);
+Orion.Wait(200);Orion.Say('banker bank');
+var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(6));
+
+Orion.UseObject(bau0);
+Orion.Wait(time);
+Orion.UseObject(bauplate);
+Orion.Wait(time);
+	
+var finditem=Orion.FindType(plate1, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bauplate, 16, 51);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate2, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bauplate, 16, 80);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate3, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bauplate, 140, 90);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate4, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bauplate, 86, 96);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate5, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bauplate, 140, 51);Orion.Wait(time);
+
+var finditem=Orion.FindType(plate6, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bauplate, 82, 51);Orion.Wait(time);
+
+Orion.UseObject(baucasa);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(ingot, color, backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(baucasa);Orion.Wait(time);
+
+Orion.CharPrint(self, '40', 'End');}}

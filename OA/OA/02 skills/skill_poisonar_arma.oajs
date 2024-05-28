@@ -1,0 +1,11 @@
+function skill_poisonar_arma(){
+
+// Type das armas
+var arma='0x1400|0x13FE|0x1440|0x1404|0x1402|0x0F48|0x0F4C|0x1442';
+//Kryss/Katana/Cutlass/War Fork/Short Spear/Battle Axe/Double Axe/Two Handed Axe
+
+Orion.UseSkill('30');
+if (Orion.WaitForTarget(1000))
+Orion.TargetType('0x0F0E', '0x0044');
+if (Orion.WaitForTarget(1000))
+Orion.TargetType(arma);}

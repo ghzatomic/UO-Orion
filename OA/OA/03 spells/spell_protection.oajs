@@ -1,0 +1,5 @@
+function spell_protection(){
+Orion.Cast('15', self);
+Orion.AddDisplayTimer(100, 2650, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.AddDisplayTimer(500, 195000, 'LeftTop', 'line|bar', 'Protection', 10, 100, '0', 0, 'darkblue');
+Orion.CancelTarget();}

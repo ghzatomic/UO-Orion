@@ -1,0 +1,5 @@
+function spell_reactive_armor(){
+Orion.Cast('7', self);
+Orion.AddDisplayTimer(100, 3250, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.AddDisplayTimer(600, 295000, 'LeftTop', 'line|bar', 'R.Armor', 10, 150, '0', 0, 'darkblue');
+Orion.CancelTarget();}

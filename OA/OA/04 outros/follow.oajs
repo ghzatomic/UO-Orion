@@ -1,0 +1,6 @@
+function follow(){
+var dist=1 // Distancia do player seguido  
+var serial=Orion.GetSerial(lasttarget);
+Orion.AddObject('player', serial);
+var player=Orion.FindObject('player');
+while (true){Orion.WalkTo(player.X(), player.Y(), player.Z(), dist, 20, 1, 1);}}

@@ -1,0 +1,18 @@
+function combat_arma(){
+Orion.Terminate('combat_bow');
+Orion.UseType('0x1BC4'); // Order Shield
+Orion.UseType('0x1B76'); // Heater Shield
+Orion.UseType('0x1400', '0x0505'); // Soul Reaver
+Orion.EquipT('0x13B3'); // Club
+Orion.EquipT('0x1400'); // Kryss
+Orion.EquipT('0x13FE'); // Katana
+Orion.EquipT('0x1440'); // Cutlass
+Orion.EquipT('0x1404'); // War Fork
+Orion.EquipT('0x0F48'); // Battle Axe
+Orion.EquipT('0x0F4C'); // Double Axe
+Orion.EquipT('0x1402'); // Short Spear
+Orion.EquipT('0x1442'); // Two Handed Axe
+Orion.EquipT('0x143E'); // Halberd
+Orion.UseType('0x1412'); // Helmet
+Orion.UseType('0x1413'); // Gorget
+Orion.Attack('lasttarget');Orion.Wait(100);}

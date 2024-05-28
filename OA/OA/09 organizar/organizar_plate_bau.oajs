@@ -1,0 +1,67 @@
+// MACRO DE ORGANIZAR PLATE EM WOODEN BOX
+// BUSCA PLATE EM BAU1 E ORGANIZA EM BAU2
+// PODE USAR BAU1 = BAU2 SE NÃO QUISER TRANSFERIR DE BAU
+
+function organizar_plate_bau(){
+
+while(true){
+
+var a='0x401B80EB'; // Infernal
+var b='0x400E038B'; // Celestial
+var c='0x401B7FDC'; // Chaos
+var d='0x401F37E1'; // Order
+var e='0x401B6C60'; // Radioactive
+var f='0x401B55DC'; // Gold
+var g='0x4032C362'; // Outro
+
+var bau1=g; // ID DO BAU 1
+var bau2=f; // ID DO BAU 2
+
+var plate1='0x1415';
+var plate2='0x1411';
+var plate3='0x1414';
+var plate4='0x1413';
+var plate5='0x1410';
+var plate6='0x1412';
+
+var time=350; 
+
+Orion.Wait(time);
+
+var plate1=Orion.FindType(plate1, 'any', bau1);
+Orion.DragItem(plate1, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 16, 51); 
+Orion.Wait(time);
+
+var plate2=Orion.FindType(plate2, 'any', bau1);
+Orion.DragItem(plate2, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 16, 80); 
+Orion.Wait(time);
+
+var plate3=Orion.FindType(plate3, 'any', bau1);
+Orion.DragItem(plate3, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 140, 90); 
+Orion.Wait(time);
+
+var plate4=Orion.FindType(plate4, 'any', bau1);
+Orion.DragItem(plate4, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 86, 96); 
+Orion.Wait(time);
+
+var plate5=Orion.FindType(plate5, 'any', bau1);
+Orion.DragItem(plate5, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 140, 51); 
+Orion.Wait(time);
+
+var plate6=Orion.FindType(plate6, 'any', bau1);
+Orion.DragItem(plate6, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 82, 51); 
+Orion.Wait(time);
+
+}}

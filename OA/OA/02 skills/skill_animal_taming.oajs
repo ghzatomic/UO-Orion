@@ -1,0 +1,3 @@
+function animal_taming(){
+Orion.UseType('0x1088', '0xFFFF');
+Orion.UseSkill('35');}

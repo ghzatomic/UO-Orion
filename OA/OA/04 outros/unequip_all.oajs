@@ -1,0 +1,33 @@
+function unequip_all(){
+
+Orion.CharPrint(self, '70', 'Start');
+
+var time=700;
+Orion.Unequip('18'); // BRINCO
+Orion.Wait(time);
+Orion.Unequip('10'); // GORGET
+Orion.Wait(time);
+Orion.Unequip('8'); // ANEL
+Orion.Wait(time);
+Orion.Unequip('14'); // BRACELET
+Orion.Wait(time);
+Orion.Unequip('17'); // FAIXA
+Orion.Wait(time);
+Orion.Unequip('19'); // ARMS
+Orion.Wait(time);
+Orion.Unequip('13'); // PEITO
+Orion.Wait(time);
+Orion.Unequip('7'); // LUVA
+Orion.Wait(time);
+Orion.Unequip('4'); // PERNA
+Orion.Wait(time);
+Orion.Unequip('6'); // MASK
+Orion.Wait(time);
+Orion.Unequip('20'); // CAPA
+Orion.Wait(time);
+Orion.Unequip('22'); // ROBE
+Orion.Wait(time);
+
+Orion.CharPrint(self, '70', 'End');
+
+}

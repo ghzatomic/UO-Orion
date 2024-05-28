@@ -1,0 +1,75 @@
+// Macro de pesca mantendo SOS na bag
+
+// Deixar o barco apontado para o norte
+// Usar vara de pesca inclinada para esquerda
+// Ficar na direita do barco encostado no mastro
+// Definir posição em X para voltar
+//-----------------------------------------------------------------
+var varadepesca='0x401DF40B' // ID da vara de pesca
+var baubarco='0x401DF6E1'; // ID do bau do barco
+var pesodefinido=400; // Peso para jogar itens fora
+var xmaximo=5100; // Posição em X para voltar
+//-----------------------------------------------------------------
+
+var time=500;
+
+function Autostart(){Orion.Exec('fishing', true);}
+
+function fishing(){
+Orion.CharPrint(self, '50', 'esvaziando bag');guardar();
+while (true){Orion.UseType('0x097B', '0x0000'); // Comer peixe
+pescar();navegar();pesar();Orion.CancelTarget();}}
+
+function guardar(){
+
+var itens='0x1BD7|0x15F8|0x14F3|0x10E1|0x0DE1|0x0DBF|0x1059'; 
+var itens=Orion.FindType(itens, 0x0000, backpack);
+for(i=0; i<itens.length; i++){
+Orion.DragItem(itens[i], 0);Orion.Wait(time);
+Orion.DropDraggedItemRelative(0, 0, 0);Orion.Wait(time);}
+
+Orion.Step('n');Orion.Wait(time);
+Orion.Step('w');Orion.Wait(time);
+
+Orion.UseObject(baubarco);Orion.Wait(time);
+
+var peixes='0x09CC|0x09CD|0x09CE|0x09CF';
+var peixes=Orion.FindType(peixes, 'any', backpack);
+for(i=0; i<peixes.length; i++){
+Orion.DragItem(peixes[i], 0);Orion.Wait(time);
+Orion.DropDraggedItem(baubarco);Orion.Wait(time);}
+
+Orion.Step('e');Orion.Wait(time);
+Orion.Step('s');Orion.Wait(time);}
+
+function pesar(){
+Orion.CharPrint(self, '50', 'verificando peso');
+var maxpeso=Player.Weight();
+if(maxpeso>=pesodefinido){guardar();}}
+
+function pescar(){
+Orion.CharPrint(self, '70', 'start');
+for(var x=2; x<=4; x++){
+for(var y=-4; y<=4; y++){
+Orion.ClearJournal();
+Orion.UseObject(varadepesca);
+if (Orion.WaitForTarget(time))
+Orion.TargetTileRelative('any', x, y, 65533);
+Orion.WaitJournal('Nao ha|Tente pescar', Orion.Now(), Orion.Now()+1000, 'my|sys');
+if (Orion.InJournal('Nao ha|Tente pescar', 'my|sys')){}
+else {Orion.WaitJournal('Voce pescou', Orion.Now(), Orion.Now()+11000, 'my|sys');}}}}
+
+function navegar(){Orion.ClearJournal();
+Orion.Say('right');Orion.Wait(1600);
+Orion.Say('stop');Orion.Wait(time);
+if (Orion.InJournal('barco parou')){voltar();}
+if ((Player.X()>xmaximo)){voltar();}}
+
+function voltar(){Orion.ClearJournal();
+Orion.Say('left');Orion.Wait(5000);
+Orion.Say('turn left');Orion.Wait(time);
+Orion.Say('forward');Orion.Wait(time);
+Orion.WaitJournal('barco parou', Orion.Now(), Orion.Now()+1000000);
+Orion.Say('back');Orion.Wait(5000);
+Orion.Say('stop');Orion.Wait(time);
+Orion.Say('turn right');Orion.Wait(time);}

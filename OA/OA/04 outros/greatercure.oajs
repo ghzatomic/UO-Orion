@@ -1,0 +1,10 @@
+function greatercure(){
+Orion.CharPrint(self, '70', 'Cure On');
+while(true){
+if(Player.Poisoned() && !Player.Paralyzed()){
+//Orion.Wait(500);
+Orion.Say('.drinkcure');
+if (Orion.WaitJournal('Greater Cure!', Orion.Now(), Orion.Now()+100)){
+Orion.AddDisplayTimer(300, 19000, 'top', 'circle|bar', 'Potion', 0, 40, '0x0058', 0, 'red');
+Orion.CharPrint(self, '40', 'Cure Off');return 0;}
+else {Orion.CharPrint(self, '40', 'Cure Off');return 0;}}}}

@@ -1,0 +1,120 @@
+function pegar_potes(){
+
+//-----------------------------------------------------
+var placa='0x4007E32E'; // ID placa da casa
+var bau0='0x40127D29'; // ID bau primario
+var bau1='0x40288E86'; // ID bau de potes
+var bau2='0x4022DF39'; // ID bau de flechas
+//-----------------------------------------------------
+
+var qbands=200 ;
+var qheal=15 ;
+var qmana=15 ;
+var qrefresh=5 ;
+var qinvis=5 ;
+var qcure=5 ;
+var qshrink=3 ;
+var qdeadly=3;
+var qpoison=15;
+var qlight=15;
+var qpara=15;
+var qreflection=15;
+var qfs=20;
+var quva=10;
+var qpfire=10;
+var qppoison=5;
+var qabobora=5;
+var qflecha=100;
+
+//-----------------------------------------------------
+
+var pote='0x0F0E';
+var bands='0x0E21';
+var uva='0x09D1';
+var pfire='0x097B';
+var ppoison='0x097B';
+var abobora='0x0C6A'
+var poison='0x1F40';
+var light='0x1F4A';
+var para='0x1F52';
+var reflection='0x1F50';
+var fs='0x1F5F';
+var flecha='0x1BFB'; // blue
+//var flecha='0x0F3F'; // red
+var time=400;
+
+Orion.CharPrint(self, '70', 'start');Orion.Wait(time);
+
+var finditem=Orion.FindType(bands, 'any', bau1);
+Orion.DragItem(finditem, qbands);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x00FF', bau1);
+Orion.DragItem(finditem, qheal);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x0480', bau1);
+Orion.DragItem(finditem, qmana);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 57, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x0021', bau1);
+Orion.DragItem(finditem, qrefresh);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 70, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x01F7', bau1);
+Orion.DragItem(finditem, qinvis);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 83, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x002C', bau1);
+Orion.DragItem(finditem, qcure);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 96, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x07FD', bau1);
+Orion.DragItem(finditem, qshrink);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 109, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(pote, '0x0044', bau1);
+Orion.DragItem(finditem, qdeadly);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 122, 132);Orion.Wait(time);
+
+var finditem=Orion.FindType(light, 'any', bau1);
+Orion.DragItem(finditem, qlight);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(poison, 'any', bau1);
+Orion.DragItem(finditem, qpoison);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(para, 'any', bau1);
+Orion.DragItem(finditem, qpara);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(reflection, 'any', bau1);
+Orion.DragItem(finditem, qreflection);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(fs, 'any', bau1);
+Orion.DragItem(finditem, qfs);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(uva, 'any', bau2);
+Orion.DragItem(finditem, quva);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 121, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(pfire, '0x09BC', bau2);
+Orion.DragItem(finditem, qpfire);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 89, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(ppoison, '0x0795', bau2);
+Orion.DragItem(finditem, qppoison);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 103, 65);Orion.Wait(time);
+
+var finditem=Orion.FindType(abobora, '0x082E', bau2);
+Orion.DragItem(finditem, qabobora);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 107);Orion.Wait(time);
+
+var finditem=Orion.FindType(flecha, 'any', bau2);
+Orion.DragItem(finditem, qflecha);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 87);Orion.Wait(time);
+
+Orion.CharPrint(self, '40', 'end');}

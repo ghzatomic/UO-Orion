@@ -1,0 +1,31 @@
+function mover_itens(){
+
+var item='0x1515'; // Type do item
+var x=15; // Posição X onde vai ser colocado o item
+var y=74; // Posição Y onde vai ser colocado o item
+
+var time=400;
+
+var bau1;
+Orion.CharPrint(self, '50', 'Selecione container com os itens');
+Orion.WaitForAddObject('bau1');var bau1='bau1';
+
+var bau2;
+Orion.CharPrint(self, '50', 'Selecione container para mover os itens');
+Orion.WaitForAddObject('bau2');var bau2='bau2';
+
+Orion.Wait(time);
+Orion.CharPrint(self, '70', 'Start');
+Orion.Wait(time);
+
+var finditem=Orion.FindType(item, 'any', bau1);
+for (i=0; i<finditem.length; i++){
+Orion.DragItem(finditem[i], 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau2, x, y);Orion.Wait(time);
+
+x=x+5;
+if(x>=140){x=15;}
+
+}
+
+Orion.CharPrint(self, '40', 'End');}

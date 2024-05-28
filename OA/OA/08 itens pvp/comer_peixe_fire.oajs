@@ -1,0 +1,6 @@
+function comer_peixe_fire(){
+Orion.UseType('0x09D1', '0x0482');
+Orion.Wait(500);
+Orion.UseType('0x097B', '0x09BC');
+Orion.AddDisplayTimer(111, 120000, 'LeftTop', 'line|bar', '', 40, 15, '0', 0, 'yellow');
+}

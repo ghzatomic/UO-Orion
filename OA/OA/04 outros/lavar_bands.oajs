@@ -1,0 +1,17 @@
+function lavar_bands(){
+
+var bands='0x0E21';
+var time=500;
+
+Orion.UseType('0x0E20');
+if (Orion.WaitForTarget(1000))
+Orion.TargetGround('0x0B41');
+Orion.Wait(time);Orion.CancelTarget();
+
+var finditem=Orion.FindType(bands, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(backpack);Orion.Wait(time);
+
+var finditem=Orion.FindType(bands, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 142, 65);Orion.Wait(time);}

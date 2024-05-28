@@ -1,0 +1,11 @@
+function dismount_mount(){
+
+if (Orion.ObjAtLayer('Mount')){
+Orion.UseObject('self');
+Orion.Say('all stay');}
+
+if (!Orion.ObjAtLayer('Mount')){
+//Orion.Say('all come');
+Orion.UseObject('Mount');}
+
+Orion.Wait(300);}

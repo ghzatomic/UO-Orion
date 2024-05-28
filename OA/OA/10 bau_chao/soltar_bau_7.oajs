@@ -1,0 +1,8 @@
+function soltar_bau_7(){
+var bau='0x0E7D|0x09AA';
+var bau = Orion.FindType(bau, 'any', backpack);
+Orion.DragItem(bau, 1);
+Orion.Wait('100');
+Orion.DropDraggedItemRelative(-1, 0, 0); // LUGAR 
+Orion.Wait('100');
+}

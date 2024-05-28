@@ -1,0 +1,5 @@
+function open_close_door_fast(){
+Orion.OpenDoor(true);
+Orion.Wait(300);
+Orion.OpenDoor(true);
+}

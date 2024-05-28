@@ -1,0 +1,8 @@
+function desparalyze(){
+Orion.CharPrint(self, '70', 'Desparalyze On');
+while (true){
+if(Player.Paralyzed()){
+//Orion.Wait(500);
+Orion.Cast('5', self);
+Orion.AddDisplayTimer(100, 1600, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.CharPrint(self, '40', 'Desparalyze Off');return 0;}}}

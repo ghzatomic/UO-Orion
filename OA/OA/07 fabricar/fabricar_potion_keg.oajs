@@ -1,0 +1,120 @@
+// Macro para fabricar potion keg
+
+// Deixar bau no chao com os itens abaixo:
+// (Tinker's Tools / Saw / Iron ingots / Logs / Boards / Empty bottles)
+
+function fabricar_potion_keg(){
+while (true){
+
+var bau='0x40079F2B'; // ID bau chao com itens
+var baubank='0x4022A833'; // ID bau bank guardar potion keg
+var placa='0x4007E32E'; // Placa da casa
+
+var tinkertools='0x1EB8';
+var saw='0x1035';
+var ingot='0x1BF2';
+var potes='0x0F0E';
+var logs='0x1BDD';
+var board='0x1BD7';
+var potionkeg='0x1940';
+var sobras='0x1BF2|0x0F0E|0x1BDD|0x1BD7';
+var time=500;
+
+Orion.Wait(time);
+Orion.CharPrint(self, '70', 'Start');
+Orion.Wait(time);
+
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(tinkertools, 'any', bau);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 127);Orion.Wait(time);
+
+var finditem=Orion.FindType(saw, 'any', bau);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 121);Orion.Wait(time);
+
+var finditem=Orion.FindType(logs, '0x0000', bau);
+Orion.DragItem(finditem, 30);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 70, 121);Orion.Wait(time);
+
+var finditem=Orion.FindType(ingot, '0x0000', bau);
+Orion.DragItem(finditem, 10);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 97);Orion.Wait(time);
+
+var finditem=Orion.FindType(board, '0x0000', bau);
+Orion.DragItem(finditem, 20);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 61, 94);Orion.Wait(time);
+
+var finditem=Orion.FindType(potes, '0x0000', bau);
+Orion.DragItem(finditem, 30);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 84, 103);Orion.Wait(time);
+
+Orion.UseType(saw);
+Orion.Wait(time);
+Orion.ClearJournal();
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(3));
+
+while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10102));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();
+	
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(1));
+
+while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10109));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();	
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+
+Orion.UseType(tinkertools);
+Orion.Wait(time);
+Orion.ClearJournal();
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(3));
+	
+while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10103));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();
+	
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(7));
+	
+while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10106));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+5000);}Orion.ClearJournal();
+	
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+
+Orion.Wait(time);	
+Orion.CharPrint(self, '50', 'Guardando');
+Orion.Wait(time);	
+
+var finditem=Orion.FindType(tinkertools, 'any', backpack);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 18, 146);Orion.Wait(time);
+
+var finditem=Orion.FindType(saw, 'any', backpack);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 18, 140);Orion.Wait(time);
+
+var finditem=Orion.FindType(sobras, '0x0000', backpack);
+for (i=0; i<finditem.length; i++){
+Orion.DragItem(finditem[i], 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);}
+
+Orion.Wait(time);	
+
+Orion.UseObject(placa);
+Orion.Wait(100);Orion.Say('banker bank');
+var gump=Orion.GetGump('last');
+gump.Select(Orion.CreateGumpHook(6));
+
+Orion.Wait(time);	
+
+var finditem=Orion.FindType(potionkeg, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(baubank, 16, 51);Orion.Wait(time);
+
+Orion.CharPrint(self, '40', 'End');}}

@@ -1,0 +1,6 @@
+function comer_buff_str(){
+Orion.UseType('0x09D1', '0x0482');
+Orion.UseType('0x09CC', '0x004C');
+Orion.UseType('0x0993');
+Orion.AddDisplayTimer(444, 120000, 'RightTop', 'line|bar', '', -110, 15, '0', 0, 'red');
+Orion.Wait(300);}

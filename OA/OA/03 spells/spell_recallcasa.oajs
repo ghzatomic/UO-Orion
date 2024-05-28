@@ -1,0 +1,9 @@
+function spell_recallcasa(){
+Orion.WarMode(0);
+Orion.Cast('32');
+if (Orion.WaitForTarget(1000))
+Orion.TargetObject('0x402A516C');
+Orion.AddDisplayTimer(100, 10000, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.UseSkill('21');
+Orion.AddDisplayTimer(800, 3700, 'underChar', 'line|bar', '', 0, 35, '0x0058', 0, 'white');
+Orion.CancelTarget();}

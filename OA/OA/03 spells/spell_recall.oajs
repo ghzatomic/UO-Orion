@@ -1,0 +1,9 @@
+function spell_recall(){
+Orion.WarMode(0);
+Orion.Cast('32');
+if (Orion.WaitForTarget(1000))
+Orion.TargetType('0x100E');
+Orion.AddDisplayTimer(100, 7700, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.UseSkill('21');
+Orion.AddDisplayTimer(800, 3700, 'underChar', 'line|bar', '', 0, 35, '0x0058', 0, 'white');
+Orion.CancelTarget();}

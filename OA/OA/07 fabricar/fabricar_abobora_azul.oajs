@@ -1,0 +1,55 @@
+function fabricar_abobora_azul(){
+while (true){
+
+var quantidade=50; // Quantidade por ciclo
+var bau='0x401B817D'; // Bau com itens (panela / abobora / Total Mana)
+
+var abobora='0x0C6A';
+var panela='0x097F';
+var mana='0x0F0E';
+var time=500;
+
+Orion.Wait(time);
+Orion.CharPrint(self, '70', 'Start');
+Orion.Wait(time);
+
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(panela, 'any', bau);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 94);Orion.Wait(time);
+
+var finditem=Orion.FindType(abobora, '0x0000', bau);
+Orion.DragItem(finditem, quantidade);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 58, 90);Orion.Wait(time);
+
+var finditem=Orion.FindType(mana, '0x0480', bau);
+Orion.DragItem(finditem, quantidade);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 90, 87);Orion.Wait(time);
+
+Orion.UseType(panela);
+Orion.Wait(time);
+Orion.ClearJournal();
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(4));
+
+for(i=0; i<quantidade; i++){while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10102));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+4000);}Orion.ClearJournal();}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+
+Orion.Wait(time);
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(panela, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 18, 148);Orion.Wait(time);
+
+var finditem=Orion.FindType(abobora, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);
+
+Orion.CharPrint(self, '40', 'End');}}

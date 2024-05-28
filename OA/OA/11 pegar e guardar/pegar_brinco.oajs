@@ -1,0 +1,54 @@
+function pegar_brinco(){
+while (true){
+
+// LOCAL START MACRO X:1485 Y:1704
+//---------------------------------------------------------------------
+var runebook='0402a516c'; // ID RUNEBOOK (.mostraruid)
+var pos=3 // POSICAO RUNA NO RUNEBOOK (MARCAR EM X:1375 Y:1651)
+//---------------------------------------------------------------------
+
+var man='0x000F865B'; 
+var woman='0x000F8657';
+var num=10;
+var time=300;
+
+while(Player.Mana()<Player.MaxMana()){
+Orion.UseSkill('Meditation');
+Orion.Wait(2000);}
+
+Orion.Wait(time);
+Orion.Say('.gate '+runebook+','+pos);	
+Orion.Wait(14000);
+
+Orion.UseSkill('Meditation');
+
+for(i=0; i<num; i++){
+
+Orion.UseObject(man);
+Orion.Wait(time);
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(101));
+
+Orion.Step('w');
+Orion.Wait(time);
+Orion.Step('e');
+
+Orion.UseObject(woman);
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(201));
+	
+Orion.Wait(time);
+	
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(101));
+	
+Orion.Step('w');
+Orion.Wait(time);
+Orion.Step('e');	
+
+Orion.Wait(time);
+Orion.UseObject(man);
+Orion.Wait(time);
+	
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(201));
+		
+Orion.Wait(time);}}}

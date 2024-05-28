@@ -1,0 +1,11 @@
+function sos_position(){
+Orion.WaitForAddObject('sos');var sos='sos';
+Orion.UseObject(sos);Orion.Wait(300);
+var gump=Orion.GetGump('last');
+var list=gump.TextList(gump);
+var sextant=list[1];
+var pos=Orion.SextantToXY(sextant);
+var xmap=pos.X();var ymap=pos.Y();
+Orion.CharPrint(self, '50', 'x:' + xmap + ' y:' + ymap);
+Orion.SetWorldMapPointerPosition(xmap, ymap);
+gump.Select(Orion.CreateGumpHook(0));}

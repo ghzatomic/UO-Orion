@@ -1,0 +1,69 @@
+function vender_peixe(){
+while(true){Orion.PrintFast(self, '70', 0, 'Start');
+
+//---------------------------------------
+var baubarco='0x401DF6E1';
+var portabarco='0x401DF6DF';
+var vendor='0x002F83AF'
+//---------------------------------------
+
+var time=500;
+Orion.Wait(time);
+Orion.UseObject(baubarco);
+Orion.Wait(time);
+
+var peixe='0x097A';
+var finditem=Orion.FindType(peixe, '0x0000', baubarco);
+Orion.DragItem(finditem, 3000);
+Orion.Wait(time);
+Orion.DropDraggedItem(backpack);
+Orion.Wait(time);
+
+Orion.Step('s');
+Orion.Wait(time);
+Orion.Step('w');
+Orion.Wait(time);
+Orion.Step('s');
+Orion.Wait(time);
+Orion.UseObject(portabarco);
+Orion.Wait(time);
+Orion.Step('w');
+Orion.Wait(time);
+
+while ((Player.X()!=2074) || (Player.Y()!=2855)){
+Orion.WalkTo(2074, 2855, -3, 0, 0, 1);}
+
+var serial=Orion.GetSerial(vendor);
+Orion.AddObject('player', serial);
+var player=Orion.FindObject('player');
+Orion.WalkTo(player.X(), player.Y(), player.Z(), 1, 20, 1, 1);
+
+Orion.ClearJournal();
+Orion.Say('Paris sell');
+Orion.UseObject(vendor); 
+Orion.WaitJournal('Aqui esta', Orion.Now(), Orion.Now()+5000);
+Orion.Wait(time);
+
+while ((Player.X()!=2087) || (Player.Y()!=2855)){
+Orion.WalkTo(2087, 2855, -3, 0, 0, 1);}
+
+Orion.Wait(time);
+Orion.UseObject(portabarco);
+Orion.Wait(time);
+
+if ((Player.X()!=2089)){
+Orion.UseObject(portabarco);
+Orion.Wait(time);
+Orion.UseObject(portabarco);}
+
+Orion.Wait(time);
+Orion.Step('e');
+Orion.Wait(time);
+Orion.Step('n');
+Orion.Wait(time);
+Orion.Step('e');
+Orion.Wait(time);
+Orion.Step('n');
+Orion.Wait(time);
+
+}}

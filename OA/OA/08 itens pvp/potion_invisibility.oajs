@@ -1,0 +1,4 @@
+function potion_invisibility(){
+Orion.Say('.drinkinvisibility');
+if (Orion.WaitJournal('Invisibility!', Orion.Now(), Orion.Now()+100)){
+Orion.AddDisplayTimer(300, 19000, 'top', 'circle|bar', 'Potion', 0, 40, '0x0058', 0, 'red');}}

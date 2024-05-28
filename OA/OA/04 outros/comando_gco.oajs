@@ -1,0 +1,3 @@
+function comando_gco(){
+Orion.Say('.gco');
+}

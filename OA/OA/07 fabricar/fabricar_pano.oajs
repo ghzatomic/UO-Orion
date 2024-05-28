@@ -1,0 +1,45 @@
+function fabricar_pano(){
+
+while(true){
+
+var roda2='0x40213823';
+var loom='0x40262C03';
+var roda='0x40262A1D';
+var bau='0x401B81A8';
+var algodao='0x0DF9';
+var tesoura='0x0F9E';
+var spools='0x0FA0';
+var pano='0x175D';
+var rolo='0x0F95';
+var time=500
+
+var finditem=Orion.FindType(algodao, 'any', bau);
+Orion.DragItem(finditem, 2);Orion.Wait(time);
+Orion.DropDraggedItem(backpack);Orion.Wait(time);
+
+Orion.UseType(algodao);if (Orion.WaitForTarget(1000))
+Orion.TargetObject(roda);
+
+Orion.Wait(3000);
+
+Orion.UseType(algodao);if (Orion.WaitForTarget(1000))
+Orion.TargetObject(roda);
+
+Orion.UseType(spools);if (Orion.WaitForTarget(1000))
+Orion.TargetObject(loom);
+
+Orion.UseType(spools);if (Orion.WaitForTarget(1000))
+Orion.TargetObject(loom);
+
+Orion.UseType(spools);if (Orion.WaitForTarget(1000))
+Orion.TargetObject(loom);
+
+Orion.UseType(spools);if (Orion.WaitForTarget(1000))
+Orion.TargetObject(loom);Orion.Wait(time);
+
+Orion.UseType(tesoura);if (Orion.WaitForTarget(1000))
+Orion.TargetType(rolo);Orion.Wait(time);
+
+var finditem=Orion.FindType(pano, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);}}

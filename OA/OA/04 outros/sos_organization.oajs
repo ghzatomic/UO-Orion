@@ -1,0 +1,204 @@
+function sos_organization(){
+
+var item='0x14ED'; // Type do item
+var x=0; // Posição X onde vai ser colocado o item
+var y=0; // Posição Y onde vai ser colocado o item
+
+var time=400;
+
+var bau1;
+Orion.CharPrint(self, '50', 'Selecione container com os itens');
+Orion.WaitForAddObject('bau1');var bau1='bau1';
+
+var bau2;
+Orion.CharPrint(self, '50', 'Selecione container para mover os itens');
+Orion.WaitForAddObject('bau2');var bau2='bau2';
+
+Orion.Wait(time);
+Orion.CharPrint(self, '70', 'Start');
+Orion.Wait(time);
+
+var finditem=Orion.FindType(item, 'any', bau1);
+for (i=0; i<finditem.length; i++){
+
+Orion.TargetObject(finditem[i], 0);
+Orion.UseObject(finditem[i], 0);Orion.Wait(100);
+var gump=Orion.GetGump('last');
+var list=gump.TextList(gump);
+var sextant=list[1];
+var pos=Orion.SextantToXY(sextant);
+var xmap=pos.X();var ymap=pos.Y();
+Orion.CharPrint(self, '50', 'x:' + xmap + ' y:' + ymap);
+Orion.SetWorldMapPointerPosition(xmap, ymap);
+gump.Select(Orion.CreateGumpHook(0));
+
+if(xmap<=100&&xmap>0){x=44;}
+if(xmap<=150&&xmap>100){x=45;}
+if(xmap<=200&&xmap>150){x=46;}
+if(xmap<=250&&xmap>200){x=47;}
+if(xmap<=300&&xmap>250){x=48;}
+if(xmap<=350&&xmap>300){x=49;}
+if(xmap<=400&&xmap>350){x=50;}
+if(xmap<=450&&xmap>400){x=51;}
+if(xmap<=500&&xmap>450){x=52;}
+if(xmap<=550&&xmap>500){x=53;}
+if(xmap<=600&&xmap>550){x=54;}
+if(xmap<=650&&xmap>600){x=55;}
+if(xmap<=700&&xmap>650){x=56;}
+if(xmap<=750&&xmap>700){x=57;}
+if(xmap<=800&&xmap>750){x=58;}
+if(xmap<=850&&xmap>800){x=59;}
+if(xmap<=900&&xmap>850){x=60;}
+if(xmap<=950&&xmap>900){x=61;}
+if(xmap<=1000&&xmap>950){x=62;}
+if(xmap<=1050&&xmap>1000){x=63;}
+if(xmap<=1100&&xmap>1050){x=64;}
+if(xmap<=1150&&xmap>1100){x=65;}
+if(xmap<=1200&&xmap>1150){x=66;}
+if(xmap<=1250&&xmap>1200){x=67;}
+if(xmap<=1300&&xmap>1250){x=68;}
+if(xmap<=1350&&xmap>1300){x=69;}
+if(xmap<=1400&&xmap>1350){x=70;}
+if(xmap<=1450&&xmap>1400){x=71;}
+if(xmap<=1500&&xmap>1450){x=72;}
+if(xmap<=1550&&xmap>1500){x=73;}
+if(xmap<=1600&&xmap>1550){x=74;}
+if(xmap<=1650&&xmap>1600){x=75;}
+if(xmap<=1700&&xmap>1650){x=76;}
+if(xmap<=1750&&xmap>1700){x=77;}
+if(xmap<=1800&&xmap>1750){x=78;}
+if(xmap<=1850&&xmap>1800){x=79;}
+if(xmap<=1900&&xmap>1850){x=80;}
+if(xmap<=1950&&xmap>1900){x=81;}
+if(xmap<=2000&&xmap>1950){x=82;}
+if(xmap<=2050&&xmap>2000){x=83;}
+if(xmap<=2100&&xmap>2050){x=84;}
+if(xmap<=2150&&xmap>2100){x=85;}
+if(xmap<=2200&&xmap>2150){x=86;}
+if(xmap<=2250&&xmap>2200){x=87;}
+if(xmap<=2300&&xmap>2250){x=88;}
+if(xmap<=2350&&xmap>2300){x=89;}
+if(xmap<=2400&&xmap>2350){x=90;}
+if(xmap<=2450&&xmap>2400){x=91;}
+if(xmap<=2500&&xmap>2450){x=92;}
+if(xmap<=2550&&xmap>2500){x=93;}
+if(xmap<=2600&&xmap>2550){x=94;}
+if(xmap<=2650&&xmap>2600){x=95;}
+if(xmap<=2700&&xmap>2650){x=96;}
+if(xmap<=2750&&xmap>2700){x=97;}
+if(xmap<=2800&&xmap>2750){x=98;}
+if(xmap<=2850&&xmap>2800){x=99;}
+if(xmap<=2900&&xmap>2850){x=100;}
+if(xmap<=2950&&xmap>2900){x=101;}
+if(xmap<=3000&&xmap>2950){x=102;}
+if(xmap<=3050&&xmap>3000){x=103;}
+if(xmap<=3100&&xmap>3050){x=104;}
+if(xmap<=3150&&xmap>3100){x=105;}
+if(xmap<=3200&&xmap>3150){x=106;}
+if(xmap<=3250&&xmap>3200){x=107;}
+if(xmap<=3300&&xmap>3250){x=108;}
+if(xmap<=3350&&xmap>3300){x=109;}
+if(xmap<=3400&&xmap>3350){x=110;}
+if(xmap<=3450&&xmap>3400){x=111;}
+if(xmap<=3500&&xmap>3450){x=112;}
+if(xmap<=3550&&xmap>3500){x=113;}
+if(xmap<=3600&&xmap>3550){x=114;}
+if(xmap<=3650&&xmap>3600){x=115;}
+if(xmap<=3700&&xmap>3650){x=116;}
+if(xmap<=3750&&xmap>3700){x=117;}
+if(xmap<=3800&&xmap>3750){x=118;}
+if(xmap<=3850&&xmap>3800){x=119;}
+if(xmap<=3900&&xmap>3850){x=120;}
+if(xmap<=3950&&xmap>3900){x=121;}
+if(xmap<=4000&&xmap>3950){x=122;}
+if(xmap<=4050&&xmap>4000){x=123;}
+if(xmap<=4100&&xmap>4050){x=124;}
+if(xmap<=4150&&xmap>4100){x=125;}
+if(xmap<=4200&&xmap>4150){x=126;}
+if(xmap<=4250&&xmap>4200){x=127;}
+if(xmap<=4300&&xmap>4250){x=128;}
+if(xmap<=4350&&xmap>4300){x=129;}
+if(xmap<=4400&&xmap>4350){x=130;}
+if(xmap<=4450&&xmap>4400){x=131;}
+if(xmap<=4500&&xmap>4450){x=132;}
+if(xmap<=4550&&xmap>4500){x=133;}
+if(xmap<=4600&&xmap>4550){x=134;}
+if(xmap<=4650&&xmap>4600){x=135;}
+if(xmap<=4700&&xmap>4650){x=136;}
+if(xmap<=4750&&xmap>4700){x=137;}
+if(xmap<=4800&&xmap>4750){x=138;}
+if(xmap<=4850&&xmap>4800){x=139;}
+if(xmap<=4900&&xmap>4850){x=140;}
+if(xmap<=4950&&xmap>4900){x=141;}
+if(xmap<=5000&&xmap>4950){x=142;}
+if(xmap<=5120&&xmap>5000){x=142;}
+
+if(ymap<=63&&ymap>0){y=65;}
+if(ymap<=126&&ymap>63){y=66;}
+if(ymap<=189&&ymap>126){y=67;}
+if(ymap<=252&&ymap>189){y=68;}
+if(ymap<=315&&ymap>252){y=69;}
+if(ymap<=378&&ymap>315){y=70;}
+if(ymap<=441&&ymap>378){y=71;}
+if(ymap<=504&&ymap>441){y=72;}
+if(ymap<=567&&ymap>504){y=73;}
+if(ymap<=630&&ymap>567){y=74;}
+if(ymap<=693&&ymap>630){y=75;}
+if(ymap<=756&&ymap>693){y=76;}
+if(ymap<=819&&ymap>756){y=77;}
+if(ymap<=882&&ymap>819){y=78;}
+if(ymap<=945&&ymap>882){y=79;}
+if(ymap<=1008&&ymap>945){y=80;}
+if(ymap<=1071&&ymap>1008){y=81;}
+if(ymap<=1134&&ymap>1071){y=82;}
+if(ymap<=1197&&ymap>1134){y=83;}
+if(ymap<=1260&&ymap>1197){y=84;}
+if(ymap<=1323&&ymap>1260){y=85;}
+if(ymap<=1386&&ymap>1323){y=86;}
+if(ymap<=1449&&ymap>1386){y=87;}
+if(ymap<=1512&&ymap>1449){y=88;}
+if(ymap<=1575&&ymap>1512){y=89;}
+if(ymap<=1638&&ymap>1575){y=90;}
+if(ymap<=1701&&ymap>1638){y=91;}
+if(ymap<=1764&&ymap>1701){y=92;}
+if(ymap<=1827&&ymap>1764){y=93;}
+if(ymap<=1890&&ymap>1827){y=94;}
+if(ymap<=1953&&ymap>1890){y=95;}
+if(ymap<=2016&&ymap>1953){y=96;}
+if(ymap<=2079&&ymap>2016){y=97;}
+if(ymap<=2142&&ymap>2079){y=98;}
+if(ymap<=2205&&ymap>2142){y=99;}
+if(ymap<=2268&&ymap>2205){y=100;}
+if(ymap<=2331&&ymap>2268){y=101;}
+if(ymap<=2394&&ymap>2331){y=102;}
+if(ymap<=2457&&ymap>2394){y=103;}
+if(ymap<=2520&&ymap>2457){y=104;}
+if(ymap<=2583&&ymap>2520){y=105;}
+if(ymap<=2646&&ymap>2583){y=106;}
+if(ymap<=2709&&ymap>2646){y=107;}
+if(ymap<=2772&&ymap>2709){y=108;}
+if(ymap<=2835&&ymap>2772){y=109;}
+if(ymap<=2898&&ymap>2835){y=110;}
+if(ymap<=2961&&ymap>2898){y=111;}
+if(ymap<=3024&&ymap>2961){y=112;}
+if(ymap<=3087&&ymap>3024){y=113;}
+if(ymap<=3150&&ymap>3087){y=114;}
+if(ymap<=3213&&ymap>3150){y=115;}
+if(ymap<=3276&&ymap>3213){y=116;}
+if(ymap<=3339&&ymap>3276){y=117;}
+if(ymap<=3402&&ymap>3339){y=118;}
+if(ymap<=3465&&ymap>3402){y=119;}
+if(ymap<=3528&&ymap>3465){y=120;}
+if(ymap<=3591&&ymap>3528){y=121;}
+if(ymap<=3654&&ymap>3591){y=122;}
+if(ymap<=3717&&ymap>3654){y=123;}
+if(ymap<=3780&&ymap>3717){y=124;}
+if(ymap<=3843&&ymap>3780){y=125;}
+if(ymap<=3906&&ymap>3843){y=126;}
+if(ymap<=3969&&ymap>3906){y=127;}
+if(ymap<=4096&&ymap>3969){y=127;}
+
+Orion.DragItem(finditem[i], 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau2, x, y);Orion.Wait(time);}
+
+Orion.CharPrint(self, '40', 'End');}

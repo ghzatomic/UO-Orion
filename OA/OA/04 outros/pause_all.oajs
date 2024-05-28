@@ -1,0 +1,9 @@
+function pause_all(){
+Orion.ClearJournal();
+while(true){Orion.Wait(100);
+if (Orion.InJournal('World save')){
+Orion.PauseScript('all', 'pause_all');
+Orion.CharPrint(self, '40', 'Pause');
+Orion.WaitJournal('Processo completo', Orion.Now(), Orion.Now()+30000);
+Orion.Wait(100);Orion.ResumeScript('all');
+Orion.CharPrint(self, '70', 'Resume');Orion.ClearJournal();}}}

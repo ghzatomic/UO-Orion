@@ -1,0 +1,11 @@
+function spell_reflection(){
+var scroll=Orion.FindType('0x1F50');
+if (scroll && scroll.length>0){
+Orion.UseType('0x1F50');
+if (Orion.WaitForTarget(1000))
+Orion.TargetObject('self');
+Orion.CancelTarget();}
+else{Orion.Cast('36', self);}
+Orion.AddDisplayTimer(100, 5000, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.AddDisplayTimer(400, 290000, 'LeftTop', 'line|bar', 'Reflection', 10, 50, '0', 0, 'darkblue');
+Orion.CancelTarget();}

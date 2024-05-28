@@ -1,0 +1,6 @@
+function spell_paralyze_field(){
+Orion.Cast('47');
+if (Orion.WaitForTarget(100))
+Orion.TargetTileRelative('any', 0, 0, 0);
+Orion.AddDisplayTimer(100, 4900, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.CancelTarget();}

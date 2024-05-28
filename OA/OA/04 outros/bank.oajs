@@ -1,0 +1,6 @@
+function bank(){
+Orion.UseObject('0x4007E32E');
+Orion.Wait(200);Orion.Say('banker bank');
+var gump=Orion.GetGump('last');
+gump.Select(Orion.CreateGumpHook(6));
+}

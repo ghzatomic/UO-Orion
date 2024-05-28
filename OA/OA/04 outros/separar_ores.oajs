@@ -1,0 +1,28 @@
+function separar_ores(){
+while (true){
+
+var bau='0x401B817D'; // ID DO BAU
+var quantidade=2; // QUANTIDADE
+var cor=0x0000; // COR DO MINERIO
+
+0x1BF2
+
+var time=350;
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(0x19B9, cor, bau);
+Orion.DragItem(finditem, quantidade);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 100, 100);Orion.Wait(time);
+
+Orion.UseType('0x19B9', cor);
+Orion.UseType('0x19B8', cor);
+Orion.UseType('0x19BA', cor);
+Orion.UseType('0x19B7', cor);
+
+Orion.Wait(time);
+var finditem=Orion.FindType(0x1BF2, any, backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);
+
+}}

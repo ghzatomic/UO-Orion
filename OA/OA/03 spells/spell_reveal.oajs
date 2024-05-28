@@ -1,0 +1,4 @@
+function spell_reveal(){
+Orion.Cast('48', lasttarget);
+Orion.AddDisplayTimer(100, 3900, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.CancelTarget();}

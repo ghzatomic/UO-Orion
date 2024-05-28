@@ -1,0 +1,85 @@
+function fabricar_peixe_fire(){
+while (true){
+
+var quantidade=50; // Quantidade por ciclo
+var bau='0x401B817D'; // Bau com itens na proporcao abaixo:
+// 15 raw fish steak
+// 6 Mandrake Root
+// 6 Blood Moss
+// 1 blood log
+// 1 oak log
+
+var all='0x0F86|0x0F7B|0x097A';
+var mandrakeroot='0x0F86';
+var bloodmoss='0x0F7B';
+var peixecru='0x097A';
+var peixefire='0x097B';
+var panela='0x097F';
+var log='0x1BDD';
+var time=500;
+
+var qmandrakeroot=(quantidade*6);
+var qbloodmoss=(quantidade*6);
+var qpeixecru=(quantidade*15);
+
+Orion.Wait(time);
+Orion.CharPrint(self, '70', 'Start');
+Orion.Wait(time);
+
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(panela, 'any', bau);
+Orion.DragItem(finditem, 1);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 92);Orion.Wait(time);
+
+var finditem=Orion.FindType(peixecru, 'any', bau);
+Orion.DragItem(finditem, qpeixecru);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 44, 110);Orion.Wait(time);
+
+var finditem=Orion.FindType(log, '0x07DA', bau);
+Orion.DragItem(finditem, quantidade);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 63, 98);Orion.Wait(time);
+
+var finditem=Orion.FindType(log, '0x04C2', bau);
+Orion.DragItem(finditem, quantidade);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 74, 96);Orion.Wait(time);
+
+var finditem=Orion.FindType(bloodmoss, 'any', bau);
+Orion.DragItem(finditem, qbloodmoss);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 98, 93);Orion.Wait(time);
+
+var finditem=Orion.FindType(mandrakeroot, 'any', bau);
+Orion.DragItem(finditem, qmandrakeroot);Orion.Wait(time);
+Orion.DropDraggedItem(backpack, 106, 111);Orion.Wait(time);
+
+Orion.UseType(panela);
+Orion.Wait(time);
+Orion.ClearJournal();
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(4));
+
+for(i=0; i<quantidade; i++){while((!Orion.InJournal('Voce pos'))){
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(10107));
+Orion.WaitJournal('Voce', Orion.Now(), Orion.Now()+4000);}Orion.ClearJournal();}
+
+Orion.Wait(200);var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(0));
+
+Orion.Wait(time);
+Orion.UseObject(bau);
+Orion.Wait(time);
+
+var finditem=Orion.FindType(panela, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau, 18, 148);Orion.Wait(time);
+
+var finditem=Orion.FindType(peixefire, '0x09BC', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);
+
+var finditem=Orion.FindType(all, 'any', backpack);
+for(i=0; i<finditem.length; i++){
+Orion.DragItem(finditem[i], 0);Orion.Wait(time);
+Orion.DropDraggedItem(bau);Orion.Wait(time);}
+
+Orion.CharPrint(self, '40', 'End');}}

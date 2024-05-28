@@ -1,0 +1,74 @@
+// Macro de Lumber
+//----------------------------------------------------------------------
+var tool='0x0F44'; // Type do machado
+var maxWeight =300; // Peso maximo
+var idRunebook='0402a516c';  // ID runebook (.mostraruid)
+var runaLumberPos=29; // Posicao runa floresta
+var runaBankPos=30; // Posicao runa bank
+var containerBank='0x4022A830'; // ID bau bank
+//----------------------------------------------------------------------
+
+var maxSearchDistance=30;  // Distancia para buscar arvores
+var treeWorldLocations=createArr(200,200); // Maximo de arvores
+var msgSuccess = 'em sua mochila';
+var msgError = 'Nao ha';
+var msgWait = 'Voce pos|Nao ha|Voce nao';
+
+function Autostart(){Orion.Exec('Lumber', true);}
+
+function Lumber(ptreeWorldLocation){
+recall(false);
+var treeWorldLocation = ptreeWorldLocation == null ? FindTreesInArea() : ptreeWorldLocation;    
+for (c=0;c<treeWorldLocation.length;c++){
+Orion.ClearJournal();  
+Orion.WalkTo(treeWorldLocation[c][0], treeWorldLocation[c][1], 0, 1, 200, 1);Orion.Wait(1000);
+LumberAgain(treeWorldLocation[c][0],treeWorldLocation[c][1]);
+if (Player.Weight()>=maxWeight){guardar();}
+else {
+while (Orion.InJournal(msgSuccess,0,0)){
+LumberAgain(treeWorldLocation[c][0],treeWorldLocation[c][1]);}}}
+Lumber(treeWorldLocation);}
+
+function FindTreesInArea(){ 
+var trueWorldLocCounter=0;
+for (c=(Player.X()-maxSearchDistance);c<(Player.X()+maxSearchDistance+1);c++){
+for (d=(Player.Y()-maxSearchDistance);d<(Player.Y()+maxSearchDistance+1);d++){
+if (Orion.ValidateTargetTile('tree', c, d)){
+treeWorldLocations[trueWorldLocCounter][0]=c;
+treeWorldLocations[trueWorldLocCounter][1]=d;
+trueWorldLocCounter++;}}}
+Orion.Print("Arvores encontrada e configurada, total: " + trueWorldLocCounter);
+treeWorldLocations.length=trueWorldLocCounter;
+return treeWorldLocations;}
+
+function createArr(x, y){
+var arr=new Array(x);
+for (var c=0; c<x; c++){arr[c]=new Array(y);}
+return arr;}
+
+function LumberAgain(x,y){
+Orion.ClearJournal();
+Orion.EquipT(tool);Orion.UseType(tool);
+Orion.WaitTargetTile('tree',x,y,0);
+Orion.WaitJournal(msgWait, Orion.Now(), (Orion.Now() + 14000), 'my|sys');
+if (Orion.InJournal(msgSuccess,0,0)){LumberAgain(x,y);}
+else {return;}}
+
+function recall(pBank){
+while (Player.Mana()<Player.MaxMana()){Orion.UseSkill('Meditation');
+Orion.WaitJournal('peace|Você perdeu', Orion.Now(), (Orion.Now()+2000));}
+if (pBank == true){
+Orion.Say('.recall ' + idRunebook + ',' + runaBankPos);}
+else {Orion.Say('.recall ' + idRunebook + ',' + runaLumberPos);
+Orion.UseType('0x097B', '0x0000');} // Comer peixe
+Orion.Wait(12000);}
+
+function OpenBank(){Orion.Say('banker bank');Orion.Wait(500);}
+
+function guardar(){
+recall(true);OpenBank();
+while (Orion.Count('0x1BDD', 'any', backpack)>=1){
+var finditem = Orion.FindType('0x1BDD', 'any', backpack);
+for(i=0; i<finditem.length; i++){
+Orion.MoveItem(finditem[i], 0, containerBank);Orion.Wait(700);} 
+Orion.Wait(100);}recall(false);}

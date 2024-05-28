@@ -1,0 +1,5 @@
+function spell_bless(){
+Orion.Cast('17', self);
+Orion.AddDisplayTimer(100, 2600, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.AddDisplayTimer(700, 120000, 'LeftTop', 'line|bar', 'Bless', 10, 200, '0', 0, 'darkblue');
+Orion.CancelTarget();}

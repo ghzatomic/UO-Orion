@@ -1,0 +1,2 @@
+function remove_display_reflection(){
+Orion.RemoveDisplayTimer('400');}

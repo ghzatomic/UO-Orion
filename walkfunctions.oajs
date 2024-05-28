@@ -1,4 +1,4 @@
-
+const algoritimo_caminho = 'shortest'
 const gridSize = 30;
 
 function mapeiaTela(){
@@ -145,8 +145,12 @@ function isTileAndavel(x,y,z){
   if (tileAndavel){
     var testaTileNegra = Orion.GetTiles('land', x, y)
     if (testaTileNegra && testaTileNegra.length > 0){
-      if (Orion.GetTiles('land', x, y)[0].Flags().toString() == '80'){
+      if (Orion.GetTiles('land', x, y)[0].Flags().toString() == '80' ){
         tileAndavel = false
+      }else{
+        /*if (Player.Z()<0 && Orion.GetTiles('land', x, y)[0].Z()>Player.Z()){
+          tileAndavel = false // Caso da parte preta da cave
+        }*/
       }
     }
   }
@@ -174,11 +178,84 @@ function get_object_at(list,x,y){
   
 }
 
+function runManager(){
+  while(true){
+    const listSafeSpot = Shared.GetVar('RMListSafeSpot');
+    if (listSafeSpot){
+
+    } 
+  }
+}
+
+function stopRun(){
+  Shared.AddVar('RMCancelRun', true);
+}
+
+function correr2(){
+  Shared.AddVar('RMCancelRun', true);
+  var onFindSpot = function(mapeado,mapa, playerX, playerY){
+    Shared.AddVar('RMCancelRun', false);
+    const listSafeSpot = findPathToSafeSpot(mapeado, playerX, playerY, algoritimo_caminho)
+    if (listSafeSpot && listSafeSpot.length > 0){
+      for (var i = 0; i<listSafeSpot.length; i++){
+        if (i % 0){
+          continue
+        }
+        const cancelRun = Shared.GetVar('RMCancelRun');
+        if (cancelRun){
+          Shared.AddVar('RMCancelRun', false);
+          break
+        }
+        const safeSpot = listSafeSpot[i]
+        if (safeSpot){
+          var xRun = mapa[safeSpot.x][safeSpot.y][0]
+          var yRun = mapa[safeSpot.x][safeSpot.y][1]
+          Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun);
+          var callb = function(x,y){
+            andarPara(x,y)
+            //Orion.CharPrint(self, 906, "aaccc "+x+" - "+y);
+          }
+          //drawPath(mapeado, playerPosition.x, playerPosition.y, safeSpot.x, safeSpot.y, callb);
+          callb(xRun,yRun)
+        }
+      }
+    }
+  } 
+
+  correrFunc(onFindSpot)
+
+}
+
 function correr(){
-  var print = true
+
+  var onFindSpot = function(mapeado,mapa, playerX, playerY){
+
+    const listSafeSpot = findPathToSafeSpot(mapeado, playerX, playerY, algoritimo_caminho)
+    if (listSafeSpot && listSafeSpot.length > 0){
+      const safeSpot = listSafeSpot[listSafeSpot.length-1]//findSafeSpot(mapeado, playerX, playerY)
+      if (safeSpot){
+        var xRun = mapa[safeSpot.x][safeSpot.y][0]
+        var yRun = mapa[safeSpot.x][safeSpot.y][1]
+        Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun);
+        var callb = function(x,y){
+          andarPara(x,y)
+          //Orion.CharPrint(self, 906, "aaccc "+x+" - "+y);
+        }
+        //drawPath(mapeado, playerPosition.x, playerPosition.y, safeSpot.x, safeSpot.y, callb);
+        callb(xRun,yRun)
+      }
+    }
+  } 
+
+  correrFunc(onFindSpot)
+
+}
+
+function correrFunc(onFindSpot){
+  var print = false
   var target = Orion.FindObject('lasttarget');
   if (target){
-    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself", 60, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
+    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself", gridSize, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
     var simInimigoX = target.X()
     var simInimigoY = target.Y()
     var inimigoList = [[simInimigoX,simInimigoY]]
@@ -234,18 +311,7 @@ function correr(){
           }
         }
         if (playerPosition){
-          const safeSpot = findSafeSpot(mapeado, playerPosition.x, playerPosition.y)
-          if (safeSpot){
-            var xRun = mapa[safeSpot.x][safeSpot.y][0]
-            var yRun = mapa[safeSpot.x][safeSpot.y][1]
-            Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun+" - "+inimigoList.length);
-            var callb = function(x,y){
-              andarPara(x,y)
-              //Orion.CharPrint(self, 906, "aaccc "+x+" - "+y);
-            }
-            //drawPath(mapeado, playerPosition.x, playerPosition.y, safeSpot.x, safeSpot.y, callb);
-            callb(xRun,yRun)
-          }
+          onFindSpot(mapeado, mapa, playerPosition.x, playerPosition.y);
         }
         if (print){
           file.Close();
@@ -326,6 +392,25 @@ function scanTela(onComplete){
 
 
 
+function swap(str, i, j) {
+  var temp = str.charAt(i);
+  str = setCharAt(str, i, str.charAt(j));
+  str = setCharAt(str, j, temp);
+  return str;
+}
+
+function setCharAt(str, index, chr) {
+  if (index > str.length - 1) return str;
+  return str.substring(0, index) + chr + str.substring(index + 1);
+}
+
+function createGrid(gridString) {
+  var grid = [];
+  for (var i = 0; i < gridSize; i++) {
+    grid.push(gridString.slice(i * gridSize, (i + 1) * gridSize).split(''));
+  }
+  return grid;
+}
 
 function abs(value) {
   return value < 0 ? -value : value;
@@ -336,17 +421,17 @@ function distance(x1, y1, x2, y2) {
 }
 
 function hasLineOfSight(grid, x1, y1, x2, y2) {
-  const dx = abs(x2 - x1);
-  const dy = abs(y2 - y1);
-  const sx = (x1 < x2) ? 1 : -1;
-  const sy = (y1 < y2) ? 1 : -1;
+  var dx = abs(x2 - x1);
+  var dy = abs(y2 - y1);
+  var sx = (x1 < x2) ? 1 : -1;
+  var sy = (y1 < y2) ? 1 : -1;
   var err = dx - dy;
 
   while (true) {
     if (x1 === x2 && y1 === y2) return true;
-    if (grid[y1][x1] === 'P' || grid[y1][x1] === 'A') return false;
+    if (grid[y1][x1] === 'A') return false;
 
-    const e2 = err * 2;
+    var e2 = err * 2;
     if (e2 > -dy) {
       err -= dy;
       x1 += sx;
@@ -370,7 +455,7 @@ function countObstaclesBetween(grid, x1, y1, x2, y2) {
   var count = 0;
 
   while (!(x1 === x2 && y1 === y2)) {
-    if (grid[y1][x1] === 'P') count++;
+    if (grid[y1][x1] === 'A') count++;
 
     var e2 = err * 2;
     if (e2 > -dy) {
@@ -419,14 +504,14 @@ function isAccessible(grid, startX, startY, endX, endY, visited) {
   return false;
 }
 
-function findSafeSpot(grid, playerX, playerY) {
+function findSafeSpot(grid, playerX, playerY, strategy) {
   var bestSpot = null;
-  var maxDistance = -1;
+  var optimalScore = (strategy === 'shortest') ? Infinity : -Infinity;
   var maxObstacles = -1;
 
   for (var y = 0; y < grid.length; y++) {
     for (var x = 0; x < grid[0].length; x++) {
-      if (grid[y][x] === '.' || grid[y][x] === 'P') {
+      if (grid[y][x] === '.' || grid[y][x] === 'A') {
         var safe = true;
         var totalObstacles = 0;
         for (var ey = 0; ey < grid.length; ey++) {
@@ -442,12 +527,27 @@ function findSafeSpot(grid, playerX, playerY) {
           if (!safe) break;
         }
         if (safe) {
-          var visited = createVisitedMatrix(grid.length, grid[0].length);
-          if (isAccessible(grid, playerX, playerY, x, y, visited)) {
-            var dist = distance(playerX, playerY, x, y);
-            if (dist > maxDistance || (dist === maxDistance && totalObstacles > maxObstacles)) {
+          var distanceToPlayer = distance(playerX, playerY, x, y);
+          var score;
+          if (strategy === 'shortest') {
+            score = distanceToPlayer;
+            if (score < optimalScore) {
               bestSpot = { x: x, y: y };
-              maxDistance = dist;
+              optimalScore = score;
+              maxObstacles = totalObstacles;
+            }
+          } else if (strategy === 'farthest') {
+            score = distanceToPlayer;
+            if (score > optimalScore) {
+              bestSpot = { x: x, y: y };
+              optimalScore = score;
+              maxObstacles = totalObstacles;
+            }
+          } else if (strategy === 'balanced') {
+            score = distanceToPlayer - totalObstacles;
+            if (score > optimalScore) {
+              bestSpot = { x: x, y: y };
+              optimalScore = score;
               maxObstacles = totalObstacles;
             }
           }
@@ -455,41 +555,26 @@ function findSafeSpot(grid, playerX, playerY) {
       }
     }
   }
+
   return bestSpot;
-}
-
-function createVisitedMatrix(rows, cols) {
-  var visited = [];
-  for (var i = 0; i < rows; i++) {
-    var row = new Array(cols);
-    for (var j = 0; j < cols; j++) {
-      row[j] = false;
-    }
-    visited.push(row);
-  }
-  return visited;
-}
-
-function findInArray(array, predicate) {
-  for (var i = 0; i < array.length; i++) {
-    if (predicate(array[i])) {
-      return array[i];
-    }
-  }
-  return null;
 }
 
 function aStarPath(grid, startX, startY, endX, endY) {
   var openSet = [{ x: startX, y: startY, f: 0, g: 0, h: distance(startX, startY, endX, endY), parent: null }];
   var closedSet = [];
-  var visited = createVisitedMatrix(grid.length, grid[0].length);
+  var visited = [];
+  for (var i = 0; i < grid.length; i++) {
+    var row = [];
+    for (var j = 0; j < grid[i].length; j++) {
+      row.push(false);
+    }
+    visited.push(row);
+  }
 
   while (openSet.length > 0) {
     var lowestFIndex = 0;
-    var lowestF = openSet[0].f;
     for (var i = 1; i < openSet.length; i++) {
-      if (openSet[i].f < lowestF) {
-        lowestF = openSet[i].f;
+      if (openSet[i].f < openSet[lowestFIndex].f) {
         lowestFIndex = i;
       }
     }
@@ -524,10 +609,17 @@ function aStarPath(grid, startX, startY, endX, endY) {
         var f = g + h;
         var neighbor = { x: nx, y: ny, f: f, g: g, h: h, parent: current };
 
-        var existing = findInArray(openSet, function (node) {
-          return node.x === nx && node.y === ny;
-        });
-        if (!existing || g < existing.g) {
+        var existing = false;
+        for (var j = 0; j < openSet.length; j++) {
+          if (openSet[j].x === nx && openSet[j].y === ny) {
+            existing = true;
+            if (g < openSet[j].g) {
+              openSet[j] = neighbor;
+            }
+            break;
+          }
+        }
+        if (!existing) {
           openSet.push(neighbor);
         }
       }
@@ -537,8 +629,8 @@ function aStarPath(grid, startX, startY, endX, endY) {
   return [];
 }
 
-function findPathToSafeSpot(grid, playerX, playerY) {
-  var safeSpot = findSafeSpot(grid, playerX, playerY);
+function findPathToSafeSpot(grid, playerX, playerY, strategy) {
+  var safeSpot = findSafeSpot(grid, playerX, playerY, strategy);
   if (safeSpot) {
     return aStarPath(grid, playerX, playerY, safeSpot.x, safeSpot.y);
   } else {

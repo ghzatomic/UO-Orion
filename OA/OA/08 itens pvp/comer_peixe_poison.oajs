@@ -1,0 +1,4 @@
+function comer_peixe_poison(){
+Orion.UseType('0x097B', '0x0795');
+Orion.AddDisplayTimer(222, 120000, 'LeftTop', 'line|bar', '', 120, 15, '0', 0, 'green');
+}

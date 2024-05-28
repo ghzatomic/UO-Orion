@@ -1,0 +1,36 @@
+function guardar_pedras_regs(){
+
+var placa='0x4007E32E'; // PLACA DA CASA
+var baug='0x4029E221'; // BAU GOLD
+var baup='0x4022A830'; // BAU PEDRAS
+var baur='0x4022A833'; // BAU REGS
+var pedras='0x0F10|0x0F18|0x0F26|0x0F16|0x0F15|0x0F13|0x0F11|0x0F0F';
+var regs='0x0F88|0x0F7A|0x0F8D|0x0F84|0x0F85|0x0F86|0x0F7B|0x0F8C';
+var gold='0x0EED';
+var time=400;
+
+Orion.Wait(time);
+Orion.CharPrint(self, '70', 'guardando');
+Orion.Wait(time);
+
+Orion.UseObject(placa);
+Orion.Wait(200);Orion.Say('banker bank');
+var gump=Orion.GetGump('last');gump.Select(Orion.CreateGumpHook(6));
+
+Orion.Wait(time);
+
+var finditem=Orion.FindType(gold, 'any', backpack);
+Orion.DragItem(finditem, 0);Orion.Wait(time);
+Orion.DropDraggedItem(baug);Orion.Wait(time);
+
+var finditem=Orion.FindType(pedras, 'any', backpack);
+for (i=0; i<finditem.length; i++){
+Orion.DragItem(finditem[i], 0);Orion.Wait(time);
+Orion.DropDraggedItem(baup);Orion.Wait(time);}
+
+var finditem=Orion.FindType(regs, 'any', backpack);
+for (i=0; i<finditem.length; i++){
+Orion.DragItem(finditem[i], 0);Orion.Wait(time);
+Orion.DropDraggedItem(baur);Orion.Wait(time);}
+
+Orion.CharPrint(self, '40', 'end');}

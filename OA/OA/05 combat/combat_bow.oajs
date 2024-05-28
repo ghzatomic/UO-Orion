@@ -1,0 +1,11 @@
+function combat_bow(){
+Orion.UseType('0x13B1'); // Bow
+Orion.UseType('0x0F50'); // Crossbow
+Orion.UseType('0x13FC'); // Heavy Crossbow
+Orion.UseType('0x1412'); // Helmet
+Orion.UseType('0x1413'); // Gorget
+Orion.Attack('lasttarget');Orion.Wait(10);
+while(true){
+Orion.Step('n');Orion.Wait(2300);
+Orion.Step('s');Orion.Wait(2300);}
+}

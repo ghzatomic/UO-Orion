@@ -1,0 +1,61 @@
+function mover_plate(){
+
+var bau2;
+Orion.CharPrint(self, '70', 'Selecione bau de destino');
+Orion.WaitForAddObject('bau2')
+var bau2='bau2';
+
+while (true){
+
+var bau1;
+Orion.CharPrint(self, '70', 'Selecione bag com plate');
+Orion.WaitForAddObject('bau1')
+var bau1='bau1';
+
+var plate1='0x1415';
+var plate2='0x1411';
+var plate3='0x1414';
+var plate4='0x1413';
+var plate5='0x1410';
+var plate6='0x1412';
+
+var time=350; 
+Orion.Wait(time);
+
+var plate1=Orion.FindType(plate1, 'any', bau1);
+Orion.DragItem(plate1, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 16, 51); 
+Orion.Wait(time);
+
+var plate2=Orion.FindType(plate2, 'any', bau1);
+Orion.DragItem(plate2, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 16, 80); 
+Orion.Wait(time);
+
+var plate3=Orion.FindType(plate3, 'any', bau1);
+Orion.DragItem(plate3, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 140, 90); 
+Orion.Wait(time);
+
+var plate4=Orion.FindType(plate4, 'any', bau1);
+Orion.DragItem(plate4, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 86, 96); 
+Orion.Wait(time);
+
+var plate5=Orion.FindType(plate5, 'any', bau1);
+Orion.DragItem(plate5, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 140, 51); 
+Orion.Wait(time);
+
+var plate6=Orion.FindType(plate6, 'any', bau1);
+Orion.DragItem(plate6, 0);
+Orion.Wait(time);
+Orion.DropDraggedItem(bau2, 82, 51); 
+Orion.Wait(time);
+
+}}

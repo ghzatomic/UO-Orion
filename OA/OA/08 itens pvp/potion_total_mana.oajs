@@ -1,0 +1,4 @@
+function potion_total_mana(){
+Orion.Say('.drinkmana');
+if (Orion.WaitJournal('Total Mana Refresh!', Orion.Now(), Orion.Now()+100)){
+Orion.AddDisplayTimer(300, 19000, 'top', 'circle|bar', 'Potion', 0, 40, '0x0058', 0, 'red');}}

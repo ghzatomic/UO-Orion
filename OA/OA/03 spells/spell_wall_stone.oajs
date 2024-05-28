@@ -1,0 +1,6 @@
+function spell_wall_stone(){
+Orion.Cast('24');
+if (Orion.WaitForTarget(1000))
+Orion.TargetTileRelative('any', 0, 0, 0);
+Orion.AddDisplayTimer(100, 3150, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'red');
+Orion.CancelTarget();}

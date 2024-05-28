@@ -1,0 +1,3 @@
+function comando_online(){
+Orion.Say('.online');
+}

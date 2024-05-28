@@ -1,0 +1,3 @@
+function terminate_all(){
+Orion.CharPrint(self, '40', 'terminate all');
+Orion.Terminate('all');}
