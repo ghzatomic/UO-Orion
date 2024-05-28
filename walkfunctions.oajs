@@ -324,6 +324,9 @@ function scanTela(onComplete){
 
 
 
+
+
+
 function abs(value) {
   return value < 0 ? -value : value;
 }
@@ -406,7 +409,7 @@ function isAccessible(grid, startX, startY, endX, endY, visited) {
       var nx = x + directions[i].dx;
       var ny = y + directions[i].dy;
 
-      if (nx >= 0 && nx < grid.length && ny >= 0 && ny < grid[0].length && !visited[ny][nx] && (grid[ny][nx] === '.' || grid[ny][nx] === 'T')) {
+      if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && !visited[ny][nx] && (grid[ny][nx] === '.' || grid[ny][nx] === 'T')) {
         visited[ny][nx] = true;
         queue.push({ x: nx, y: ny });
       }
@@ -439,7 +442,7 @@ function findSafeSpot(grid, playerX, playerY) {
           if (!safe) break;
         }
         if (safe) {
-          var visited = Array.from({ length: grid.length }, () => Array(grid[0].length).fill(false));
+          var visited = createVisitedMatrix(grid.length, grid[0].length);
           if (isAccessible(grid, playerX, playerY, x, y, visited)) {
             var dist = distance(playerX, playerY, x, y);
             if (dist > maxDistance || (dist === maxDistance && totalObstacles > maxObstacles)) {
@@ -455,36 +458,89 @@ function findSafeSpot(grid, playerX, playerY) {
   return bestSpot;
 }
 
-function findPath(grid, startX, startY, endX, endY) {
-  var path = [];
-  var x = startX, y = startY;
-  var dx = abs(endX - startX);
-  var dy = abs(endY - startY);
-  var sx = (startX < endX) ? 1 : -1;
-  var sy = (startY < endY) ? 1 : -1;
-  var err = dx - dy;
-
-  while (!(x === endX && y === endY)) {
-    path.push({ x: x, y: y });
-    var e2 = err * 2;
-    if (e2 > -dy) {
-      err -= dy;
-      x += sx;
+function createVisitedMatrix(rows, cols) {
+  var visited = [];
+  for (var i = 0; i < rows; i++) {
+    var row = new Array(cols);
+    for (var j = 0; j < cols; j++) {
+      row[j] = false;
     }
-    if (e2 < dx) {
-      err += dx;
-      y += sy;
+    visited.push(row);
+  }
+  return visited;
+}
+
+function findInArray(array, predicate) {
+  for (var i = 0; i < array.length; i++) {
+    if (predicate(array[i])) {
+      return array[i];
+    }
+  }
+  return null;
+}
+
+function aStarPath(grid, startX, startY, endX, endY) {
+  var openSet = [{ x: startX, y: startY, f: 0, g: 0, h: distance(startX, startY, endX, endY), parent: null }];
+  var closedSet = [];
+  var visited = createVisitedMatrix(grid.length, grid[0].length);
+
+  while (openSet.length > 0) {
+    var lowestFIndex = 0;
+    var lowestF = openSet[0].f;
+    for (var i = 1; i < openSet.length; i++) {
+      if (openSet[i].f < lowestF) {
+        lowestF = openSet[i].f;
+        lowestFIndex = i;
+      }
+    }
+    var current = openSet[lowestFIndex];
+
+    if (current.x === endX && current.y === endY) {
+      var path = [];
+      while (current) {
+        path.push({ x: current.x, y: current.y });
+        current = current.parent;
+      }
+      return path.reverse();
+    }
+
+    openSet.splice(lowestFIndex, 1);
+    closedSet.push(current);
+    visited[current.y][current.x] = true;
+
+    var directions = [
+      { dx: 1, dy: 0 },
+      { dx: -1, dy: 0 },
+      { dx: 0, dy: 1 },
+      { dx: 0, dy: -1 }
+    ];
+
+    for (var i = 0; i < directions.length; i++) {
+      var nx = current.x + directions[i].dx;
+      var ny = current.y + directions[i].dy;
+      if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && !visited[ny][nx] && (grid[ny][nx] === '.' || grid[ny][nx] === 'T')) {
+        var g = current.g + 1;
+        var h = distance(nx, ny, endX, endY);
+        var f = g + h;
+        var neighbor = { x: nx, y: ny, f: f, g: g, h: h, parent: current };
+
+        var existing = findInArray(openSet, function (node) {
+          return node.x === nx && node.y === ny;
+        });
+        if (!existing || g < existing.g) {
+          openSet.push(neighbor);
+        }
+      }
     }
   }
 
-  path.push({ x: endX, y: endY });
-  return path;
+  return [];
 }
 
 function findPathToSafeSpot(grid, playerX, playerY) {
   var safeSpot = findSafeSpot(grid, playerX, playerY);
   if (safeSpot) {
-    return findPath(grid, playerX, playerY, safeSpot.x, safeSpot.y);
+    return aStarPath(grid, playerX, playerY, safeSpot.x, safeSpot.y);
   } else {
     return []; // Nenhum local seguro encontrado
   }
