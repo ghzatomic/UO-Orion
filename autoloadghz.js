@@ -18,13 +18,14 @@ function Autostart() {
     Orion.Wait(2000);
     Orion.Wait(100);
     Orion.Exec('loopCastPerfeito')
+    Shared.AddVar('armamento', 0);
     Orion.CharPrint(self, 906, 'Bom jogo !!!');
 }
 
 
 function teste() {
-    var x = 958
-    var y = 736
+    var x = 2797
+    var y = 866
     var z = Player.Z()
     Orion.CharPrint(self, 906, 'aa'+ isTileAndavel(x,y,z));
     //testexx()

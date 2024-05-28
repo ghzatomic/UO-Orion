@@ -1,5 +1,5 @@
 
-const gridSize = 30;
+const gridSize = 60;
 
 function mapeiaTela(){
   function callback(i, j) {
@@ -121,9 +121,9 @@ function isTileAndavel(x,y,z){
   var tilesAt = Orion.GetTiles('any', x, y,z,255)
   var tileAndavel = true
   if (tilesAt){
-    if (tilesAt.length == 0){
-      return false
-    }
+    /*if (tilesAt.length == 0){
+      tileAndavel = false //Verificar na caverna e nas dungeons
+    }*/
     for (var i = 0; i < tilesAt.length; i++) {
       var data = tilesAt[i]
       var strFlag = data.Flags().toString(16)
@@ -175,7 +175,7 @@ function get_object_at(list,x,y){
 }
 
 function correr(){
-
+  var print = false
   var target = Orion.FindObject('lasttarget');
   if (target){
     enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself", 10, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
@@ -193,10 +193,10 @@ function correr(){
     var eu = "T"
     var onComplete = function (mapa, gradeX, gradeY){
       var playerPosition = undefined
-      //var loc = 'E:/git/UO Orion Macros/teste.txt'
-      //var file = Orion.NewFile(loc);
-      //var create = file.Open(loc)
-      //if (create){
+      var loc = 'E:/git/UO Orion Macros/teste.txt'
+      var file = print?Orion.NewFile(loc):undefined
+      var create = print?file.Open(loc):true
+      if (create){
         var mapeado = []
         for (var i = 0; i < gradeX; i++) {
           var mapeadoRow = []
@@ -229,7 +229,9 @@ function correr(){
             row += ''+strObj;
           }
           mapeado[i] = mapeadoRow
-          //file.Write(row+"\n");
+          if (print){
+            file.Write(row+"\n");
+          }
         }
         if (playerPosition){
           const safeSpot = findSafeSpot(mapeado, playerPosition.x, playerPosition.y)
@@ -245,8 +247,10 @@ function correr(){
             callb(xRun,yRun)
           }
         }
-        //file.Close();
-      //}
+        if (print){
+          file.Close();
+        }
+      }
 
     }
     //row += '('+mapa[i][j][0]+','+mapa[i][j][1]+'-'+andavel+'),';
@@ -317,8 +321,6 @@ function scanTela(onComplete){
   percorrerAteLimite(gradeX,gradeY,StartX,StartY,gradeX,gradeY, callback)
 
 }
-
-
 
 
 
@@ -487,31 +489,12 @@ function findPath(grid, startX, startY, endX, endY) {
   return path;
 }
 
-/*function drawPath(grid, startX, startY, endX, endY, callback) {
-  const path = [];
-  var x = startX, y = startY;
-  const dx = Math.abs(endX - startX);
-  const dy = Math.abs(endY - startY);
-  const sx = (startX < endX) ? 1 : -1;
-  const sy = (startY < endY) ? 1 : -1;
-  var err = dx - dy;
-
-  while (!(x === endX && y === endY)) {
-    path.push({ x, y });
-    const e2 = 2 * err;
-    if (e2 > -dy) {
-      err -= dy;
-      x += sx;
-    }
-    if (e2 < dx) {
-      err += dx;
-      y += sy;
-    }
+// Função principal para encontrar o caminho até o local mais seguro
+function findPathToSafeSpot(grid, playerX, playerY) {
+  var safeSpot = findSafeSpot(grid, playerX, playerY);
+  if (safeSpot) {
+    return findPath(grid, playerX, playerY, safeSpot.x, safeSpot.y);
+  } else {
+    return []; // Nenhum local seguro encontrado
   }
-
-  path.forEach(pos => {
-    const pathCell = gridElement.children[pos.y * gridSize + pos.x];
-    callback(x,y)
-  });
-  
-}*/
+}

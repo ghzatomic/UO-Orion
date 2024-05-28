@@ -3,20 +3,6 @@ var msg_castando_heal = "An Nox";
 var msg_potion = "Greater Cure!";
 var envenenado = "envenenado"
 
-function armamentoGHZ() {
-  if (Shared.GetVar('armamento') == 0) {
-    ArmarArma();
-    Shared.AddVar('armamento', 1);
-  } else if (Shared.GetVar('armamento') == 1) {
-    ArmarBow();
-    Shared.AddVar('armamento', 2);
-  } else {
-    Orion.Say('.Disarm');
-    Shared.AddVar('armamento', 0);
-  }
-}
-
-
 function castFSPreGHZ() {
   castPreGHZ('Kal Vas Flam', "Flame Strike", 3800, '0x1F5F', undefined, false)
 }
