@@ -1,5 +1,5 @@
 
-const gridSize = 60;
+const gridSize = 30;
 
 function mapeiaTela(){
   function callback(i, j) {
@@ -156,7 +156,7 @@ function isTileAndavel(x,y,z){
 
 function canWalk(x,y){
   //var lista = Orion.GetPathArrayEx(x,y,256,1,255,2,2)
-  Orion.CharPrint(self, 906, "aa"+Orion.GetPathArrayEx(x,y,x+10,y+10));
+  
 }
 
 function get_object_at(list,x,y){
@@ -178,7 +178,7 @@ function correr(){
   var print = false
   var target = Orion.FindObject('lasttarget');
   if (target){
-    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself", 10, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
+    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself", 30, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
     var simInimigoX = target.X()
     var simInimigoY = target.Y()
     var inimigoList = [[simInimigoX,simInimigoY]]
@@ -324,7 +324,6 @@ function scanTela(onComplete){
 
 
 
-
 function abs(value) {
   return value < 0 ? -value : value;
 }
@@ -384,15 +383,10 @@ function countObstaclesBetween(grid, x1, y1, x2, y2) {
   return count;
 }
 
-function isAccessible(grid, startX, startY, endX, endY) {
+function isAccessible(grid, startX, startY, endX, endY, visited) {
+  if (visited[endY][endX]) return true;
+
   var queue = [{ x: startX, y: startY }];
-  var visited = [];
-  for (var i = 0; i < gridSize; i++) {
-    visited[i] = [];
-    for (var j = 0; j < gridSize; j++) {
-      visited[i][j] = false;
-    }
-  }
   visited[startY][startX] = true;
 
   var directions = [
@@ -412,7 +406,7 @@ function isAccessible(grid, startX, startY, endX, endY) {
       var nx = x + directions[i].dx;
       var ny = y + directions[i].dy;
 
-      if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize && !visited[ny][nx] && (grid[ny][nx] === '.' || grid[ny][nx] === 'T')) {
+      if (nx >= 0 && nx < grid.length && ny >= 0 && ny < grid[0].length && !visited[ny][nx] && (grid[ny][nx] === '.' || grid[ny][nx] === 'T')) {
         visited[ny][nx] = true;
         queue.push({ x: nx, y: ny });
       }
@@ -427,13 +421,13 @@ function findSafeSpot(grid, playerX, playerY) {
   var maxDistance = -1;
   var maxObstacles = -1;
 
-  for (var y = 0; y < gridSize; y++) {
-    for (var x = 0; x < gridSize; x++) {
+  for (var y = 0; y < grid.length; y++) {
+    for (var x = 0; x < grid[0].length; x++) {
       if (grid[y][x] === '.' || grid[y][x] === 'P') {
         var safe = true;
         var totalObstacles = 0;
-        for (var ey = 0; ey < gridSize; ey++) {
-          for (var ex = 0; ex < gridSize; ex++) {
+        for (var ey = 0; ey < grid.length; ey++) {
+          for (var ex = 0; ex < grid[0].length; ex++) {
             if (grid[ey][ex] === 'E') {
               if (hasLineOfSight(grid, ex, ey, x, y)) {
                 safe = false;
@@ -444,12 +438,15 @@ function findSafeSpot(grid, playerX, playerY) {
           }
           if (!safe) break;
         }
-        if (safe && isAccessible(grid, playerX, playerY, x, y)) {
-          var dist = distance(playerX, playerY, x, y);
-          if (dist > maxDistance || (dist === maxDistance && totalObstacles > maxObstacles)) {
-            bestSpot = { x: x, y: y };
-            maxDistance = dist;
-            maxObstacles = totalObstacles;
+        if (safe) {
+          var visited = Array.from({ length: grid.length }, () => Array(grid[0].length).fill(false));
+          if (isAccessible(grid, playerX, playerY, x, y, visited)) {
+            var dist = distance(playerX, playerY, x, y);
+            if (dist > maxDistance || (dist === maxDistance && totalObstacles > maxObstacles)) {
+              bestSpot = { x: x, y: y };
+              maxDistance = dist;
+              maxObstacles = totalObstacles;
+            }
           }
         }
       }
@@ -468,11 +465,6 @@ function findPath(grid, startX, startY, endX, endY) {
   var err = dx - dy;
 
   while (!(x === endX && y === endY)) {
-    // Verificar se o próximo passo é acessível
-    if (!isAccessible(grid, x, y, x + sx, y + sy)) {
-      return []; // Retorna um caminho vazio se um passo não for acessível
-    }
-
     path.push({ x: x, y: y });
     var e2 = err * 2;
     if (e2 > -dy) {
@@ -489,7 +481,6 @@ function findPath(grid, startX, startY, endX, endY) {
   return path;
 }
 
-// Função principal para encontrar o caminho até o local mais seguro
 function findPathToSafeSpot(grid, playerX, playerY) {
   var safeSpot = findSafeSpot(grid, playerX, playerY);
   if (safeSpot) {
