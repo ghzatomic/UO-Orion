@@ -175,16 +175,16 @@ function get_object_at(list,x,y){
 }
 
 function correr(){
-  var print = false
+  var print = true
   var target = Orion.FindObject('lasttarget');
   if (target){
-    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself", 30, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
+    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself", 60, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
     var simInimigoX = target.X()
     var simInimigoY = target.Y()
     var inimigoList = [[simInimigoX,simInimigoY]]
     for(var i=0 ; i < enemyList.length; i++){
       var inim = enemyList[i];
-      inimigoList.push(inim.X(),inim.Y())
+      inimigoList.push([inim.X(),inim.Y()])
     }
     var inimigoListPosition = []
     var vazio = "."
