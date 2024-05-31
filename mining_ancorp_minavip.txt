@@ -41,7 +41,7 @@ var bauJoias='0x401DF280'; // ID bau de joias
 var bauPic='0x401DF280'; //ID bau picareta
 var bauReg='0x4033975B';//ID bau de reagents
 var local=1, // 0 p/ casa fora da mina, 1 p/ banco proximo a mina e 2 para recall.
-var onSmaltar=1; // 0 para guardar ores e 1 para guardar lingotes.
+var onSmaltar=0; // 0 para guardar ores e 1 para guardar lingotes.
 var SmaltarCave=0; //0 para usar forja na mina e 1 para usar em casa.
 var hidd=0; // 0 = não fica em stealth, 1 = usa stealth.
 var guard=0; // 0 = não chama guards, 1 = chama guards.

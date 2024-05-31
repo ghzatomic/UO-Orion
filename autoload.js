@@ -1323,7 +1323,7 @@ function Loot() {
     var list = Orion.FindList('Loot', serial);
     for (var i = 0; i < list.length; i++) {
       Orion.MoveItem(list[i], 0, 'backpack');
-      Orion.Wait(100);
+      Orion.Wait(250);
     }
   }
   for (var i = 0; i < Gold.length; i++) {

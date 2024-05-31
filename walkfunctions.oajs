@@ -1,5 +1,5 @@
 const algoritimo_caminho = 'balanced'
-const gridSize = 30;
+const gridSize = 40;
 
 function mapeiaTela(){
   function callback(i, j) {
@@ -187,6 +187,59 @@ function runManager(){
   }
 }
 
+
+function autoSeguirInimigo() {
+  var isWalking = Orion.IsWalking()
+  Shared.AddVar('RMCancelRun', true);
+  if (isWalking) {
+      Orion.StopWalking()
+      Orion.ClearBadLocations();
+  }
+  var enemy = Orion.FindObject('lasttarget');
+  //walkToTarget(enemy)
+  if (enemy) {
+      Orion.WalkTo(enemy.X(), enemy.Y(), enemy.Z(), 1, enemy.Z() + 5, 1, 1);
+      Orion.Attack(enemy);
+  }
+
+}
+
+
+function walkToTarget(target){
+  Shared.AddVar('RMCancelRun', true);
+  if(!target)
+  {
+      return false;
+  }
+  var x = target.X();
+  var y = target.Y();
+  var z = target.Z();
+  var pathArray = Orion.GetPathArray(x, y, z);
+  while(pathArray.length>0)
+  {
+      Orion.ClearBadLocations();
+      var npcList = Orion.FindType('any', 'any', 'ground', 'ignoreself', '5');
+      for(i=0; i < npcList.length; i++)
+      {
+          var npc = Orion.FindObject(npcList[i]);
+          Orion.SetBadLocation(npc.X(), npc.Y());
+      }
+      var stepTarget = pathArray[0];
+      var check = Orion.WalkTo(stepTarget.X(),stepTarget.Y(),stepTarget.Z(),1,255,1,1);
+      if(!check)
+      {
+          Orion.Print('Não da para ir !');
+          return false;
+      }
+      x = target.X();
+      y = target.Y();
+      z = target.Z();
+      pathArray = Orion.GetPathArray(x, y, z);
+  }
+  return true;
+}
+
+
 function stopRun(){
   Shared.AddVar('RMCancelRun', true);
 }
@@ -208,9 +261,9 @@ function correr2(){
         }
         const safeSpot = listSafeSpot[i]
         if (safeSpot){
-          var xRun = mapa[safeSpot.x][safeSpot.y][0]
-          var yRun = mapa[safeSpot.x][safeSpot.y][1]
-          Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun);
+          var xRun = mapa[safeSpot.y][safeSpot.x][0]
+          var yRun = mapa[safeSpot.y][safeSpot.x][1]
+          //Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun);
           var callb = function(x,y){
             andarPara(x,y)
             //Orion.CharPrint(self, 906, "aaccc "+x+" - "+y);
@@ -234,9 +287,9 @@ function correr(){
     if (listSafeSpot && listSafeSpot.length > 0){
       const safeSpot = listSafeSpot[listSafeSpot.length-1]//findSafeSpot(mapeado, playerX, playerY)
       if (safeSpot){
-        var xRun = mapa[safeSpot.x][safeSpot.y][0]
-        var yRun = mapa[safeSpot.x][safeSpot.y][1]
-        Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun);
+        var xRun = mapa[safeSpot.y][safeSpot.x][0]
+        var yRun = mapa[safeSpot.y][safeSpot.x][1]
+        //Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun);
         var callb = function(x,y){
           andarPara(x,y)
           //Orion.CharPrint(self, 906, "aaccc "+x+" - "+y);
@@ -255,7 +308,7 @@ function correrFunc(onFindSpot){
   var print = true
   var target = Orion.FindObject('lasttarget');
   //if (target){
-    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself", gridSize, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
+    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself|live", gridSize, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
     //var simInimigoX = target.X()
     //var simInimigoY = target.Y()
     var inimigoList = []//[[simInimigoX,simInimigoY]]
@@ -557,7 +610,7 @@ function minimax(grid, depth, isMaximizingPlayer, alpha, beta, playerX, playerY)
     for (var i = 0; i < directions.length; i++) {
       const nx = playerX + directions[i].dx;
       const ny = playerY + directions[i].dy;
-      if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && (grid[ny][nx] === '.' || grid[ny][nx] === 'A')) {
+      if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && grid[ny][nx] === '.') {
         const eval = minimax(grid, depth - 1, false, alpha, beta, nx, ny);
         maxEval = Math.max(maxEval, eval);
         alpha = Math.max(alpha, eval);
@@ -572,7 +625,7 @@ function minimax(grid, depth, isMaximizingPlayer, alpha, beta, playerX, playerY)
     for (var i = 0; i < directions.length; i++) {
       const nx = playerX + directions[i].dx;
       const ny = playerY + directions[i].dy;
-      if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && (grid[ny][nx] === '.' || grid[ny][nx] === 'A')) {
+      if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && grid[ny][nx] === '.') {
         const eval = minimax(grid, depth - 1, true, alpha, beta, nx, ny);
         minEval = Math.min(minEval, eval);
         beta = Math.min(beta, eval);
@@ -602,7 +655,7 @@ function findBestMove(grid, playerX, playerY, strategy) {
   for (var i = 0; i < directions.length; i++) {
     const nx = playerX + directions[i].dx;
     const ny = playerY + directions[i].dy;
-    if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && (grid[ny][nx] === '.' || grid[ny][nx] === 'A')) {
+    if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && grid[ny][nx] === '.') {
       const moveValue = minimax(grid, 3, false, -Infinity, Infinity, nx, ny);
       if (moveValue > bestValue) {
         bestMove = { x: nx, y: ny };
@@ -690,11 +743,16 @@ function aStarPath(grid, startX, startY, endX, endY) {
 }
 
 function findPathToSafeSpot(grid, playerX, playerY, strategy) {
-  const safeSpot = findSafeSpot(grid, playerX, playerY, strategy);
+  var safeSpot = findSafeSpot(grid, playerX, playerY, strategy);
   if (safeSpot) {
-    const path = aStarPath(grid, playerX, playerY, safeSpot.x, safeSpot.y);
-    if (path.length > 0) {
-      return path;
+    if (safeSpot.length < 5){
+      safeSpot = findSafeSpot(grid, playerX, playerY, 'shortest');
+    }
+    if (safeSpot){
+      const path = aStarPath(grid, playerX, playerY, safeSpot.x, safeSpot.y);
+      if (path.length > 0) {
+        return path;
+      }
     }
   }
   // Se nenhum local seguro for encontrado ou se o A* não encontrou um caminho, use BFS para encontrar uma saída possível
@@ -734,9 +792,9 @@ function bfsPath(grid, startX, startY) {
       const nx = x + directions[i].dx;
       const ny = y + directions[i].dy;
 
-      if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && !visited[ny][nx] && (grid[ny][nx] === '.' || grid[ny][nx] === 'A')) {
+      if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && !visited[ny][nx] && grid[ny][nx] === '.') {
         const newPath = path.concat({ x: nx, y: ny });
-        if (grid[ny][nx] === 'A' || (nx === 0 || nx === gridSize - 1 || ny === 0 || ny === gridSize - 1)) {
+        if ((nx === 0 || nx === gridSize - 1 || ny === 0 || ny === gridSize - 1)) {
           return newPath;
         }
         visited[ny][nx] = true;
