@@ -22,24 +22,6 @@ function Autostart() {
     Orion.CharPrint(self, 906, 'Bom jogo !!!');
 }
 
-
 function teste() {
-    var x = 2797
-    var y = 866
-    var z = Player.Z()
-    Orion.CharPrint(self, 906, 'aa'+ isTileAndavel(x,y,z));
-    //testexx()
-    /*var enemy = Orion.FindObject('lasttarget');
-    var x = Player.X()+10
-    var y = Player.Y()+10
-    var z = Player.Z()
-
-    //x = enemy.X()
-    //y = enemy.Y()
-    //z = enemy.Z()
-
-    var arr = Orion.GetPathArray(x,y,z);
-    Orion.CharPrint(self, 906, 'aa'+arr.length);
-    Orion.CharPrint(self, 906, 'bb'+Player.X()+"-"+Player.Y()+"-"+Player.Z());*/
+Orion.Info()
 }
-

@@ -1,6 +1,48 @@
 const algoritimo_caminho = 'balanced'
 const gridSize = 40;
 
+function auto_pvm(){
+  var lastX = 0
+  var lastZ = 0
+  var lastY = 0
+  var runAll = true
+  Shared.AddVar('RMCancelRun', false);
+  while(runAll) {
+    TargetNextEnemy_PvM()
+    Orion.Wait(500)
+    var enemy = Orion.FindObject('lasttarget');
+    Orion.CharPrint(self, 906, 'Mudando ');
+    Orion.Wait(1500)
+    while(!enemy.Dead()){
+      enemy = Orion.FindObject('lasttarget');
+      if (!enemy){
+        Orion.CharPrint(self, 906, 'Nao Enemy ');
+        break
+      }
+      if (Shared.GetVar('RMCancelRun')){
+        Orion.CharPrint(self, 906, 'RMCancelRun ');
+        runAll = false
+        break
+      }
+      
+      if (Player.X() != enemy.X() && Player.Y() != enemy.Y()){
+        var distancia = 1
+        Orion.WalkTo(enemy.X(), enemy.Y(), Player.Z(), distancia, Player.Z(), 1, 1);
+      }
+      lastX = enemy.X()
+      lastY = enemy.Y()
+      lastZ = enemy.Z()
+      if (enemy.Dead()){
+        Orion.CharPrint(self, 906, 'Morreu ! ');
+        break
+      }
+      
+    }
+  }
+  
+
+}
+
 function mapeiaTela(){
   function callback(i, j) {
     //console.log(`Célula em (${i}, ${j})`);
@@ -245,15 +287,27 @@ function stopRun(){
 }
 
 function correr2(){
+  correrLocal(gridSize,undefined)
+}
+
+function correrLocal(gridSizeLocal,qtdePassos){
   Shared.AddVar('RMCancelRun', true);
   var onFindSpot = function(mapeado,mapa, playerX, playerY){
     Shared.AddVar('RMCancelRun', false);
-    const listSafeSpot = findPathToSafeSpot(mapeado, playerX, playerY, algoritimo_caminho)
+    const listSafeSpot = findPathToSafeSpot(mapeado, playerX, playerY, algoritimo_caminho,gridSizeLocal)
     if (listSafeSpot && listSafeSpot.length > 0){
       for (var i = 0; i<listSafeSpot.length; i++){
+        Orion.CharPrint(self, 906, 'Teste '+" "+i);
+        if (qtdePassos){
+          if (qtdePassos > i){
+            Orion.CharPrint(self, 906, 'Correndo '+qtdePassos+" "+i);
+            break
+          }
+        }
         if (i % 0){
           continue
         }
+        
         const cancelRun = Shared.GetVar('RMCancelRun');
         if (cancelRun){
           Shared.AddVar('RMCancelRun', false);
@@ -275,7 +329,7 @@ function correr2(){
     }
   } 
 
-  correrFunc(onFindSpot)
+  correrFunc(onFindSpot,gridSizeLocal)
 
 }
 
@@ -304,11 +358,11 @@ function correr(){
 
 }
 
-function correrFunc(onFindSpot){
+function correrFunc(onFindSpot,gridSizeLocal){
   var print = true
   var target = Orion.FindObject('lasttarget');
   //if (target){
-    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself|live", gridSize, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
+    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself|live", gridSizeLocal?gridSizeLocal:gridSize, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
     //var simInimigoX = target.X()
     //var simInimigoY = target.Y()
     var inimigoList = []//[[simInimigoX,simInimigoY]]
@@ -407,20 +461,20 @@ function testexx(){
       file.Close();
     }
   }
-  scanTela(onComplete);
+  scanTela(onComplete,gridSizeLocal);
 
 }
 
-function scanTela(onComplete){
+function scanTela(onComplete,gridSizeLocal){
   //var tiles = Orion.GetTiles("any",Player.X,Player.Y);
   //if (tiles){
   //  Orion.CharPrint(self, 906, "aaaa"+Orion.GetGraphic(tiles));
   //}
   //Orion.CharPrint(self, 906, "CanWalk -"+Player.X()+","+Player.Y()+" - "+Orion.CanWalk("North", Player.X()-1,Player.Y()-1,Player.Z()));
-  var StartX = gridSize/2
-  var StartY = gridSize/2
-  var gradeX = gridSize
-  var gradeY = gridSize
+  var StartX = gridSizeLocal?gridSizeLocal:gridSize/2
+  var StartY = gridSizeLocal?gridSizeLocal:gridSize/2
+  var gradeX = gridSizeLocal?gridSizeLocal:gridSize
+  var gradeY = gridSizeLocal?gridSizeLocal:gridSize
   var run = create2DArray(gradeX, gradeY, 0);
   var count = 1
   var callback = function(x,y){
@@ -455,10 +509,10 @@ function setCharAt(str, index, chr) {
   return str.substring(0, index) + chr + str.substring(index + 1);
 }
 
-function createGrid(gridString) {
+function createGrid(gridString,gridSizeLocal) {
   const grid = [];
-  for (var i = 0; i < gridSize; i++) {
-    grid.push(gridString.slice(i * gridSize, (i + 1) * gridSize).split(''));
+  for (var i = 0; i < gridSizeLocal?gridSizeLocal:gridSize; i++) {
+    grid.push(gridString.slice(i * gridSizeLocal?gridSizeLocal:gridSize, (i + 1) * gridSizeLocal?gridSizeLocal:gridSize).split(''));
   }
   return grid;
 }
@@ -525,7 +579,7 @@ function calculateRisk(grid, x, y) {
   return risk;
 }
 
-function findSafeSpot(grid, playerX, playerY, strategy) {
+function findSafeSpot(grid, playerX, playerY, strategy, gridSizeLocal) {
   var bestSpot = null;
   var optimalScore = (strategy === 'shortest') ? Infinity : -Infinity;
 
@@ -573,7 +627,7 @@ function findSafeSpot(grid, playerX, playerY, strategy) {
 
   // Se nenhum local seguro for encontrado, vá para o canto mais distante
   if (!bestSpot) {
-    bestSpot = { x: gridSize - 1, y: gridSize - 1 };
+    bestSpot = { x: gridSizeLocal?gridSizeLocal:gridSize - 1, y: gridSizeLocal?gridSizeLocal:gridSize - 1 };
     for (var y = 0; y < grid.length; y++) {
       for (var x = 0; x < grid[0].length; x++) {
         if (grid[y][x] === '.' || grid[y][x] === 'A') {
@@ -742,11 +796,11 @@ function aStarPath(grid, startX, startY, endX, endY) {
   return [];
 }
 
-function findPathToSafeSpot(grid, playerX, playerY, strategy) {
-  var safeSpot = findSafeSpot(grid, playerX, playerY, strategy);
+function findPathToSafeSpot(grid, playerX, playerY, strategy,gridSizeLocal) {
+  var safeSpot = findSafeSpot(grid, playerX, playerY, strategy,gridSizeLocal);
   if (safeSpot) {
     if (safeSpot.length < 5){
-      safeSpot = findSafeSpot(grid, playerX, playerY, 'shortest');
+      safeSpot = findSafeSpot(grid, playerX, playerY, 'shortest',gridSizeLocal);
     }
     if (safeSpot){
       const path = aStarPath(grid, playerX, playerY, safeSpot.x, safeSpot.y);
@@ -759,7 +813,7 @@ function findPathToSafeSpot(grid, playerX, playerY, strategy) {
   return bfsPath(grid, playerX, playerY);
 }
 
-function bfsPath(grid, startX, startY) {
+function bfsPath(grid, startX, startY,gridSizeLocal) {
   const queue = [{ x: startX, y: startY, path: [] }];
   const visited = [];
   for (var i = 0; i < grid.length; i++) {
@@ -794,7 +848,7 @@ function bfsPath(grid, startX, startY) {
 
       if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && !visited[ny][nx] && grid[ny][nx] === '.') {
         const newPath = path.concat({ x: nx, y: ny });
-        if ((nx === 0 || nx === gridSize - 1 || ny === 0 || ny === gridSize - 1)) {
+        if ((nx === 0 || nx === gridSizeLocal?gridSizeLocal:gridSize - 1 || ny === 0 || ny === gridSizeLocal?gridSizeLocal:gridSize - 1)) {
           return newPath;
         }
         visited[ny][nx] = true;

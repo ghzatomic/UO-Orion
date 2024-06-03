@@ -17,6 +17,7 @@ function teste2() {
   //Orion.WalkTo(4094, 323, 0, 0, 10, 2, 1);
 }
 function teste() {
+  Orion.Info()
 }
 
 function Autostart() {

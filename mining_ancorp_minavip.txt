@@ -381,3 +381,42 @@ function LocMov(x){
 			Orion.CharPrint('self', '0x0035', 'Valor da variavel \"local" não definida corretamente!');
 	}
 }
+
+
+function smelt_all() {
+  var typeOres='0x19B9|0x19B8|0x19B7|0x19BA';
+   while(Orion.FindType(typeOres, 'any', 'bauBS').length> 0){
+   	smelt_guarda()
+   	Orion.Wait(500);
+   }
+    
+}
+
+function smelt_guarda()
+{
+    var typeOres='0x19B9|0x19B8|0x19B7|0x19BA';
+    var typeLingots='0x1BF2';
+	var findItems0 = Orion.FindType(typeOres, 'any','bauBS');
+	if (findItems0.length)
+	{
+		Orion.DragItem(findItems0[0], 100);
+		Orion.Wait('300');
+	}
+	Orion.Wait(300);
+	Orion.DropDraggedItem('backpack', 72, 85);
+	Orion.Wait('500');
+	Orion.UseType(hammer);
+	var ores = Orion.FindType(typeOres, 'any', backpack);
+	for (var i=0; i <= ores.length; i++){
+		Orion.UseObject(ores[i]);
+		Orion.Wait(50);
+	}
+	while (Orion.Count(typeLingots, 'any', backpack)>= 1){
+		var finditem = Orion.FindType(typeLingots, 'any', backpack);
+		for(i = 0; i < finditem.length; i++) {
+		     Orion.MoveItem(finditem[i], 0, 'bauBS');
+		     Orion.Wait(500);
+        } 
+     	Orion.Wait(100);
+     }
+}
