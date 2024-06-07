@@ -28,6 +28,7 @@
 //ATENÇÃO!!!
 // Configurações Inicias
 var minaX=6096, minaY=1359, minaZ=(0), casaX=6096, casaY=1359, casaZ=(30), forjaX=6096, forjaY=1359, forjaZ=(30), ressX=1063, ressY=1431, ressZ=(-90); 
+var rareOresCor = '!0x09BC|!0x09BA|!0x09B9|!0x09BD' // Inferno Chaos order celestial
 var typeOres='0x19B9|0x19B8|0x19B7|0x19BA';
 var typeJoias='0x0F16|0x0E1F|0x0F26|0x14ED|0x3C2D|0x0F13|0x0F18|0x0F10|0x0F0F|0x0F11|0x0F15';
 var typeLingots='0x1BF2';
@@ -41,7 +42,7 @@ var bauJoias='0x401DF280'; // ID bau de joias
 var bauPic='0x401DF280'; //ID bau picareta
 var bauReg='0x4033975B';//ID bau de reagents
 var local=1, // 0 p/ casa fora da mina, 1 p/ banco proximo a mina e 2 para recall.
-var onSmaltar=0; // 0 para guardar ores e 1 para guardar lingotes.
+var onSmaltar=1; // 0 para guardar ores e 1 para guardar lingotes.
 var SmaltarCave=0; //0 para usar forja na mina e 1 para usar em casa.
 var hidd=0; // 0 = não fica em stealth, 1 = usa stealth.
 var guard=0; // 0 = não chama guards, 1 = chama guards.
@@ -174,9 +175,9 @@ function smaltar(){
 		Orion.WalkTo(forjaX, forjaY, forjaZ, 0, 0, 1, 1);
 		Orion.Wait(1000);
 	}
-	while(Orion.Count(typeOres, 'any', backpack)>0){
+	while(Orion.Count(typeOres, rareOresCor, backpack)>0){
 		Orion.UseType(hammer);
-		var ores = Orion.FindType(typeOres, 'any', backpack);
+		var ores = Orion.FindType(typeOres, rareOresCor, backpack);
 		for (var i=0; i <= ores.length; i++){
 			Orion.UseObject(ores[i]);
 			Orion.Wait(50);
@@ -187,26 +188,21 @@ function smaltar(){
 }
 
 function Guardar(){
-	if(onSmaltar==0){
-		while (Orion.Count(typeOres, 'any', backpack)>= 1){
-			var finditem = Orion.FindType(typeOres, 'any', backpack);
-			for(i = 0; i < finditem.length; i++) {
-			     Orion.MoveItem(finditem[i], 0, 'bauBS');
-			     Orion.Wait(500);
-	        } 
-	     	Orion.Wait(100);
-	     }
-	}else if(onSmaltar==1){
-		while (Orion.Count(typeLingots, 'any', backpack)>= 1){
-			var finditem = Orion.FindType(typeLingots, 'any', backpack);
-			for(i = 0; i < finditem.length; i++) {
-			     Orion.MoveItem(finditem[i], 0, 'bauBS');
-			     Orion.Wait(500);
-	        } 
-	     	Orion.Wait(100);
-	     }
-	}else{
-		Orion.CharPrint('self', '0x0035', 'Valor da variavel \"onSmaltar" não definida corretamente!');
+	while (Orion.Count(typeOres, 'any', backpack)>= 1){
+		var finditem = Orion.FindType(typeOres, 'any', backpack);
+		for(i = 0; i < finditem.length; i++) {
+				Orion.MoveItem(finditem[i], 0, 'bauBS');
+				Orion.Wait(500);
+		} 
+		Orion.Wait(100);
+	}
+	while (Orion.Count(typeLingots, 'any', backpack)>= 1){
+		var finditem = Orion.FindType(typeLingots, 'any', backpack);
+		for(i = 0; i < finditem.length; i++) {
+				Orion.MoveItem(finditem[i], 0, 'bauBS');
+				Orion.Wait(500);
+		} 
+		Orion.Wait(100);
 	}
 	while (Orion.Count(typeJoias, 'any', backpack)>= 1){
 		var finditem = Orion.FindType(typeJoias, 'any', backpack);

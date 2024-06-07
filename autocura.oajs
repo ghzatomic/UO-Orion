@@ -137,7 +137,7 @@ function ManaGHZ(){
 
   function executaHeal(){
     var bandages = Orion.FindType('0x0E21');
-    if (Player.Hits() < 30)  {
+    if (Player.Hits() < 40)  {
         if (Orion.Count("0x0F0E","0x00FF",backpack)>0) {
            Orion.CharPrint(self, 906, "Socorro !! bebendo potion")
            Orion.UseType("0x0F0E","0x00FF")
