@@ -229,8 +229,28 @@ function runManager(){
   }
 }
 
+function sqrt(value) {
+  if (value < 0) return NaN;
+  var x = value;
+  var y = 1;
+  const e = 0.000001; // margem de erro
 
-function autoSeguirInimigo() {
+  while (x - y > e) {
+    x = (x + y) / 2;
+    y = value / x;
+  }
+
+  return x;
+}
+
+function estaProximo(x1, y1, x2, y2, distanciaMaxima) {
+  const deltaX = x2 - x1;
+  const deltaY = y2 - y1;
+  const distancia = sqrt(deltaX * deltaX + deltaY * deltaY);
+  return distancia <= distanciaMaxima;
+}
+
+function autoSeguirInimigoProx(callbackProximo) {
   var isWalking = Orion.IsWalking()
   Shared.AddVar('RMCancelRun', true);
   if (isWalking) {
@@ -240,9 +260,22 @@ function autoSeguirInimigo() {
   var enemy = Orion.FindObject('lasttarget');
   //walkToTarget(enemy)
   if (enemy) {
+      const distanciaMaxima = 2;
+      const proximidade = estaProximo(Player.X(), Player.Y(), enemy.X(), enemy.Y(), distanciaMaxima);
+      if (proximidade) {
+        callbackProximo()
+      }
       Orion.WalkTo(enemy.X(), enemy.Y(), enemy.Z(), 1, enemy.Z() + 5, 1, 1);
       Orion.Attack(enemy);
   }
+}
+
+function autoSeguirInimigo() {
+  var funcProximidade = function (){
+    ArmarArma();
+  }
+
+  autoSeguirInimigoProx(funcProximidade)
 
 }
 

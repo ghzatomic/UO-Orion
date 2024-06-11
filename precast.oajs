@@ -23,7 +23,7 @@ function castMAPreGHZ() {
 }
 
 function castCurePreGHZ() {
-  castPreGHZ("An Nox", "Cure", 2300, "", 'self', false, undefined,1400)
+  castPreGHZ("An Nox", "Cure", 2400, "", 'self', false, undefined,700)
 }
 
 function onComboFSFinish(){
