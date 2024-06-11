@@ -377,7 +377,7 @@ function correrFunc(onFindSpot,gridSizeLocal){
     var eu = "T"
     var onComplete = function (mapa, gradeX, gradeY){
       var playerPosition = undefined
-      var loc = 'E:/git/UO Orion Macros/teste.txt'
+      var loc = 'D:/git/UO Orion Macros/teste.txt'
       var file = print?Orion.NewFile(loc):undefined
       var create = print?file.Open(loc):true
       if (create){

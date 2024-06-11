@@ -17,11 +17,18 @@ function Autostart() {
 
     Orion.Wait(2000);
     Orion.Wait(100);
-    Orion.Exec('loopCastPerfeito')
+    Orion.Exec('loopCastPerfeitoV2')
     Shared.AddVar('armamento', 0);
     Orion.CharPrint(self, 906, 'Bom jogo !!!');
 }
 
+function onCastPoisonTeste(){
+    Orion.CharPrint(self, 906, 'aaaa');
+}
+
 function teste() {
-Orion.Info()
+    
+    Shared.AddVar('CPCallbackFunction', 'onCastPoisonTeste');
+    var callback = Shared.GetVar('CPCallbackFunction');
+    eval(callback)()
 }
