@@ -19,7 +19,44 @@ function Autostart() {
     Orion.Wait(100);
     Orion.Exec('loopCastPerfeitoV2')
     Shared.AddVar('armamento', 0);
+    setaVariaveisImportantes()
     Orion.CharPrint(self, 906, 'Bom jogo !!!');
+}
+
+function resetVariaveisImportantes(){
+	Shared.RemoveVar('idRunebook');
+}
+
+function setaVariaveisImportantes(){
+    resetVariaveisImportantes()
+    selectionaObjESetaVariavel('idRunebook', 'Selecione o runebook para correr')
+}
+
+function selectionaObjESetaVariavel(nameVar,msg){
+    Orion.ClearJournal('self');
+    if (!Shared.GetVar(nameVar)){
+        Orion.CancelTarget();
+        Orion.ClientLastTarget();
+        Orion.CharPrint(self, 906, msg);
+        while(!Shared.GetVar(nameVar)){
+            Orion.Say('.mostraruid')
+            Orion.Wait(1000)
+            Orion.WaitJournal('UID', Orion.Now(), Orion.Now()+10000, 'sys');
+            if (Orion.InJournal('UID', 'sys')){
+            	var jorMSG = Orion.InJournal('UID', 'sys')
+	            if (jorMSG){
+	                 var id = jorMSG.Text().split(':')[1]
+	                 if (id){
+	                 	Shared.AddVar(nameVar, '0x'+id.trim());
+            	 	 	Orion.CharPrint(self,906,'Setando id : '+Shared.GetVar(nameVar));
+            	 		 break;
+	                 }
+	                 
+	            }
+            }
+        }
+    }
+    
 }
 
 function onCastPoisonTeste(){

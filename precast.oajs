@@ -11,7 +11,7 @@ function castFSPreGHZ() {
 }
 
 function castPoisonPreGHZ() {
-  castPreGHZ('In Nox', "Poison", 3200, '', undefined, false, undefined,1200)
+  castPreGHZ('In Nox', "Poison", 3200, '', undefined, false, undefined,1250)
 }
 
 function castParalizePreGHZ() {
@@ -22,16 +22,22 @@ function castMAPreGHZ() {
   castPreGHZ("In Por Y", "Magic Arrow", 1300, "", undefined, false, undefined,200)
 }
 
+function castMAPreGHZExplosion() {
+  interromperCast();
+  desativaCast();
+  castPreGHZ("In Por Y", "Magic Arrow", 1300, "", 'explo', false, undefined,200)
+}
+
 function castCurePreGHZ() {
   castPreGHZ("An Nox", "Cure", 2400, "", 'self', false, undefined,700)
 }
 
 function onComboFSFinish(){
-  castPreGHZ('In Nox', "Poison", 3200, '', undefined, false, 'onComboPoisonFinish',1200)
+  castPreGHZ('In Nox', "Poison", 3200, '', undefined, false, 'onComboFSFinish',1250)
 }
 
 function onComboPoisonFinish(){
-  castPreGHZ('Kal Vas Flam', "Flame Strike", 3800, '0x1F5F', undefined, false, 'onComboFSFinish',1200)
+  castPreGHZ('Kal Vas Flam', "Flame Strike", 3800, '0x1F5F', undefined, false, 'onComboPoisonFinish',1200)
 }
 
 function onComboMAFinish(){
@@ -70,6 +76,7 @@ function desativaCast() {
   Shared.AddVar('CPCallbackFunction', 'nullCallback');
   Orion.ClearJournal(lastCastMSG);
   Orion.ClearJournal(lastCastCAST);
+  Shared.AddVar('RMCancelRun', true);
 }
 
 function interromperCast() {
@@ -142,8 +149,12 @@ function castPreGHZ(MSG, CAST, DELAY, TYPE, TARGET, DESATIVAVEL,callbackCastou,D
 
 function castMagiaFunction(funct_back, lastCastUse, lastCastCAST, lastCastMSG, lastCastDelay, target) {
   var enemy = true
+  var lastEnemy = undefined
   if (target == 'lasttarget') { // Aqui verifica se a magia é self, por exemplo o cure
     enemy = Orion.FindObject('lasttarget');
+  }else if (target == 'explo') {
+    lastEnemy = Orion.FindObject('lasttarget');
+    enemy = Orion.FindObject('self');
   }
 
   if (enemy) {
@@ -155,11 +166,24 @@ function castMagiaFunction(funct_back, lastCastUse, lastCastCAST, lastCastMSG, l
     if (lastCastCAST != '') {
       if (scroll && scroll.length > 0) {
         Orion.UseObject(scroll[0]);
-        Orion.WaitTargetObject(target)
-
+        if (target == 'explo') {
+          Orion.WaitTargetType('0x0F0E', '0x0015')
+          Orion.TargetObject(lastEnemy);
+        }else{
+          Orion.WaitTargetObject(target)
+        }
       } else {
-        Orion.WaitTargetObject(target)
-        Orion.Cast(lastCastCAST);
+        if (target == 'explo') {
+          Orion.Cast(lastCastCAST);
+          Orion.WaitTargetType('0x0F0E', '0x0015')
+          Orion.Wait(350);
+          Orion.WaitTargetObject('self')
+          
+        }else{
+          Orion.WaitTargetObject(target)
+          Orion.Cast(lastCastCAST);
+        }
+        
       }
     }
     Orion.AddDisplayTimer(100, lastCastDelay, 'UnderChar', 'Circle|Bar', lastCastCAST, 0, 0, '0x00FF', 0, 'white');
@@ -416,5 +440,107 @@ function loopCastPerfeitoV2() {
       }
       castMagiaFunction(back_cast, lastCastUse, lastCastCAST, lastCastMSG, lastCastDelay, target)
     }
+  }
+}
+
+
+function printPocaoCD(){
+  var pocaoIsCD = pocaoCd();
+  if (pocaoIsCD){
+    Orion.CharPrint(self, 906, 'CD : ' + pocaoIsCD);
+  }
+}
+
+function pocaoCd(){
+  var msg = Orion.InJournal("Pocao",'self')
+  if (msg){
+    var segs = msg.Text().split(':')[1]
+    if (segs){
+      segs = segs.split('seg')[0]
+      if (segs){
+        Orion.ClearJournal(msg.Text(),'self');
+        var tempo = parseInt(segs.trim())
+        Orion.AddDisplayTimer(1800, (tempo)*1000, 'Top', 'line|bar', 'Proxima Potion', 0, 0, '0x0058', 0, 'white');
+        return tempo
+      }
+    }
+  }
+  return undefined
+}
+
+function go_casa(){
+  Orion.WarMode(0);
+  var onHide = function (){
+    interromperCast();
+    desativaCast();
+    castMagiaFunction(nullCallback,'0x1F4C','Recall',"Kal Ort Por",10500,Shared.GetVar('idRunebook'))
+    Orion.Wait(200)
+  }
+  //onHide();
+  executa_skill_hiding_stealth(onHide);
+  /*invis = Orion.FindType(0x0F0E, 0x01F7);
+  var pocaoIsCD = pocaoCd();
+  if (invis && invis.length > 0 && pocaoIsCD != undefined){
+    executa_skill_hiding_stealth(onHide);
+  }else{
+    onHide();
+  }*/
+}
+
+function skill_hiding_stealth() {
+  executa_skill_hiding_stealth(undefined);
+}
+
+function executa_skill_hiding_stealth(functionHidden) {
+  while (true) {
+    if (!Player.Hidden()) {
+      Orion.CharPrint(self, '70', 'Ninja On - Pare de andar !');
+      Orion.Unequip('13');
+      Orion.Wait('700');
+      Orion.Unequip('19');
+      invis = Orion.FindType(0x0F0E, 0x01F7);
+      if (functionHidden){
+        functionHidden();
+      }
+      var useSkill = function (){
+        Orion.UseSkill('21');
+        Orion.AddDisplayTimer(800, 3700, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'white');
+        Orion.ClearJournal();
+        Orion.WaitJournal('Voce ficou invisivel', Orion.Now(), Orion.Now() + 5000);
+      }
+      if (invis && invis.length > 0){
+        Orion.UseType(0x0F0E, 0x01F7);
+        Orion.Wait(200)
+        Orion.ClientOptionSet("AlwaysRun",0)
+        var pocaoIsCD = pocaoCd();
+        if (pocaoIsCD){
+          useSkill();
+        }else{
+          Orion.ClearJournal();
+          Orion.WaitJournal('Invisibility', Orion.Now(), Orion.Now() + 1000);
+        }
+      }else{
+        Orion.ClientOptionSet("AlwaysRun",0)
+        useSkill();
+      }
+      Orion.UseSkill('47');
+      Orion.AddDisplayTimer(900, 3700, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'black');
+      Orion.WaitJournal('Voce comeca a se mover em silencio', Orion.Now(), Orion.Now() + 4000);
+    }
+
+    while (Player.Hidden()) {
+      Orion.UseSkill('47');
+      //Orion.AddDisplayTimer(900, 3700, 'underChar', 'line|bar', '', 0, 0, '0x0058', 0, 'black');
+      Orion.WaitJournal('Voce comeca a se mover em silencio', Orion.Now(), Orion.Now() + 4000);
+    }
+    if (!Player.Hidden()) {
+      Orion.ClientOptionSet("AlwaysRun",1)
+    }
+    Orion.CharPrint(self, '40', 'Ninja Off');
+    Orion.UseType('0x1415');
+    Orion.UseType('0x1410');
+    
+    
+    return 0;
   }
 }

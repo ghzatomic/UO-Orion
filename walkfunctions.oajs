@@ -1,49 +1,50 @@
 const algoritimo_caminho = 'balanced'
 const gridSize = 40;
 
-function auto_pvm(){
+
+function auto_pvm() {
   var lastX = 0
   var lastZ = 0
   var lastY = 0
   var runAll = true
   Shared.AddVar('RMCancelRun', false);
-  while(runAll) {
+  while (runAll) {
     TargetNextEnemy_PvM()
     Orion.Wait(500)
     var enemy = Orion.FindObject('lasttarget');
     Orion.CharPrint(self, 906, 'Mudando ');
     Orion.Wait(1500)
-    while(!enemy.Dead()){
+    while (!enemy.Dead()) {
       enemy = Orion.FindObject('lasttarget');
-      if (!enemy){
+      if (!enemy) {
         Orion.CharPrint(self, 906, 'Nao Enemy ');
         break
       }
-      if (Shared.GetVar('RMCancelRun')){
+      if (Shared.GetVar('RMCancelRun')) {
         Orion.CharPrint(self, 906, 'RMCancelRun ');
         runAll = false
         break
       }
-      
-      if (Player.X() != enemy.X() && Player.Y() != enemy.Y()){
+
+      if (Player.X() != enemy.X() && Player.Y() != enemy.Y()) {
         var distancia = 1
         Orion.WalkTo(enemy.X(), enemy.Y(), Player.Z(), distancia, Player.Z(), 1, 1);
       }
       lastX = enemy.X()
       lastY = enemy.Y()
       lastZ = enemy.Z()
-      if (enemy.Dead()){
+      if (enemy.Dead()) {
         Orion.CharPrint(self, 906, 'Morreu ! ');
         break
       }
-      
+
     }
   }
-  
+
 
 }
 
-function mapeiaTela(){
+function mapeiaTela() {
   function callback(i, j) {
     //console.log(`Célula em (${i}, ${j})`);
   }
@@ -52,26 +53,26 @@ function mapeiaTela(){
 }
 
 
-function writeFileLine(data){
+function writeFileLine(data) {
   var loc = 'E:/git/UO Orion Macros/teste.txt'
   var file = Orion.NewFile(loc);
   var create = file.Open(loc)
-  if (create){
+  if (create) {
     file.WriteLine(data);
     file.Close();
   }
 }
 
 function create2DArray(x, y, initialValue) {
-    var array = [];
-    for (var i = 0; i < x; i++) {
-        var row = [];
-        for (var j = 0; j < y; j++) {
-            row.push(initialValue);
-        }
-        array.push(row);
+  var array = [];
+  for (var i = 0; i < x; i++) {
+    var row = [];
+    for (var j = 0; j < y; j++) {
+      row.push(initialValue);
     }
-    return array;
+    array.push(row);
+  }
+  return array;
 }
 
 function percorrerAteLimite(x, y, startX, startY, maxX, maxY, callback) {
@@ -88,44 +89,44 @@ function percorrerAteLimite(x, y, startX, startY, maxX, maxY, callback) {
   var dl = directions.length
   var visitados = [];
   for (var i = 0; i < x; i++) {
-      visitados.push([]);
-      for (var j = 0; j < y; j++) {
-          visitados[i][j] = false;
-      }
+    visitados.push([]);
+    for (var j = 0; j < y; j++) {
+      visitados[i][j] = false;
+    }
   }
   var queue = [[startX, startY]];
   var readIndex = 0; // Índice para leitura da fila
-    
-  while (readIndex < queue.length) {
-        var current = queue[readIndex++];
-        var curX = current[0];
-        var curY = current[1];
-        
-        if (curX < 0 || curX >= x || curY < 0 || curY >= y || visitados[curX][curY] || curX >= maxX || curY >= maxY) {
-            continue;
-        }
 
-        visitados[curX][curY] = true;
-        callback(curX, curY);
-        
-        for (var i = 0; i < directions.length; i++) {
-            var newX = curX + directions[i][0];
-            var newY = curY + directions[i][1];
-            queue.push([newX, newY]);
-        }
+  while (readIndex < queue.length) {
+    var current = queue[readIndex++];
+    var curX = current[0];
+    var curY = current[1];
+
+    if (curX < 0 || curX >= x || curY < 0 || curY >= y || visitados[curX][curY] || curX >= maxX || curY >= maxY) {
+      continue;
     }
+
+    visitados[curX][curY] = true;
+    callback(curX, curY);
+
+    for (var i = 0; i < directions.length; i++) {
+      var newX = curX + directions[i][0];
+      var newY = curY + directions[i][1];
+      queue.push([newX, newY]);
+    }
+  }
 }
 
 
 
 
-function andarPara(x,y){
+function andarPara(x, y) {
   var isWalking = Orion.IsWalking()
   if (isWalking) {
-      Orion.StopWalking()
-      Orion.ClearBadLocations();
+    Orion.StopWalking()
+    Orion.ClearBadLocations();
   }
-  Orion.WalkTo(x, y, Player.Z(), 1, Player.Z()+20, 1, 1);
+  Orion.WalkTo(x, y, Player.Z(), 1, Player.Z() + 20, 1, 1);
 }
 
 function isOutsideRegion(x, y, x0, y0, r) {
@@ -139,20 +140,20 @@ function isOutsideRegion(x, y, x0, y0, r) {
   return distanceSquared > rSquared;
 }
 
-function isTileAndavel(x,y,z){
+function isTileAndavel(x, y, z) {
   Orion.ClearBadLocations();
-  var objList = Orion.FindType('any', 'any', 'ground', 'ignoreself', 'xyz: '+x+','+y+','+z);
+  var objList = Orion.FindType('any', 'any', 'ground', 'ignoreself', 'xyz: ' + x + ',' + y + ',' + z);
   var containsObj = false
   var objContains = undefined
-  for(i=0; i < objList.length; i++){
-      var o = Orion.FindObject(objList[i]);
-      if (o.X() == x && o.Y() == y && o.Z() <= z && !o.IsMulti()){
-        containsObj = true
-        objContains = o
-      }
-      //Orion.SetBadLocation(o.X(), o.Y());
+  for (i = 0; i < objList.length; i++) {
+    var o = Orion.FindObject(objList[i]);
+    if (o.X() == x && o.Y() == y && o.Z() <= z && !o.IsMulti()) {
+      containsObj = true
+      objContains = o
+    }
+    //Orion.SetBadLocation(o.X(), o.Y());
   }
-  
+
   //var arr = Orion.GetPathArray(x,y,z);
   //Orion.Wait(1000)
   var pathOk = true//arr.length <= 0
@@ -160,36 +161,36 @@ function isTileAndavel(x,y,z){
     //Implementar o CanWalk
     pathOk = true
   }*/
-  var tilesAt = Orion.GetTiles('any', x, y,z,255)
+  var tilesAt = Orion.GetTiles('any', x, y, z, 255)
   var tileAndavel = true
-  if (tilesAt){
+  if (tilesAt) {
     /*if (tilesAt.length == 0){
       tileAndavel = false //Verificar na caverna e nas dungeons
     }*/
     for (var i = 0; i < tilesAt.length; i++) {
       var data = tilesAt[i]
       var strFlag = data.Flags().toString(16)
-      if (strFlag[strFlag.length-2]+strFlag[strFlag.length-1] === "40" || strFlag[strFlag.length-2]+strFlag[strFlag.length-1] === "50"){
+      if (strFlag[strFlag.length - 2] + strFlag[strFlag.length - 1] === "40" || strFlag[strFlag.length - 2] + strFlag[strFlag.length - 1] === "50") {
         tileAndavel = false
         break
-      }else {
+      } else {
         var strFlag = Orion.GetLandTiledata(data.Graphic()).Flags().toString(16)
-        if (strFlag[strFlag.length-2]+strFlag[strFlag.length-1] === "40"){
+        if (strFlag[strFlag.length - 2] + strFlag[strFlag.length - 1] === "40") {
           tileAndavel = false
           break
         }
       }
-    } 
-    
-  }else{
-    return  ! containsObj // N tem tile eh pq nao existe nada
+    }
+
+  } else {
+    return !containsObj // N tem tile eh pq nao existe nada
   }
-  if (tileAndavel){
+  if (tileAndavel) {
     var testaTileNegra = Orion.GetTiles('land', x, y)
-    if (testaTileNegra && testaTileNegra.length > 0){
-      if (Orion.GetTiles('land', x, y)[0].Flags().toString() == '80' ){
+    if (testaTileNegra && testaTileNegra.length > 0) {
+      if (Orion.GetTiles('land', x, y)[0].Flags().toString() == '80') {
         tileAndavel = false
-      }else{
+      } else {
         /*if (Player.Z()<0 && Orion.GetTiles('land', x, y)[0].Z()>Player.Z()){
           tileAndavel = false // Caso da parte preta da cave
         }*/
@@ -197,35 +198,35 @@ function isTileAndavel(x,y,z){
     }
   }
   //Orion.CharPrint(self, 906, 'eee '+pathOk+","+tileAndavel+","+containsObj);
-  return tileAndavel && ! containsObj
+  return tileAndavel && !containsObj
 }
 
-function canWalk(x,y){
+function canWalk(x, y) {
   //var lista = Orion.GetPathArrayEx(x,y,256,1,255,2,2)
-  
+
 }
 
-function get_object_at(list,x,y){
-  if (list){
+function get_object_at(list, x, y) {
+  if (list) {
     for (var i = 0; i < list.length; i++) {
       var obj = list[i];
-      if (obj && obj.X() && obj.Y()){
-        if (obj.X() == x && obj.Y() == y){
-        return obj
-      }
+      if (obj && obj.X() && obj.Y()) {
+        if (obj.X() == x && obj.Y() == y) {
+          return obj
+        }
       }
 
     }
   }
-  
+
 }
 
-function runManager(){
-  while(true){
+function runManager() {
+  while (true) {
     const listSafeSpot = Shared.GetVar('RMListSafeSpot');
-    if (listSafeSpot){
+    if (listSafeSpot) {
 
-    } 
+    }
   }
 }
 
@@ -254,24 +255,24 @@ function autoSeguirInimigoProx(callbackProximo) {
   var isWalking = Orion.IsWalking()
   Shared.AddVar('RMCancelRun', true);
   if (isWalking) {
-      Orion.StopWalking()
-      Orion.ClearBadLocations();
+    Orion.StopWalking()
+    Orion.ClearBadLocations();
   }
   var enemy = Orion.FindObject('lasttarget');
   //walkToTarget(enemy)
   if (enemy) {
-      const distanciaMaxima = 2;
-      const proximidade = estaProximo(Player.X(), Player.Y(), enemy.X(), enemy.Y(), distanciaMaxima);
-      if (proximidade) {
-        callbackProximo()
-      }
-      Orion.WalkTo(enemy.X(), enemy.Y(), enemy.Z(), 1, enemy.Z() + 5, 1, 1);
-      Orion.Attack(enemy);
+    const distanciaMaxima = 2;
+    const proximidade = estaProximo(Player.X(), Player.Y(), enemy.X(), enemy.Y(), distanciaMaxima);
+    if (proximidade) {
+      callbackProximo()
+    }
+    Orion.WalkTo(enemy.X(), enemy.Y(), enemy.Z(), 1, enemy.Z() + 5, 1, 1);
+    Orion.Attack(enemy);
   }
 }
 
 function autoSeguirInimigo() {
-  var funcProximidade = function (){
+  var funcProximidade = function () {
     ArmarArma();
   }
 
@@ -280,190 +281,186 @@ function autoSeguirInimigo() {
 }
 
 
-function walkToTarget(target){
+function walkToTarget(target) {
   Shared.AddVar('RMCancelRun', true);
-  if(!target)
-  {
-      return false;
+  if (!target) {
+    return false;
   }
   var x = target.X();
   var y = target.Y();
   var z = target.Z();
   var pathArray = Orion.GetPathArray(x, y, z);
-  while(pathArray.length>0)
-  {
-      Orion.ClearBadLocations();
-      var npcList = Orion.FindType('any', 'any', 'ground', 'ignoreself', '5');
-      for(i=0; i < npcList.length; i++)
-      {
-          var npc = Orion.FindObject(npcList[i]);
-          Orion.SetBadLocation(npc.X(), npc.Y());
-      }
-      var stepTarget = pathArray[0];
-      var check = Orion.WalkTo(stepTarget.X(),stepTarget.Y(),stepTarget.Z(),1,255,1,1);
-      if(!check)
-      {
-          Orion.Print('Não da para ir !');
-          return false;
-      }
-      x = target.X();
-      y = target.Y();
-      z = target.Z();
-      pathArray = Orion.GetPathArray(x, y, z);
+  while (pathArray.length > 0) {
+    Orion.ClearBadLocations();
+    var npcList = Orion.FindType('any', 'any', 'ground', 'ignoreself', '5');
+    for (i = 0; i < npcList.length; i++) {
+      var npc = Orion.FindObject(npcList[i]);
+      Orion.SetBadLocation(npc.X(), npc.Y());
+    }
+    var stepTarget = pathArray[0];
+    var check = Orion.WalkTo(stepTarget.X(), stepTarget.Y(), stepTarget.Z(), 1, 255, 1, 1);
+    if (!check) {
+      Orion.Print('Não da para ir !');
+      return false;
+    }
+    x = target.X();
+    y = target.Y();
+    z = target.Z();
+    pathArray = Orion.GetPathArray(x, y, z);
   }
   return true;
 }
 
 
-function stopRun(){
+function stopRun() {
   Shared.AddVar('RMCancelRun', true);
 }
 
-function correr2(){
-  correrLocal(gridSize,undefined)
+function correr2() {
+  correrLocal(gridSize, undefined)
 }
 
-function correrLocal(gridSizeLocal,qtdePassos){
+function correrLocal(gridSizeLocal, qtdePassos) {
   Shared.AddVar('RMCancelRun', true);
-  var onFindSpot = function(mapeado,mapa, playerX, playerY){
+  var onFindSpot = function (mapeado, mapa, playerX, playerY) {
     Shared.AddVar('RMCancelRun', false);
-    const listSafeSpot = findPathToSafeSpot(mapeado, playerX, playerY, algoritimo_caminho,gridSizeLocal)
-    if (listSafeSpot && listSafeSpot.length > 0){
-      for (var i = 0; i<listSafeSpot.length; i++){
-        Orion.CharPrint(self, 906, 'Teste '+" "+i);
-        if (qtdePassos){
-          if (qtdePassos > i){
-            Orion.CharPrint(self, 906, 'Correndo '+qtdePassos+" "+i);
+    const listSafeSpot = findPathToSafeSpot(mapeado, playerX, playerY, algoritimo_caminho, gridSizeLocal)
+    if (listSafeSpot && listSafeSpot.length > 0) {
+      for (var i = 0; i < listSafeSpot.length; i++) {
+        Orion.CharPrint(self, 906, 'Teste ' + " " + i);
+        if (qtdePassos) {
+          if (qtdePassos > i) {
+            Orion.CharPrint(self, 906, 'Correndo ' + qtdePassos + " " + i);
             break
           }
         }
-        if (i % 0){
+        if (i % 0) {
           continue
         }
-        
+
         const cancelRun = Shared.GetVar('RMCancelRun');
-        if (cancelRun){
+        if (cancelRun) {
           Shared.AddVar('RMCancelRun', false);
           break
         }
         const safeSpot = listSafeSpot[i]
-        if (safeSpot){
+        if (safeSpot) {
           var xRun = mapa[safeSpot.y][safeSpot.x][0]
           var yRun = mapa[safeSpot.y][safeSpot.x][1]
           //Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun);
-          var callb = function(x,y){
-            andarPara(x,y)
+          var callb = function (x, y) {
+            andarPara(x, y)
             //Orion.CharPrint(self, 906, "aaccc "+x+" - "+y);
           }
           //drawPath(mapeado, playerPosition.x, playerPosition.y, safeSpot.x, safeSpot.y, callb);
-          callb(xRun,yRun)
+          callb(xRun, yRun)
         }
       }
     }
-  } 
+  }
 
-  correrFunc(onFindSpot,gridSizeLocal)
+  correrFunc(onFindSpot, gridSizeLocal)
 
 }
 
-function correr(){
+function correr() {
 
-  var onFindSpot = function(mapeado,mapa, playerX, playerY){
+  var onFindSpot = function (mapeado, mapa, playerX, playerY) {
 
     const listSafeSpot = findPathToSafeSpot(mapeado, playerX, playerY, algoritimo_caminho)
-    if (listSafeSpot && listSafeSpot.length > 0){
-      const safeSpot = listSafeSpot[listSafeSpot.length-1]//findSafeSpot(mapeado, playerX, playerY)
-      if (safeSpot){
+    if (listSafeSpot && listSafeSpot.length > 0) {
+      const safeSpot = listSafeSpot[listSafeSpot.length - 1]//findSafeSpot(mapeado, playerX, playerY)
+      if (safeSpot) {
         var xRun = mapa[safeSpot.y][safeSpot.x][0]
         var yRun = mapa[safeSpot.y][safeSpot.x][1]
         //Orion.CharPrint(self, 906, "aa "+xRun+" - "+yRun);
-        var callb = function(x,y){
-          andarPara(x,y)
+        var callb = function (x, y) {
+          andarPara(x, y)
           //Orion.CharPrint(self, 906, "aaccc "+x+" - "+y);
         }
         //drawPath(mapeado, playerPosition.x, playerPosition.y, safeSpot.x, safeSpot.y, callb);
-        callb(xRun,yRun)
+        callb(xRun, yRun)
       }
     }
-  } 
+  }
 
   correrFunc(onFindSpot)
 
 }
 
-function correrFunc(onFindSpot,gridSizeLocal){
+function correrFunc(onFindSpot, gridSizeLocal) {
   var print = true
   var target = Orion.FindObject('lasttarget');
   //if (target){
-    enemyList =  Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself|live", gridSizeLocal?gridSizeLocal:gridSize, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
-    //var simInimigoX = target.X()
-    //var simInimigoY = target.Y()
-    var inimigoList = []//[[simInimigoX,simInimigoY]]
-    for(var i=0 ; i < enemyList.length; i++){
-      var inim = enemyList[i];
-      inimigoList.push([inim.X(),inim.Y()])
-    }
-    var inimigoListPosition = []
-    var vazio = "."
-    var impassavel = "A"
-    var inimigo = "E"
-    var eu = "T"
-    var onComplete = function (mapa, gradeX, gradeY){
-      var playerPosition = undefined
-      var loc = 'D:/git/UO Orion Macros/teste.txt'
-      var file = print?Orion.NewFile(loc):undefined
-      var create = print?file.Open(loc):true
-      if (create){
-        var mapeado = []
-        for (var i = 0; i < gradeX; i++) {
-          var mapeadoRow = []
-          var row = "";
-          for (var j = 0; j < gradeY; j++) {
-            var strObj = vazio
-            if (mapa[i][j][0] == Player.X() && mapa[i][j][1] == Player.Y()){
-              strObj = eu
-              playerPosition = {x:i,y:j}
-            }else{
-              var achouInimigo = false
-              for(var inimIndex = 0; inimIndex < inimigoList.length; inimIndex++){
-                var inimigoX = inimigoList[inimIndex][0]
-                var inimigoY = inimigoList[inimIndex][1]
-                if (mapa[i][j][0] == inimigoX && mapa[i][j][1] == inimigoY){
-                  achouInimigo = true
-                  strObj = inimigo
-                  inimigoListPosition[inimigoListPosition.length] = {x:i,y:j}
-                  break
-                }
-              }
-              if (!achouInimigo){
-                var andavel = isTileAndavel(mapa[i][j][0],mapa[i][j][1],Player.Z())
-                if (!andavel){
-                  strObj = impassavel
-                }
+  enemyList = Orion.FindTypeEx("any", "-1", "ground", "ignorefriends|ignoreself|live", gridSizeLocal ? gridSizeLocal : gridSize, "gray|red")//Orion.FindType("any", "-1", "ground", "near|mobile|ignorefriends", 18, "gray|red");
+  //var simInimigoX = target.X()
+  //var simInimigoY = target.Y()
+  var inimigoList = []//[[simInimigoX,simInimigoY]]
+  for (var i = 0; i < enemyList.length; i++) {
+    var inim = enemyList[i];
+    inimigoList.push([inim.X(), inim.Y()])
+  }
+  var inimigoListPosition = []
+  var vazio = "."
+  var impassavel = "A"
+  var inimigo = "E"
+  var eu = "T"
+  var onComplete = function (mapa, gradeX, gradeY) {
+    var playerPosition = undefined
+    var loc = 'D:/git/UO Orion Macros/teste.txt'
+    var file = print ? Orion.NewFile(loc) : undefined
+    var create = print ? file.Open(loc) : true
+    if (create) {
+      var mapeado = []
+      for (var i = 0; i < gradeX; i++) {
+        var mapeadoRow = []
+        var row = "";
+        for (var j = 0; j < gradeY; j++) {
+          var strObj = vazio
+          if (mapa[i][j][0] == Player.X() && mapa[i][j][1] == Player.Y()) {
+            strObj = eu
+            playerPosition = { x: i, y: j }
+          } else {
+            var achouInimigo = false
+            for (var inimIndex = 0; inimIndex < inimigoList.length; inimIndex++) {
+              var inimigoX = inimigoList[inimIndex][0]
+              var inimigoY = inimigoList[inimIndex][1]
+              if (mapa[i][j][0] == inimigoX && mapa[i][j][1] == inimigoY) {
+                achouInimigo = true
+                strObj = inimigo
+                inimigoListPosition[inimigoListPosition.length] = { x: i, y: j }
+                break
               }
             }
-            mapeadoRow[j] = strObj
-            row += ''+strObj;
+            if (!achouInimigo) {
+              var andavel = isTileAndavel(mapa[i][j][0], mapa[i][j][1], Player.Z())
+              if (!andavel) {
+                strObj = impassavel
+              }
+            }
           }
-          mapeado[i] = mapeadoRow
-          if (print){
-            file.Write(row+"\n");
-          }
+          mapeadoRow[j] = strObj
+          row += '' + strObj;
         }
-        if (playerPosition){
-          onFindSpot(mapeado, mapa, playerPosition.x, playerPosition.y);
-        }
-        if (print){
-          file.Close();
+        mapeado[i] = mapeadoRow
+        if (print) {
+          file.Write(row + "\n");
         }
       }
-
+      if (playerPosition) {
+        onFindSpot(mapeado, mapa, playerPosition.x, playerPosition.y);
+      }
+      if (print) {
+        file.Close();
+      }
     }
-    //row += '('+mapa[i][j][0]+','+mapa[i][j][1]+'-'+andavel+'),';
-    scanTela(onComplete);
+
+  }
+  //row += '('+mapa[i][j][0]+','+mapa[i][j][1]+'-'+andavel+'),';
+  scanTela(onComplete);
   //}
 }
-function testexx(){
+function testexx() {
   //var objetos_chao = Orion.FindTypeEx('any', '-1', ground, 'ignoreself', '18');
   //var inimigos = Orion.FindType('any', '-1', ground, 'ignoreself', '18');
   //Orion.CanWalk("North", 4093,321,Player.Z())
@@ -476,55 +473,55 @@ function testexx(){
   //var data = Orion.GetLandTiledata(Orion.GetTiles('any', 4093, 322, 0, 3)[0].Graphic())
   //var fl = data.Flags()
   //Orion.CharPrint(self, 906, ""+fl);
-  var onComplete = function (mapa, gradeX, gradeY){
-    
+  var onComplete = function (mapa, gradeX, gradeY) {
+
     var loc = 'E:/git/UO Orion Macros/teste.txt'
     var file = Orion.NewFile(loc);
     var create = file.Open(loc)
-    if (create){
+    if (create) {
       for (var i = 0; i < gradeX; i++) {
-          var row = "";
-          for (var j = 0; j < gradeY; j++) {
-              //Orion.CanWalk("North", mapa[i][j][0]-1,mapa[i][j][1],Player.Z())
-              var andavel = isTileAndavel(mapa[i][j][0],mapa[i][j][1],Player.Z())
-              row += '('+mapa[i][j][0]+','+mapa[i][j][1]+'-'+andavel+'),';
-          }
-          file.WriteLine(row);
+        var row = "";
+        for (var j = 0; j < gradeY; j++) {
+          //Orion.CanWalk("North", mapa[i][j][0]-1,mapa[i][j][1],Player.Z())
+          var andavel = isTileAndavel(mapa[i][j][0], mapa[i][j][1], Player.Z())
+          row += '(' + mapa[i][j][0] + ',' + mapa[i][j][1] + '-' + andavel + '),';
+        }
+        file.WriteLine(row);
       }
       file.Close();
     }
   }
-  scanTela(onComplete,gridSizeLocal);
+  scanTela(onComplete, gridSizeLocal);
 
 }
 
-function scanTela(onComplete,gridSizeLocal){
+function scanTela(onComplete, gridSizeLocal) {
   //var tiles = Orion.GetTiles("any",Player.X,Player.Y);
   //if (tiles){
   //  Orion.CharPrint(self, 906, "aaaa"+Orion.GetGraphic(tiles));
   //}
   //Orion.CharPrint(self, 906, "CanWalk -"+Player.X()+","+Player.Y()+" - "+Orion.CanWalk("North", Player.X()-1,Player.Y()-1,Player.Z()));
-  var StartX = gridSizeLocal?gridSizeLocal:gridSize/2
-  var StartY = gridSizeLocal?gridSizeLocal:gridSize/2
-  var gradeX = gridSizeLocal?gridSizeLocal:gridSize
-  var gradeY = gridSizeLocal?gridSizeLocal:gridSize
+  var StartX = gridSizeLocal ? gridSizeLocal : gridSize / 2
+  var StartY = gridSizeLocal ? gridSizeLocal : gridSize / 2
+  var gradeX = gridSizeLocal ? gridSizeLocal : gridSize
+  var gradeY = gridSizeLocal ? gridSizeLocal : gridSize
   var run = create2DArray(gradeX, gradeY, 0);
   var count = 1
-  var callback = function(x,y){
+  var callback = function (x, y) {
     var xPlayer = Player.X()
     var yPlayer = Player.Y()
-    xPlayer = xPlayer+(x-StartX)
-    yPlayer = yPlayer+(y-StartY)
-    run[y][x] = [xPlayer,yPlayer] // Inverte o xy para se adequar ao jogo
-    
-    if (count>=gradeX*gradeY){
+    xPlayer = xPlayer + (x - StartX)
+    yPlayer = yPlayer + (y - StartY)
+    run[y][x] = [xPlayer, yPlayer] // Inverte o xy para se adequar ao jogo
+
+    if (count >= gradeX * gradeY) {
       onComplete(run, gradeX, gradeY)
     }
 
-    count = count+1
+    count = count + 1
   }
-  
-  percorrerAteLimite(gradeX,gradeY,StartX,StartY,gradeX,gradeY, callback)
+
+  percorrerAteLimite(gradeX, gradeY, StartX, StartY, gradeX, gradeY, callback)
 
 }
 
@@ -542,10 +539,10 @@ function setCharAt(str, index, chr) {
   return str.substring(0, index) + chr + str.substring(index + 1);
 }
 
-function createGrid(gridString,gridSizeLocal) {
+function createGrid(gridString, gridSizeLocal) {
   const grid = [];
-  for (var i = 0; i < gridSizeLocal?gridSizeLocal:gridSize; i++) {
-    grid.push(gridString.slice(i * gridSizeLocal?gridSizeLocal:gridSize, (i + 1) * gridSizeLocal?gridSizeLocal:gridSize).split(''));
+  for (var i = 0; i < gridSizeLocal ? gridSizeLocal : gridSize; i++) {
+    grid.push(gridString.slice(i * gridSizeLocal ? gridSizeLocal : gridSize, (i + 1) * gridSizeLocal ? gridSizeLocal : gridSize).split(''));
   }
   return grid;
 }
@@ -660,7 +657,7 @@ function findSafeSpot(grid, playerX, playerY, strategy, gridSizeLocal) {
 
   // Se nenhum local seguro for encontrado, vá para o canto mais distante
   if (!bestSpot) {
-    bestSpot = { x: gridSizeLocal?gridSizeLocal:gridSize - 1, y: gridSizeLocal?gridSizeLocal:gridSize - 1 };
+    bestSpot = { x: gridSizeLocal ? gridSizeLocal : gridSize - 1, y: gridSizeLocal ? gridSizeLocal : gridSize - 1 };
     for (var y = 0; y < grid.length; y++) {
       for (var x = 0; x < grid[0].length; x++) {
         if (grid[y][x] === '.' || grid[y][x] === 'A') {
@@ -829,13 +826,13 @@ function aStarPath(grid, startX, startY, endX, endY) {
   return [];
 }
 
-function findPathToSafeSpot(grid, playerX, playerY, strategy,gridSizeLocal) {
-  var safeSpot = findSafeSpot(grid, playerX, playerY, strategy,gridSizeLocal);
+function findPathToSafeSpot(grid, playerX, playerY, strategy, gridSizeLocal) {
+  var safeSpot = findSafeSpot(grid, playerX, playerY, strategy, gridSizeLocal);
   if (safeSpot) {
-    if (safeSpot.length < 5){
-      safeSpot = findSafeSpot(grid, playerX, playerY, 'shortest',gridSizeLocal);
+    if (safeSpot.length < 5) {
+      safeSpot = findSafeSpot(grid, playerX, playerY, 'shortest', gridSizeLocal);
     }
-    if (safeSpot){
+    if (safeSpot) {
       const path = aStarPath(grid, playerX, playerY, safeSpot.x, safeSpot.y);
       if (path.length > 0) {
         return path;
@@ -846,7 +843,7 @@ function findPathToSafeSpot(grid, playerX, playerY, strategy,gridSizeLocal) {
   return bfsPath(grid, playerX, playerY);
 }
 
-function bfsPath(grid, startX, startY,gridSizeLocal) {
+function bfsPath(grid, startX, startY, gridSizeLocal) {
   const queue = [{ x: startX, y: startY, path: [] }];
   const visited = [];
   for (var i = 0; i < grid.length; i++) {
@@ -881,7 +878,7 @@ function bfsPath(grid, startX, startY,gridSizeLocal) {
 
       if (nx >= 0 && nx < grid[0].length && ny >= 0 && ny < grid.length && !visited[ny][nx] && grid[ny][nx] === '.') {
         const newPath = path.concat({ x: nx, y: ny });
-        if ((nx === 0 || nx === gridSizeLocal?gridSizeLocal:gridSize - 1 || ny === 0 || ny === gridSizeLocal?gridSizeLocal:gridSize - 1)) {
+        if ((nx === 0 || nx === gridSizeLocal ? gridSizeLocal : gridSize - 1 || ny === 0 || ny === gridSizeLocal ? gridSizeLocal : gridSize - 1)) {
           return newPath;
         }
         visited[ny][nx] = true;
