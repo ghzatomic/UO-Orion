@@ -1,0 +1,196 @@
+function fazJarroVenderCook() {
+    Orion.ClearJournal()
+    Bank();
+    var bauIron = selectionaObjESetaVariavel(undefined, 'Selecione o bau com iron')
+    var bauJarro = selectionaObjESetaVariavel(undefined, 'Selecione o bau onde ficara os jarros')
+    var bauGold = selectionaObjESetaVariavel(undefined, 'Selecione o bau onde ficara o gold')
+    var feitos = 0
+    Orion.UseObject(bauIron);
+    Orion.UseObject(bauJarro);
+    Orion.UseObject(bauGold);
+    var ignoreListJarros = ""
+    while (true) {
+
+        var findItems0 = Orion.FindType('0x1BF2', '0x0000', bauIron, 'item|fast|recurse');
+        if (findItems0.length > 0) {
+            Orion.MoveItem(findItems0[0], 3, 'backpack')
+            Orion.Wait(600);
+        }
+        Orion.UseType('0x1EB8', '0xFFFF');
+        Orion.Wait(200);
+        var gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+        if (gump0 !== null || Orion.WaitForGump(1000)) {
+            if (gump0 === null) {
+                gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+            }
+            if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x00000485')) {
+                gump0.Select(Orion.CreateGumpHook(5008));
+                Orion.Wait(100);
+            }
+        }
+        Orion.Wait(3000);
+        var findItems1 = Orion.FindType('0x103E', 'any', 'backpack', 'item|fast', 'finddistance', '', false, ignoreListJarros);
+        Orion.MoveItem(findItems1[0], -1, bauJarro)
+        ignoreListJarros = ignoreListJarros + "|" + findItems1[0]
+        Orion.Wait(600)
+        feitos += 1
+        Orion.CharPrint(self, 906, 'Feitos :' + feitos);
+        if (feitos > 200) {
+            //Close
+            var gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+            if (gump0 !== null || Orion.WaitForGump(1000)) {
+                if (gump0 === null) {
+                    gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+                }
+                if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x00000485')) {
+                    gump0.Select(Orion.CreateGumpHook(0));
+                    Orion.Wait(100);
+                }
+            }
+            Orion.Wait(700)
+            vaiVendorCook();
+            Orion.Say('Andras sell');
+            Orion.Wait(11000)
+            vaiParaACasaEEntra();
+            meditar();
+            Orion.Wait(500);
+            Bank();
+            Orion.Wait(500);
+            Orion.UseObject(bauIron);
+            Orion.Wait(500);
+            Orion.UseObject(bauJarro);
+            Orion.Wait(500);
+            Orion.UseObject(bauGold);
+            Orion.Wait(500);
+            guardaGold(bauGold)
+            Orion.Wait(500)
+            feitos = 0
+        }
+    }
+}
+
+function vaiParaACasaEEntra() {
+    Orion.UseObject('0x401476D0');
+    var gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000472');
+    if (gump0 !== null || Orion.WaitForGump(1000)) {
+        if (gump0 === null) {
+            gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000472');
+        }
+        if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x00000472')) {
+            gump0.Select(Orion.CreateGumpHook(11));
+            Orion.Wait(100);
+        }
+    }
+    var gump1 = Orion.GetGump('0xFFFFFFFF', '0x00000472');
+    if (gump1 !== null || Orion.WaitForGump(1000)) {
+        if (gump1 === null) {
+            gump1 = Orion.GetGump('0xFFFFFFFF', '0x00000472');
+        }
+        if ((gump1 !== null) && (!gump1.Replayed()) && (gump1.ID() === '0x00000472')) {
+            gump1.Select(Orion.CreateGumpHook(111));
+            Orion.Wait(100);
+        }
+    }
+    Orion.Wait(11000);
+    Orion.WalkTo(4095, 323, 0, 0, 255, 1, 1);
+    closeDoor();
+
+}
+
+function guardaGold(bau) {
+    var findItems0 = Orion.FindType('0x0EED', '0xFFFF', 'backpack', 'item|fast|recurse');
+    if (findItems0.length) {
+        Orion.MoveItem(findItems0[0], -1, bau ? bau : Player.BankSerial())
+        Orion.Wait(600)
+    }
+}
+
+function vaiVendorCook() {
+    Orion.UseObject('0x401476D0');
+    if (Orion.WaitForGump(1000)) {
+        var gump0 = Orion.GetGump('last');
+        if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x00000472')) {
+            gump0.Select(Orion.CreateGumpHook(12));
+            Orion.Wait(100);
+        }
+    }
+    if (Orion.WaitForGump(1000)) {
+        var gump1 = Orion.GetGump('last');
+        if ((gump1 !== null) && (!gump1.Replayed()) && (gump1.ID() === '0x00000472')) {
+            gump1.Select(Orion.CreateGumpHook(112));
+            Orion.Wait(100);
+        }
+    }
+    Orion.Wait(11000);
+}
+
+
+function vender_peixe() {
+    while (true) {
+        Orion.PrintFast(self, '70', 0, 'Start');
+
+        //---------------------------------------
+        var baubarco = '0x4025822C';
+        var portabarco = '0x40258229';
+        var vendor = '0x002F83AF'
+        //---------------------------------------
+
+        var time = 500;
+        Orion.Wait(time);
+        Orion.UseObject(baubarco);
+        Orion.Wait(time);
+
+        var peixe = '0x097A';
+        var finditem = Orion.FindType(peixe, '0x0000', baubarco);
+        Orion.DragItem(finditem, 2000);
+        Orion.Wait(time);
+        Orion.DropDraggedItem(backpack);
+        Orion.Wait(time);
+
+        Orion.Step('s');
+        Orion.Wait(time);
+        Orion.Step('w');
+        Orion.Wait(time);
+        Orion.Step('s');
+        Orion.Wait(time);
+        Orion.UseObject(portabarco);
+        Orion.Wait(time);
+        Orion.Step('w');
+        Orion.Wait(time);
+
+        while ((Player.X() != 2072)(Player.Y() != 2855)) {
+            Orion.WalkTo(2072, 2855, -3, 0, 0, 1);
+        }
+
+        Orion.ClearJournal();
+        Orion.Say('Paris sell');
+        Orion.UseObject(vendor);
+        Orion.WaitJournal('Aqui esta', Orion.Now(), Orion.Now() + 5000);
+        Orion.Wait(time);
+
+        while ((Player.X() != 2087)(Player.Y() != 2855)) {
+            Orion.WalkTo(2087, 2855, -3, 0, 0, 0);
+        }
+
+        Orion.Wait(time);
+        Orion.UseObject(portabarco);
+        Orion.Wait(time);
+
+        if ((Player.X() != 2089)) {
+            Orion.UseObject(portabarco);
+            Orion.Wait(time);
+            Orion.UseObject(portabarco);
+        }
+
+        Orion.Wait(time);
+        Orion.Step('e');
+        Orion.Wait(time);
+        Orion.Step('n');
+        Orion.Wait(time);
+        Orion.Step('e');
+        Orion.Wait(time);
+        Orion.Step('n');
+        Orion.Wait(time);
+
+    }
+}

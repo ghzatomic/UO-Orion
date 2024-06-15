@@ -34,11 +34,15 @@ function setaVariaveisImportantes(){
 
 function selectionaObjESetaVariavel(nameVar,msg){
     Orion.ClearJournal('self');
-    if (!Shared.GetVar(nameVar)){
+    var variavel = undefined
+    if (nameVar){
+        variavel = Shared.GetVar(nameVar)
+    }
+    if (!variavel){
         Orion.CancelTarget();
         Orion.ClientLastTarget();
         Orion.CharPrint(self, 906, msg);
-        while(!Shared.GetVar(nameVar)){
+        while(!variavel){
             Orion.Say('.mostraruid')
             Orion.Wait(1000)
             Orion.WaitJournal('UID', Orion.Now(), Orion.Now()+10000, 'sys');
@@ -47,9 +51,15 @@ function selectionaObjESetaVariavel(nameVar,msg){
 	            if (jorMSG){
 	                 var id = jorMSG.Text().split(':')[1]
 	                 if (id){
-	                 	Shared.AddVar(nameVar, '0x'+id.trim());
-            	 	 	Orion.CharPrint(self,906,'Setando id : '+Shared.GetVar(nameVar));
-            	 		 break;
+                        if (nameVar){
+                            Shared.AddVar(nameVar, '0x'+id.trim());
+                            variavel = Shared.GetVar(nameVar)
+                        }else{
+                            variavel = '0x'+id.trim()
+                        }
+            	 	 	Orion.CharPrint(self,906,'Setando id : '+variavel);
+                        return variavel
+            	 		break;
 	                 }
 	                 
 	            }

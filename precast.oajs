@@ -33,11 +33,11 @@ function castCurePreGHZ() {
 }
 
 function onComboFSFinish(){
-  castPreGHZ('In Nox', "Poison", 3200, '', undefined, false, 'onComboFSFinish',1250)
+  castPreGHZ('In Nox', "Poison", 3300, '', undefined, false, 'onComboPoisonFinish',1250)
 }
 
 function onComboPoisonFinish(){
-  castPreGHZ('Kal Vas Flam', "Flame Strike", 3800, '0x1F5F', undefined, false, 'onComboPoisonFinish',1200)
+  castPreGHZ('Kal Vas Flam', "Flame Strike", 3650, '0x1F5F', undefined, false, 'onComboFSFinish',1400)
 }
 
 function onComboMAFinish(){
@@ -49,7 +49,7 @@ function onComboParaliseFinish(){
 }
 
 function combo_poison_fs(){
-  onComboPoisonFinish()
+  onComboFSFinish()
 }
 
 function combo_ma_paralise(){
