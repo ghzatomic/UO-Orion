@@ -1,13 +1,383 @@
+function getVendorByName(nome) {
+    var vendorList = Orion.FindTypeEx("-1", "-1", "ground", "human", 'finddistance', "yellow");
+    if (vendorList.length > 0) {
+        for (i = 0; i < vendorList.length; i++) {
+            if (vendorList[i].Name() === nome) {
+                Orion.CharPrint(self, '0x0790', "Vendor selecionado : " + vendorList[i].Name());
+                return vendorList[i]
+            }
+        }
+    }
+    return undefined
+}
+
+function teste2Target() {
+    Bank();
+    var bauIron = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau com iron')
+    Orion.Wait(500)
+    Orion.UseObject(bauIron);
+    var bauJarro = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau onde ficara os jarros')
+    Orion.Wait(500)
+    Orion.UseObject(bauJarro);
+    var bauGold = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau onde ficara o gold')
+    Orion.Wait(500)
+    Orion.UseObject(bauGold);
+}
+
+function testeTargetLast() {
+    Orion.CharPrint(self, '0x0790', "Vendor selecionado : " + Orion.ClientLastTarget());
+}
+
+function getVendorBySerial(serial) {
+    var vendorList = Orion.FindTypeEx("-1", "-1", "ground", "human", 'finddistance', "yellow");
+    if (vendorList.length > 0) {
+        for (i = 0; i < vendorList.length; i++) {
+            if (vendorList[i].Serial() === serial) {
+                Orion.CharPrint(self, '0x0790', "Vendor selecionado : " + vendorList[i].Name());
+                return vendorList[i]
+            }
+        }
+    }
+    return undefined
+}
+
+function comprarLoop() {
+    Orion.ClearJournal()
+    Bank();
+    var shopList = Orion.GetShopList('Comprar Lightning');
+    var arrItens = shopList.Items();
+    var vendor = selectionaObjESetaVariavelWorks(undefined, 'Selecione o vendor')
+    var vendorObj = getVendorBySerial(vendor)
+    var bauDestino = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau onde ficara os itens')
+    Orion.Wait(500)
+    Orion.UseObject(bauDestino);
+    Orion.Wait(500)
+    while (true) {
+        Orion.UseObject(vendor);
+        Orion.Wait(700)
+        Orion.UseObject(vendor);
+        Orion.Wait(700)
+        Orion.UseObject(vendor);
+        Orion.Wait(700)
+        Orion.UseObject(vendor);
+        if (vendorObj) {
+            Orion.Say(vendorObj.Name() + ' buy');
+            while (Orion.IsShopping()) {
+                Orion.Wait(500)
+            }
+            if (arrItens.length > 0) {
+                Bank();
+                Orion.Wait(500)
+                Orion.UseObject(bauDestino);
+                Orion.Wait(500)
+                for (var index = 0; index < arrItens.length; index++) {
+                    const item = arrItens[index];
+                    var type = item.Graphic()
+                    var color = item.Color()
+                    var quantidade = item.Count()
+                    var findItems0 = Orion.FindTypeEx(type, color, 'backpack', '');
+                    if (findItems0.length > 0) {
+                        moveItem(type, color, 'backpack', 'item|fast|recurse', -1, bauDestino)
+                    }
+                }
+            }
+        }
+
+
+    }
+}
+
+function fazerScrollsLoop() {
+    Orion.ClearJournal()
+    Bank();
+    var bauOrigem = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau com reagentes e scrolls')
+    var bauDestino = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau onde ficara o scroll pronto')
+    Orion.Wait(500)
+    Orion.UseObject(bauOrigem);
+    Orion.Wait(500)
+    Orion.UseObject(bauDestino);
+    var qtdeLote = 30
+    while (true) {
+        fazerFS(bauOrigem, bauDestino, qtdeLote)
+        fazerLightning(bauOrigem, bauDestino, qtdeLote)
+    }
+}
+
+function fazerLightning(bauOrigem, bauDestino, qtdeLote) {
+    var qtdeFsFeitos = 0
+    var findItems0 = Orion.FindTypeEx('0x1F4A', '0x0000', 'backpack', '');
+    if (findItems0.length > 0) {
+        qtdeFsFeitos = findItems0[0].Count()
+        if (findItems0[0].Count() >= qtdeLote) {
+            //Guarda bank
+            guardaItem('0x1F4A', '0x0000', 'backpack', bauDestino, -1)
+            Orion.Wait(500)
+        }
+
+    }
+    while (qtdeFsFeitos < qtdeLote) {
+        var findItems0 = Orion.FindTypeEx('0x1F4A', '0x0000', 'backpack', '');
+        if (findItems0.length > 0) {
+            qtdeFsFeitos = findItems0[0].Count()
+        }
+        Orion.Wait(25)
+        // Move itens
+        var findItems0 = Orion.FindTypeEx('0x0E34', '0x0000', 'backpack', '');
+        if (findItems0.length == 0) {
+            if (qtdeLote - qtdeFsFeitos > 0) {
+                moveItem('0x0E34', '0x0000', bauOrigem, 'item|fast|recurse', qtdeLote - qtdeFsFeitos, 'backpack')
+            }
+
+        } else {
+            if (findItems0[0].Count() < qtdeLote - qtdeFsFeitos) {
+                moveItem('0x0E34', '0x0000', bauOrigem, 'item|fast|recurse', (qtdeLote - qtdeFsFeitos) - findItems0[0].Count(), 'backpack')
+            }
+        }
+        findItems0 = Orion.FindTypeEx('0x0F8C', '0x0000', 'backpack', '');
+        if (findItems0.length == 0) {
+            if (qtdeLote - qtdeFsFeitos > 0) {
+                moveItem('0x0F8C', '0x0000', bauOrigem, 'item|fast|recurse', qtdeLote - qtdeFsFeitos, 'backpack')
+            }
+        } else {
+            if (findItems0[0].Count() < qtdeLote - qtdeFsFeitos) {
+                moveItem('0x0F8C', '0x0000', bauOrigem, 'item|fast|recurse', (qtdeLote - qtdeFsFeitos) - findItems0[0].Count(), 'backpack')
+            }
+        }
+        findItems0 = Orion.FindTypeEx('0x0F86', '0x0000', 'backpack', '');
+        if (findItems0.length == 0) {
+            if (qtdeLote - qtdeFsFeitos > 0) {
+                moveItem('0x0F86', '0x0000', bauOrigem, 'item|fast|recurse', qtdeLote - qtdeFsFeitos, 'backpack')
+            }
+        } else {
+            if (findItems0[0].Count() < qtdeLote - qtdeFsFeitos) {
+                moveItem('0x0F86', '0x0000', bauOrigem, 'item|fast|recurse', (qtdeLote - qtdeFsFeitos) - findItems0[0].Count(), 'backpack')
+            }
+        }
+        Orion.UseType('0x0FBF', '0x0000');
+        Orion.Wait(200);
+        //Faz Last
+        var gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+        if (gump0 !== null || Orion.WaitForGump(1000)) {
+            if (gump0 === null) {
+                gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+            }
+            if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x00000485')) {
+                gump0.Select(Orion.CreateGumpHook(4));
+                Orion.Wait(100);
+            }
+        }
+        var gump1 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+        if (gump1 !== null || Orion.WaitForGump(1000)) {
+            if (gump1 === null) {
+                gump1 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+            }
+            if ((gump1 !== null) && (!gump1.Replayed()) && (gump1.ID() === '0x00000485')) {
+                gump1.Select(Orion.CreateGumpHook(10106));
+                Orion.Wait(100);
+            }
+        }
+        Orion.Wait(6000);
+    }
+    var findItems0 = Orion.FindTypeEx('0x1F4A', '0x0000', 'backpack', '');
+    if (findItems0.length > 0) {
+        qtdeFsFeitos = findItems0[0].Count()
+        if (findItems0[0].Count() >= qtdeLote) {
+            //Guarda bank
+            guardaItem('0x1F4A', '0x0000', 'backpack', bauDestino, -1)
+            Orion.Wait(500)
+        }
+
+    }
+}
+
+function fazerFS(bauOrigem, bauDestino, qtdeLote) {
+    var qtdeFsFeitos = 0
+    var findItems0 = Orion.FindTypeEx('0x1F5F', '0x0000', 'backpack', '');
+    if (findItems0.length > 0) {
+        qtdeFsFeitos = findItems0[0].Count()
+        if (findItems0[0].Count() >= qtdeLote) {
+            //Guarda bank
+            guardaItem('0x1F5F', '0x0000', 'backpack', bauDestino, -1)
+            Orion.Wait(500)
+        }
+
+    }
+    while (qtdeFsFeitos < qtdeLote) {
+        var findItems0 = Orion.FindTypeEx('0x1F5F', '0x0000', 'backpack', '');
+        if (findItems0.length > 0) {
+            qtdeFsFeitos = findItems0[0].Count()
+        }
+        Orion.Wait(25)
+        // Move itens
+        var findItems0 = Orion.FindTypeEx('0x0E34', '0x0000', 'backpack', '');
+        if (findItems0.length == 0) {
+            if (qtdeLote - qtdeFsFeitos > 0) {
+                moveItem('0x0E34', '0x0000', bauOrigem, 'item|fast|recurse', qtdeLote - qtdeFsFeitos, 'backpack')
+            }
+
+        } else {
+            if (findItems0[0].Count() < qtdeLote - qtdeFsFeitos) {
+                moveItem('0x0E34', '0x0000', bauOrigem, 'item|fast|recurse', (qtdeLote - qtdeFsFeitos) - findItems0[0].Count(), 'backpack')
+            }
+        }
+        findItems0 = Orion.FindTypeEx('0x0F8C', '0x0000', 'backpack', '');
+        if (findItems0.length == 0) {
+            if (qtdeLote - qtdeFsFeitos > 0) {
+                moveItem('0x0F8C', '0x0000', bauOrigem, 'item|fast|recurse', qtdeLote - qtdeFsFeitos, 'backpack')
+            }
+        } else {
+            if (findItems0[0].Count() < qtdeLote - qtdeFsFeitos) {
+                moveItem('0x0F8C', '0x0000', bauOrigem, 'item|fast|recurse', (qtdeLote - qtdeFsFeitos) - findItems0[0].Count(), 'backpack')
+            }
+        }
+        findItems0 = Orion.FindTypeEx('0x0F8D', '0x0000', 'backpack', '');
+        if (findItems0.length == 0) {
+            if (qtdeLote - qtdeFsFeitos > 0) {
+                moveItem('0x0F8D', '0x0000', bauOrigem, 'item|fast|recurse', qtdeLote - qtdeFsFeitos, 'backpack')
+            }
+        } else {
+            if (findItems0[0].Count() < qtdeLote - qtdeFsFeitos) {
+                moveItem('0x0F8D', '0x0000', bauOrigem, 'item|fast|recurse', (qtdeLote - qtdeFsFeitos) - findItems0[0].Count(), 'backpack')
+            }
+        }
+        Orion.UseType('0x0FBF', '0x0000');
+        Orion.Wait(200);
+        //Faz Last
+        var gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+        if (gump0 !== null || Orion.WaitForGump(1000)) {
+            if (gump0 === null) {
+                gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+            }
+            if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x00000485')) {
+                gump0.Select(Orion.CreateGumpHook(7));
+                Orion.Wait(100);
+            }
+        }
+        var gump1 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+        if (gump1 !== null || Orion.WaitForGump(1000)) {
+            if (gump1 === null) {
+                gump1 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+            }
+            if ((gump1 !== null) && (!gump1.Replayed()) && (gump1.ID() === '0x00000485')) {
+                gump1.Select(Orion.CreateGumpHook(10103));
+                Orion.Wait(100);
+            }
+        }
+        Orion.Wait(6000);
+    }
+    var findItems0 = Orion.FindTypeEx('0x1F5F', '0x0000', 'backpack', '');
+    if (findItems0.length > 0) {
+        qtdeFsFeitos = findItems0[0].Count()
+        if (findItems0[0].Count() >= qtdeLote) {
+            //Guarda bank
+            guardaItem('0x1F5F', '0x0000', 'backpack', bauDestino, -1)
+            Orion.Wait(500)
+        }
+
+    }
+}
+
+function moveItem(type, cor, bauOrigem, flags, quantidade, destino) {
+    var findItems0 = Orion.FindType(type, cor, bauOrigem, flags);
+    if (findItems0.length > 0) {
+        Orion.MoveItem(findItems0[0], quantidade, destino)
+        Orion.Wait(800);
+    }
+}
+
+function fazBottleEVende() {
+    Orion.ClearJournal()
+    Bank();
+    var bauCeramic = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau com ceramic')
+    var bauGold = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau onde ficara o gold')
+    Orion.Wait(500)
+    Orion.UseObject(bauCeramic);
+    Orion.Wait(500)
+    Orion.UseObject(bauGold);
+    var vendorNome = 'Tadi'
+    var vendor = getVendorByName(vendorNome);
+    while (true) {
+        var findItems0 = Orion.FindTypeEx('0x0F0E', '0x0000', 'backpack', '');
+        if (findItems0.length > 0 && findItems0[0].Count() > 1000) {
+            //Reseta vendor
+            Orion.UseObject(vendor.Serial());
+            Orion.Wait(700)
+            Orion.UseObject(vendor.Serial());
+            Orion.Wait(700)
+            Orion.UseObject(vendor.Serial());
+            Orion.Wait(700)
+            Orion.UseObject(vendor.Serial());
+            Orion.Say(vendor.Name() + ' sell');
+            Orion.Wait(5000)
+            //Guarda bank
+            Bank();
+            Orion.Wait(1500);
+            Orion.UseObject(bauCeramic);
+            Orion.Wait(500);
+            Orion.UseObject(bauGold);
+            Orion.Wait(500);
+            guardaGold(bauGold)
+            Orion.Wait(500)
+        }
+        //Pega ceramic
+        var findItems0 = Orion.FindType('0x1BF2', '0x09B0', bauCeramic, 'item|fast|recurse');
+        if (findItems0.length > 0) {
+            Orion.MoveItem(findItems0[0], 200, 'backpack')
+            Orion.Wait(600);
+        }
+        Orion.UseType('0x1EB8', '0xFFFF');
+        Orion.Wait(200);
+        //Faz Last
+        var gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+        if (gump0 !== null || Orion.WaitForGump(1000)) {
+            if (gump0 === null) {
+                gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+            }
+            if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x00000485')) {
+                gump0.Select(Orion.CreateGumpHook(5008));
+                Orion.Wait(100);
+            }
+        }
+        Orion.Wait(3000);
+    }
+}
+
+
 function fazJarroVenderCook() {
     Orion.ClearJournal()
     Bank();
-    var bauIron = selectionaObjESetaVariavel(undefined, 'Selecione o bau com iron')
-    var bauJarro = selectionaObjESetaVariavel(undefined, 'Selecione o bau onde ficara os jarros')
-    var bauGold = selectionaObjESetaVariavel(undefined, 'Selecione o bau onde ficara o gold')
-    var feitos = 0
+    var bauIron = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau com iron')
+    var bauJarro = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau onde ficara os jarros')
+    var bauGold = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau onde ficara o gold')
+    var vendorNome = 'Andras'
+    Orion.Wait(500)
     Orion.UseObject(bauIron);
+    Orion.Wait(500)
     Orion.UseObject(bauJarro);
+    Orion.Wait(500)
     Orion.UseObject(bauGold);
+    const qtdeVende = 200
+    vaiVendorCook()
+    var vendor = getVendorByName(vendorNome);
+    vaiParaACasaEEntra()
+    Orion.UseObject(bauIron);
+    Orion.Wait(500)
+    Orion.UseObject(bauJarro);
+    Orion.Wait(500)
+    Orion.UseObject(bauGold);
+    while (Player.Mana() < Player.MaxMana()) {
+        if (!Orion.InJournal('Voce comeca')) {
+            meditar();
+        }
+        if (Orion.InJournal("Voce perdeu sua concentracao|cancelada")) {
+            Orion.ClearJournal()
+            Orion.CharPrint(self, '0x0790', "Reiniciando a medit");
+            meditar();
+        }
+        Orion.Wait(1000)
+
+    }
+    var feitos = 0
     var ignoreListJarros = ""
     while (true) {
 
@@ -35,7 +405,7 @@ function fazJarroVenderCook() {
         Orion.Wait(600)
         feitos += 1
         Orion.CharPrint(self, 906, 'Feitos :' + feitos);
-        if (feitos > 200) {
+        if (feitos > qtdeVende) {
             //Close
             var gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
             if (gump0 !== null || Orion.WaitForGump(1000)) {
@@ -49,13 +419,32 @@ function fazJarroVenderCook() {
             }
             Orion.Wait(700)
             vaiVendorCook();
-            Orion.Say('Andras sell');
-            Orion.Wait(11000)
+            Orion.UseObject(vendor.Serial());
+            Orion.Wait(700)
+            Orion.UseObject(vendor.Serial());
+            Orion.Wait(700)
+            Orion.UseObject(vendor.Serial());
+            Orion.Wait(700)
+            Orion.UseObject(vendor.Serial());
+            Orion.Say(vendor.Name() + ' sell');
+            Orion.Wait(5000)
             vaiParaACasaEEntra();
-            meditar();
-            Orion.Wait(500);
+            Orion.Wait(1500);
+            while (Player.Mana() < Player.MaxMana()) {
+                if (!Orion.InJournal('Voce comeca')) {
+                    meditar();
+                }
+                if (Orion.InJournal("Voce perdeu sua concentracao|cancelada")) {
+                    Orion.ClearJournal()
+                    Orion.CharPrint(self, '0x0790', "Reiniciando a medit");
+                    meditar();
+                }
+                Orion.Wait(1000)
+
+            }
             Bank();
-            Orion.Wait(500);
+            Bank();
+            Orion.Wait(1500);
             Orion.UseObject(bauIron);
             Orion.Wait(500);
             Orion.UseObject(bauJarro);
@@ -92,9 +481,18 @@ function vaiParaACasaEEntra() {
         }
     }
     Orion.Wait(11000);
-    Orion.WalkTo(4095, 323, 0, 0, 255, 1, 1);
+    Orion.WalkTo(4095, 323, 0, 0, 255, 1, 1, 2000);
+    Orion.Wait(500)
     closeDoor();
+    Orion.Wait(5000)
+}
 
+function guardaItem(item, cor, origem, destino, quantidade) {
+    var findItems0 = Orion.FindType(item, cor, origem, 'item|fast|recurse');
+    if (findItems0.length) {
+        Orion.MoveItem(findItems0[0], quantidade, destino ? destino : Player.BankSerial())
+        Orion.Wait(600)
+    }
 }
 
 function guardaGold(bau) {
@@ -124,73 +522,85 @@ function vaiVendorCook() {
     Orion.Wait(11000);
 }
 
+function vaiVendorBottle() {
+    Orion.UseObject('0x401476D0');
+    if (Orion.WaitForGump(1000)) {
+        var gump0 = Orion.GetGump('last');
+        if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x00000472')) {
+            gump0.Select(Orion.CreateGumpHook(13));
+            Orion.Wait(100);
+        }
+    }
+    if (Orion.WaitForGump(1000)) {
+        var gump1 = Orion.GetGump('last');
+        if ((gump1 !== null) && (!gump1.Replayed()) && (gump1.ID() === '0x00000472')) {
+            gump1.Select(Orion.CreateGumpHook(113));
+            Orion.Wait(100);
+        }
+    }
+    Orion.Wait(11000);
+}
+
+
+function recallObject(runebookId) {
+    Orion.Cast('32');
+    if (Orion.WaitForTarget(1000))
+        Orion.TargetObject(runebookId);
+    Orion.Wait(11000)
+}
 
 function vender_peixe() {
+    Orion.ClearJournal()
+    var chaveDoBarco = selectionaObjESetaVariavelWorks(undefined, 'Selecione a chave do barco')
+    var bauDosPeixes = 0x4029610A//selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau dos peixes')
+    Orion.UseObject(bauDosPeixes);
+    Orion.Wait(300)
+    //var idItemVendido = selectionaObjESetaVariavelWorks(undefined, 'Selecione o item a ser vendido')
+    //var idItemObject = Orion.FindObject(idItemVendido);
+    var corItem = '0x0000'//idItemObject.Color()
+    var typeIdItemVendido = '0x097A'//Orion.FindType(idItemObject.Graphic())
+    const qtdePeixe = 100
+    var runeBookVendor = selectionaObjESetaVariavelWorks(undefined, 'Selecione o runebook do vendor')
+    var vendor = '0x002F83AF'//selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau onde ficara o gold')
+    //Recall no barco -> Pegar os peixes -> Recall no vendor -> Vender os peixes 
     while (true) {
-        Orion.PrintFast(self, '70', 0, 'Start');
+        Orion.ClearJournal()
+        recallObject(chaveDoBarco)
+        while (Player.Mana() < Player.MaxMana()) {
+            if (!Orion.InJournal('Voce comeca')) {
+                meditar();
+            }
+            if (Orion.InJournal("Voce perdeu sua concentracao|cancelada")) {
+                Orion.ClearJournal()
+                Orion.CharPrint(self, '0x0790', "Reiniciando a medit");
+                meditar();
+            }
+            Orion.Wait(1000)
 
-        //---------------------------------------
-        var baubarco = '0x4025822C';
-        var portabarco = '0x40258229';
-        var vendor = '0x002F83AF'
-        //---------------------------------------
-
-        var time = 500;
-        Orion.Wait(time);
-        Orion.UseObject(baubarco);
-        Orion.Wait(time);
-
-        var peixe = '0x097A';
-        var finditem = Orion.FindType(peixe, '0x0000', baubarco);
-        Orion.DragItem(finditem, 2000);
-        Orion.Wait(time);
-        Orion.DropDraggedItem(backpack);
-        Orion.Wait(time);
-
-        Orion.Step('s');
-        Orion.Wait(time);
-        Orion.Step('w');
-        Orion.Wait(time);
-        Orion.Step('s');
-        Orion.Wait(time);
-        Orion.UseObject(portabarco);
-        Orion.Wait(time);
-        Orion.Step('w');
-        Orion.Wait(time);
-
-        while ((Player.X() != 2072)(Player.Y() != 2855)) {
-            Orion.WalkTo(2072, 2855, -3, 0, 0, 1);
         }
-
+        Orion.UseObject(bauDosPeixes);
+        Orion.Wait(300)
+        var findItems0 = Orion.FindType(typeIdItemVendido, corItem, bauDosPeixes, 'item|fast|recurse');
+        if (findItems0.length > 0) {
+            Orion.CharPrint(self, 906, 'Vai pegar !!');
+            Orion.MoveItem(findItems0[0], qtdePeixe, 'backpack')
+            Orion.Wait(600);
+        } else {
+            Orion.CharPrint(self, 906, 'Acabou !!');
+            break;
+        }
+        recallObject(runeBookVendor)
         Orion.ClearJournal();
         Orion.Say('Paris sell');
         Orion.UseObject(vendor);
         Orion.WaitJournal('Aqui esta', Orion.Now(), Orion.Now() + 5000);
-        Orion.Wait(time);
-
-        while ((Player.X() != 2087)(Player.Y() != 2855)) {
-            Orion.WalkTo(2087, 2855, -3, 0, 0, 0);
-        }
-
-        Orion.Wait(time);
-        Orion.UseObject(portabarco);
-        Orion.Wait(time);
-
-        if ((Player.X() != 2089)) {
-            Orion.UseObject(portabarco);
-            Orion.Wait(time);
-            Orion.UseObject(portabarco);
-        }
-
-        Orion.Wait(time);
-        Orion.Step('e');
-        Orion.Wait(time);
-        Orion.Step('n');
-        Orion.Wait(time);
-        Orion.Step('e');
-        Orion.Wait(time);
-        Orion.Step('n');
-        Orion.Wait(time);
-
+        Orion.Wait(500);
     }
+
+}
+
+
+function selectionaObjESetaVariavelWorks(nameVar, msg) {
+    return selectionaObjESetaVariavel(nameVar, msg, undefined)
+
 }

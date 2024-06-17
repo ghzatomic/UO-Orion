@@ -56,6 +56,13 @@ function combo_ma_paralise(){
   onComboMAFinish() 
 }
 
+function onComboFSLoop(){
+  castPreGHZ('Kal Vas Flam', "Flame Strike", 3650, '0x1F5F', undefined, false, 'onComboFSLoop',1400)
+}
+function onComboParaliseLoop(){
+  castPreGHZ('An Ex Por', "Paralyze", 3200, '', undefined, false, 'onComboParaliseLoop',1250)
+}
+
 function combo_poison_fs2(){
   castPreGHZ('In Nox', "Poison", 3200, '', undefined, false, undefined)
   castPreGHZ('Kal Vas Flam', "Flame Strike", 3800, '0x1F5F', undefined, false, undefined)
