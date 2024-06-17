@@ -6,67 +6,111 @@ function nullCallback (){
   
 }
 
+const magias = {
+  "fs": {
+    "msg": 'Kal Vas Flam',
+    "cast": 'Flame Strike',
+    "delay": 3300,
+    "type": '0x1F5F',
+    "delayExec": 1200
+  },
+  "poison": {
+    "msg": 'In Nox',
+    "cast": 'Poison',
+    "delay": 3300,
+    "type": '',
+    "delayExec": 1250
+  },
+  "paralise": {
+    "msg": 'An Ex Por',
+    "cast": 'Paralyze',
+    "delay": 3200,
+    "type": '',
+    "delayExec": 1250
+  },
+  "lightning": {
+    "msg": 'Por Ort Grav',
+    "cast": 'Lightning',
+    "delay": 3200,
+    "type": '0x1F4A',
+    "delayExec": 1250
+  },
+  "ma": {
+    "msg": 'In Por Y',
+    "cast": 'Magic Arrow',
+    "delay": 1300,
+    "type": '',
+    "delayExec": 200
+  },
+  "cure": {
+    "msg": 'An Nox',
+    "cast": 'Cure',
+    "delay": 2400,
+    "type": '',
+    "delayExec": 700
+  },
+}
+
+
 function castFSPreGHZ() {
-  castPreGHZ('Kal Vas Flam', "Flame Strike", 3800, '0x1F5F', undefined, false, undefined,1200)
+  const magia = magias["fs"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'castFSPreGHZ',magia.delayExec)
 }
 
 function castPoisonPreGHZ() {
-  castPreGHZ('In Nox', "Poison", 3200, '', undefined, false, undefined,1250)
+  const magia = magias["poison"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'castPoisonPreGHZ',magia.delayExec)
 }
 
 function castParalizePreGHZ() {
-  castPreGHZ('An Ex Por', "Paralyze", 3200, '', undefined, false, undefined,1250)
+  const magia = magias["paralise"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'castParalizePreGHZ',magia.delayExec)
+}
+
+function castLightningPreGHZ() {
+  const magia = magias["lightning"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'castLightningPreGHZ',magia.delayExec)
 }
 
 function castMAPreGHZ() {
-  castPreGHZ("In Por Y", "Magic Arrow", 1300, "", undefined, false, undefined,200)
+  const magia = magias["ma"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'castMAPreGHZ',magia.delayExec)
 }
 
 function castMAPreGHZExplosion() {
   interromperCast();
   desativaCast();
-  castPreGHZ("In Por Y", "Magic Arrow", 1300, "", 'explo', false, undefined,200)
+  const magia = magias["ma"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, 'explo', false, undefined,magia.delayExec)
 }
 
 function castCurePreGHZ() {
-  castPreGHZ("An Nox", "Cure", 2400, "", 'self', false, undefined,700)
+  const magia = magias["cure"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, 'self', false, undefined,magia.delayExec)
 }
 
-function onComboFSFinish(){
-  castPreGHZ('In Nox', "Poison", 3300, '', undefined, false, 'onComboPoisonFinish',1250)
+function onComboPoisonFSFinish(){
+  const magia = magias["poison"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'onComboPoisonFSFinish',magia.delayExec)
 }
 
-function onComboPoisonFinish(){
-  castPreGHZ('Kal Vas Flam', "Flame Strike", 3650, '0x1F5F', undefined, false, 'onComboFSFinish',1400)
+function onComboFSPoisonFinish(){
+  const magia = magias["fs"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'onComboFSPoisonFinish',magia.delayExec)
 }
 
-function onComboMAFinish(){
-  castPreGHZ("In Por Y", "Magic Arrow", 1300, "", undefined, false, 'onComboParaliseFinish',200)
+
+function onComboMAParaliseFinish(){
+  const magia = magias["ma"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'onComboParaliseMAFinish',magia.delayExec)
 }
 
-function onComboParaliseFinish(){
-  castPreGHZ('An Ex Por', "Paralyze", 3200, '', undefined, false, 'onComboMAFinish',1250)
+function onComboParaliseMAFinish(){
+  const magia = magias["paralise"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'onComboMAParaliseFinish',magia.delayExec)
 }
 
-function combo_poison_fs(){
-  onComboFSFinish()
-}
 
-function combo_ma_paralise(){
-  onComboMAFinish() 
-}
-
-function onComboFSLoop(){
-  castPreGHZ('Kal Vas Flam', "Flame Strike", 3650, '0x1F5F', undefined, false, 'onComboFSLoop',1400)
-}
-function onComboParaliseLoop(){
-  castPreGHZ('An Ex Por', "Paralyze", 3200, '', undefined, false, 'onComboParaliseLoop',1250)
-}
-
-function combo_poison_fs2(){
-  castPreGHZ('In Nox', "Poison", 3200, '', undefined, false, undefined)
-  castPreGHZ('Kal Vas Flam', "Flame Strike", 3800, '0x1F5F', undefined, false, undefined)
-}
 
 
 function desativaCast() {

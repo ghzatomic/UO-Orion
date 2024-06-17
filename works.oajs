@@ -44,7 +44,7 @@ function getVendorBySerial(serial) {
 function comprarLoop() {
     Orion.ClearJournal()
     Bank();
-    var shopList = Orion.GetShopList('Comprar Lightning');
+    var shopList = Orion.GetShopList('Comprar NW');
     var arrItens = shopList.Items();
     var vendor = selectionaObjESetaVariavelWorks(undefined, 'Selecione o vendor')
     var vendorObj = getVendorBySerial(vendor)
