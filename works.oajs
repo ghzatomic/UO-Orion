@@ -604,3 +604,63 @@ function selectionaObjESetaVariavelWorks(nameVar, msg) {
     return selectionaObjESetaVariavel(nameVar, msg, undefined)
 
 }
+
+
+///////////////////////////// Taming
+
+
+function tamingpro() {
+    Orion.UseType('0x1088');
+    if (!Orion.ObjAtLayer('TamingPro')) {
+      if (!Orion.FindObject('TamingPro')) {
+        Orion.AddObject('TamingPro');
+        Orion.Print('-1', 'Target yout Taming')
+        Orion.WaitForTarget(1000);
+      }
+    }
+    Orion.ClearJournal();
+    Orion.Wait(100);
+    Orion.UseSkill('Animal Taming', 'TamingPro');
+    Orion.Wait(1000);
+    while (!Orion.ObjAtLayer('TamingPro')) {
+      Orion.Wait(1000);
+      if (Orion.InJournal('nao conseguiu domesticar')) {
+        tamingpro();
+      }
+      if (Orion.InJournal('linha visao')) {
+        tamingpro();
+      }
+      if (Orion.InJournal('feroz')) {
+        peace();
+        tamingpro();
+      }
+      if (Orion.InJournal('aceitou voce')) {
+        Orion.Say('.drink Shrink');
+        Orion.WaitTargetObject('TamingPro');
+        Orion.UseType('0x1413'); // Gorget
+        Orion.Terminate('tamingpro');
+      }
+      if (Orion.InJournal('domesticado')) {
+        Orion.UseType('0x1413'); // Gorget
+        Orion.Terminate('tamingpro');
+      }
+    }
+  }
+  
+  function peace() {
+    Orion.ClearJournal();
+    Orion.Wait(100);
+    Orion.UseSkill('Peacemaking', 'TamingPro')
+    Orion.Wait(100);
+    while (!Orion.InJournal('se acalmou')) {
+      Orion.Wait(1000);
+      if (Orion.InJournal('falhou')) {
+        peace();
+      }
+      if (Orion.InJournal('tocou mal')) {
+        peace();
+      }
+    }
+  }
+
+  //////////////////////////////////////
