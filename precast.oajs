@@ -1,6 +1,6 @@
 var msg_curado = "O veneno em seu corpo foi curado";
-var msg_castando_heal = "An Nox";
-var msg_potion = "Greater Cure!";
+var msg_castando_CURE = "An Nox";
+var msg_potion_CURE = "Greater Cure!";
 var envenenado = "envenenado"
 function nullCallback (){
   
@@ -54,60 +54,68 @@ const magias = {
 
 function castFSPreGHZ() {
   const magia = magias["fs"]
-  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'castFSPreGHZ',magia.delayExec)
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, undefined,magia.delayExec,'castFSPreGHZ',false)
 }
 
 function castPoisonPreGHZ() {
   const magia = magias["poison"]
-  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'castPoisonPreGHZ',magia.delayExec)
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, undefined,magia.delayExec,'castPoisonPreGHZ',false)
 }
 
 function castParalizePreGHZ() {
   const magia = magias["paralise"]
-  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'castParalizePreGHZ',magia.delayExec)
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, undefined,magia.delayExec,'castParalizePreGHZ',false)
 }
 
 function castLightningPreGHZ() {
   const magia = magias["lightning"]
-  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'castLightningPreGHZ',magia.delayExec)
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, undefined,magia.delayExec,'castLightningPreGHZ',false)
 }
 
 function castMAPreGHZ() {
   const magia = magias["ma"]
-  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'castMAPreGHZ',magia.delayExec)
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, undefined,magia.delayExec,'castMAPreGHZ',false)
 }
 
 function castMAPreGHZExplosion() {
   interromperCast();
   desativaCast();
   const magia = magias["ma"]
-  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, 'explo', false, undefined,magia.delayExec)
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, 'explo', false, undefined,magia.delayExec,'castMAPreGHZExplosion',false)
 }
 
 function castCurePreGHZ() {
+  var lastFunction = undefined
+  if (Shared.GetVar('CPfuncaoName') != ''){
+    lastFunction = Shared.GetVar('CPfuncaoName')
+  }
   const magia = magias["cure"]
-  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, 'self', false, undefined,magia.delayExec)
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, 'self', false, lastFunction,magia.delayExec,'castCurePreGHZ',false)
 }
 
-function onComboPoisonFSFinish(){
+function comboPoisonLoop(){
   const magia = magias["poison"]
-  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'onComboPoisonFSFinish',magia.delayExec)
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, undefined,magia.delayExec,'comboPoisonLoop',true)
 }
 
-function onComboFSPoisonFinish(){
+function comboFSLoop(){
   const magia = magias["fs"]
-  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'onComboFSPoisonFinish',magia.delayExec)
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, undefined,magia.delayExec,'comboFSLoop',true)
 }
 
 
-function onComboMAParaliseFinish(){
+function comboMALoop(){
   const magia = magias["ma"]
-  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'onComboParaliseMAFinish',magia.delayExec)
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, undefined,magia.delayExec,'comboMALoop',true)
 }
 
-function onComboParaliseMAFinish(){
+function comboParaliseLoop(){
   const magia = magias["paralise"]
-  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, 'onComboMAParaliseFinish',magia.delayExec)
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, undefined,magia.delayExec,'comboParaliseLoop',true)
+}
+function comboLightningLoop(){
+  const magia = magias["lightning"]
+  castPreGHZ(magia.msg, magia.cast, magia.delay, magia.type, undefined, false, undefined,magia.delayExec,'comboLightningLoop',true)
 }
 
 
@@ -125,6 +133,8 @@ function desativaCast() {
   Shared.AddVar('CPCastDelayExec', 0);
   Shared.AddVar('CPTarget', 'lasttarget');
   Shared.AddVar('CPCallbackFunction', 'nullCallback');
+  Shared.AddVar('CPfuncaoName', '');
+  Shared.AddVar('CPisLoop', false);
   Orion.ClearJournal(lastCastMSG);
   Orion.ClearJournal(lastCastCAST);
   Shared.AddVar('RMCancelRun', true);
@@ -142,7 +152,7 @@ function interromperCast() {
   }
 }
 
-function castPreGHZ(MSG, CAST, DELAY, TYPE, TARGET, DESATIVAVEL,callbackCastou,DELAYEXEC) {
+function castPreGHZ(MSG, CAST, DELAY, TYPE, TARGET, DESATIVAVEL,callbackCastou,DELAYEXEC,funcaoName, isLoop) {
   if (!TARGET) {
     TARGET = "lasttarget"
   }
@@ -160,13 +170,15 @@ function castPreGHZ(MSG, CAST, DELAY, TYPE, TARGET, DESATIVAVEL,callbackCastou,D
       Shared.AddVar('CPCastDelayExec', DELAYEXEC);
       Shared.AddVar('CPUseType', TYPE);
       Shared.AddVar('CPTarget', TARGET);
+      Shared.AddVar('CPfuncaoName', funcaoName);
+      Shared.AddVar('CPisLoop', isLoop);
       Shared.AddVar('CPCallbackFunction', callbackCastou?callbackCastou:'nullCallback');
       Orion.ClearJournal();
       interromperCast()
       Orion.ClearJournal(CAST);
       Orion.CharPrint(self, 906, 'Desativando ' + lastCastCAST + ' ativando ' + CAST);
     } else {
-      if (DESATIVAVEL) {
+      if (DESATIVAVEL && TARGET!='self' ) {
         desativaCast();
         interromperCast()
         Orion.ClearJournal(CAST);
@@ -183,10 +195,12 @@ function castPreGHZ(MSG, CAST, DELAY, TYPE, TARGET, DESATIVAVEL,callbackCastou,D
       Shared.AddVar('CPUseType', TYPE);
       Shared.AddVar('CPCastDelayExec', DELAYEXEC);
       Shared.AddVar('CPTarget', TARGET);
+      Shared.AddVar('CPfuncaoName', funcaoName);
+      Shared.AddVar('CPisLoop', isLoop);
       Shared.AddVar('CPCallbackFunction', callbackCastou?callbackCastou:'nullCallback');
       Orion.CharPrint(self, 906, 'Ativando ' + CAST);
     } else {
-      if (DESATIVAVEL) {
+      if (DESATIVAVEL && TARGET!='self') {
         Orion.ClearJournal(CAST);
         desativaCast();
         interromperCast()
@@ -200,14 +214,13 @@ function castPreGHZ(MSG, CAST, DELAY, TYPE, TARGET, DESATIVAVEL,callbackCastou,D
 
 function castMagiaFunction(funct_back, lastCastUse, lastCastCAST, lastCastMSG, lastCastDelay, target) {
   var enemy = true
-  var lastEnemy = undefined
-  if (target == 'lasttarget') { // Aqui verifica se a magia é self, por exemplo o cure
-    enemy = Orion.FindObject('lasttarget');
-  }else if (target == 'explo') {
-    lastEnemy = Orion.FindObject('lasttarget');
-    enemy = Orion.FindObject('self');
+  var lastEnemy = undefined;
+  if (target == 'explo' || target == 'self') {
+    lastEnemy = Orion.GetSerial('lastattack');
+    enemy = Orion.GetSerial('self');
+  }else{
+    enemy = Orion.GetSerial('lastattack');//Orion.FindObject('lasttarget');Orion.FindObject('lasttarget');
   }
-
   if (enemy) {
     Orion.ClearJournal('A magia falhou')
     var scroll = undefined;
@@ -230,11 +243,24 @@ function castMagiaFunction(funct_back, lastCastUse, lastCastCAST, lastCastMSG, l
           Orion.Wait(350);
           Orion.WaitTargetObject('self')
           
+        }else if (target == 'self') {
+          Orion.WaitTargetObject('self')
+          Orion.Cast(lastCastCAST);
+          Shared.AddVar('CPTarget', lastEnemy);
+          Orion.ClientLastTarget(lastEnemy);
+          Orion.ClientLastAttack(lastEnemy);
+          Orion.Attack(lastEnemy);
         }else{
           Orion.WaitTargetObject(target)
           Orion.Cast(lastCastCAST);
         }
         
+      }
+      if (target == 'self' || target == 'explo'){
+        Shared.AddVar('CPTarget', lastEnemy);
+        Orion.ClientLastTarget(lastEnemy);
+        Orion.ClientLastAttack(lastEnemy);
+        Orion.Attack(lastEnemy);
       }
     }
     Orion.AddDisplayTimer(100, lastCastDelay, 'UnderChar', 'Circle|Bar', lastCastCAST, 0, 0, '0x00FF', 0, 'white');
@@ -271,82 +297,6 @@ function printVisibility(target) {
 
 }
 
-function loopCastPerfeito() {
-  Orion.CharPrint(self, 906, 'Iniciando CP ..');
-  Shared.AddVar('CPUseType', '');
-  Shared.AddVar('CPCastActive', "");
-  Shared.AddVar('CPCastMSG', "");
-  Shared.AddVar('CPCastCast', "");
-  Shared.AddVar('CPCastDelay', 0);
-  Shared.AddVar('CPCastDelayExec', 0);
-  Shared.AddVar('CPTarget', 'lasttarget');
-  Shared.AddVar('CPCallbackFunction', 'nullCallback');
-  Orion.ClearJournal('A magia falhou')
-  var castMagia = false
-  Orion.JournalIgnoreCase(true)
-  var last = ""
-  var falha_magia = false
-  // Quando solta paralyze e ma em sequencia, ele entra em loop e tem q ver o pq 
-  while (true) {
-    var lastCastMSG = Shared.GetVar('CPCastMSG');
-    var lastCastCAST = Shared.GetVar('CPCastCast');
-    var lastDelayExec = Shared.GetVar('CPCastDelayExec');
-    var lastCastDelay = Shared.GetVar('CPCastDelay');
-    var lastCastUse = Shared.GetVar('CPUseType');
-    var target = Shared.GetVar('CPTarget');
-    printVisibility("lasttarget")
-    if (Shared.GetVar('CPCastActive') == 1) {
-      castMagia = true
-      if (Orion.InJournal(lastCastMSG + "|" + last, "cast")) {
-        Orion.ClearJournal(lastCastCAST);
-        Shared.AddVar('CPCastActive', 0);
-        Shared.AddVar('CPUseType', '');
-        Shared.AddVar('CPCastActive', "");
-        Shared.AddVar('CPCastMSG', "");
-        Shared.AddVar('CPCastCast', "");
-        Shared.AddVar('CPCastDelay', 0);
-        Shared.AddVar('CPCastDelayExec', 0);
-        Shared.AddVar('CPTarget', 'lasttarget');
-        Shared.AddVar('CPCallbackFunction', 'nullCallback');
-        Orion.CharPrint(self, 906, 'Desativando loop ' + lastCastCAST);
-        Orion.Wait(25);
-        castMagia = false
-      }
-      if (castMagia) {
-        function back_cast(lastCastUse, lastCastCAST, lastCastMSG, lastCastDelay) {
-          castMagia = false;
-          Orion.WaitJournal(lastCastCAST, Orion.Now() - 500, Orion.Now() + 280);  // Aguarda aparecer no jornal a magia
-          last = lastCastMSG
-        }
-        castMagiaFunction(back_cast, lastCastUse, lastCastCAST, lastCastMSG, lastCastDelay, target)
-      }
-    }
-    if (Orion.InJournal("A magia falhou", "cast")) {
-      Orion.ClearJournal("A magia falhou", "cast");
-      Orion.Wait(15);
-      while (Orion.InJournal("A magia falhou", "cast")) {
-        Orion.ClearJournal("A magia falhou", "cast");
-      }
-
-      falha_magia = true
-    }
-    if (falha_magia) {
-      Shared.AddVar('CPCastActive', 0); // desativa o cast
-
-      Orion.ClearJournal("A magia falhou");
-      Orion.Wait(15);
-      //Orion.RemoveDisplayTimer(100);
-      //Orion.Wait(15);
-      //Orion.AddDisplayTimer(100, lastCastDelay, 'UnderChar', 'Circle|Bar', 'DELAY', 0,0, '0x00FF', 0, 'white');
-      falha_magia = false
-      Shared.AddVar('CPCastActive', 1); // Ativa novamente
-    }
-    Orion.Wait(15);
-  }
-
-}
-
-
 function waitCast(timeout, onMagiaFalhou, onDesabilitado, onFinish){
   timeout = parseInt(timeout)
   //Orion.CharPrint(self, 906, 'wait'+' - '+ timeout);
@@ -361,7 +311,7 @@ function waitCast(timeout, onMagiaFalhou, onDesabilitado, onFinish){
       if (onMagiaFalhou){
         onMagiaFalhou()
       }
-      break
+      return retorno;
     }
     if (Shared.GetVar('CPCastActive') != 1){
       retorno = 1
@@ -389,26 +339,23 @@ function loopCastPerfeitoV2() {
   Shared.AddVar('CPCastDelayExec', 0);
   Shared.AddVar('CPTarget', 'lasttarget');
   Shared.AddVar('CPCallbackFunction', 'nullCallback');
+  Shared.AddVar('CPfuncaoName', '');
+  Shared.AddVar('CPisLoop', false);
   Orion.ClearJournal('A magia falhou')
   var castMagia = false
   Orion.JournalIgnoreCase(true)
   var last = ""
   // Quando solta paralyze e ma em sequencia, ele entra em loop e tem q ver o pq 
   while (true) {
-    var lastCastMSG = Shared.GetVar('CPCastMSG');
-    var lastCastCAST = Shared.GetVar('CPCastCast');
-    var lastCastDelay = Shared.GetVar('CPCastDelay');
-    var lastDelayExec = Shared.GetVar('CPCastDelayExec');
-    var lastCastUse = Shared.GetVar('CPUseType');
-    var target = Shared.GetVar('CPTarget');
     var callback = Shared.GetVar('CPCallbackFunction');
     if (callback == 'nullCallback'){
       callback = undefined
     }
-    printVisibility("lasttarget")
+    printVisibility(Shared.GetVar('CPTarget'))
 
 
-    var desativaLoop = function(){
+    var desativaLoop = function(target){
+      var lastCastCAST = Shared.GetVar('CPCastCast');
       Orion.ClearJournal(lastCastCAST);
       Shared.AddVar('CPCastActive', 0);
       Shared.AddVar('CPUseType', '');
@@ -417,7 +364,9 @@ function loopCastPerfeitoV2() {
       Shared.AddVar('CPCastCast', "");
       Shared.AddVar('CPCastDelay', 0);
       Shared.AddVar('CPCastDelayExec', 0);
-      Shared.AddVar('CPTarget', 'lasttarget');
+      Shared.AddVar('CPTarget', target);
+      Shared.AddVar('CPfuncaoName', '');
+      Shared.AddVar('CPisLoop', false);
       Shared.AddVar('CPCallbackFunction', 'nullCallback');
       //Orion.CharPrint(self, 906, 'Desativando loop ' + lastCastCAST);
       Orion.ClearJournal(lastCastCAST);
@@ -427,13 +376,13 @@ function loopCastPerfeitoV2() {
       interromperCast()
     }
     var onCastFinish = function(){
-      Orion.CharPrint(self, 906, 'Finish ' + lastCastCAST);
+      Orion.CharPrint(self, 906, 'Finish - ' + Shared.GetVar('CPCastCast'));
     }
     var onMagiaFalhou = function(){
-      Orion.CharPrint(self, 906, 'Falha ' + lastCastCAST);
+      Orion.CharPrint(self, 906, 'Falha - ' + Shared.GetVar('CPCastCast'));
     }
     var onMacroDesabilitado = function(){
-      Orion.CharPrint(self, 906, 'Disable ' + lastCastCAST);
+      Orion.CharPrint(self, 906, 'Disable ' + Shared.GetVar('CPCastCast'));
     }
 
     if (Shared.GetVar('CPCastActive') == 1) {
@@ -442,14 +391,14 @@ function loopCastPerfeitoV2() {
         castMagia = false;
         const inicio = Date.now();
 
-        Orion.WaitJournal(lastCastCAST_local, Orion.Now() - 500, Orion.Now() + 280);  // Aguarda aparecer no jornal a magia
-        last = lastCastMSG_local
-        if (Orion.InJournal(lastCastMSG_local + "|" + last, "cast")) {
+        Orion.WaitJournal(Shared.GetVar('CPCastCast'), Orion.Now() - 500, Orion.Now() + 280);  // Aguarda aparecer no jornal a magia
+        last = Shared.GetVar('CPCastMSG')
+        if (Orion.InJournal(Shared.GetVar('CPCastMSG') + "|" + last, "cast")) {
           //Orion.CharPrint(self, 906, 'CASTOU ! ' + lastCastDelay_local);
-          Orion.ClearJournal(lastCastCAST_local);
+          Orion.ClearJournal(Shared.GetVar('CPCastCast'));
           Orion.ClearJournal(last);
-          while (Orion.InJournal(lastCastCAST_local)) {
-            Orion.ClearJournal(lastCastCAST_local);
+          while (Orion.InJournal(Shared.GetVar('CPCastCast'))) {
+            Orion.ClearJournal(Shared.GetVar('CPCastCast'));
           }
           while (Orion.InJournal(last)) {
             Orion.ClearJournal(last);
@@ -457,13 +406,13 @@ function loopCastPerfeitoV2() {
           const fim = Date.now();
           const duracao = fim - inicio;
           //Orion.CharPrint(self, 906, 'Demorou: ' + duracao);
-          const delayNecessarioExecucao = lastDelayExec+duracao
-          var delay = lastCastDelay_local-delayNecessarioExecucao
+          const delayNecessarioExecucao =  Shared.GetVar('CPCastDelayExec')+duracao
+          var delay = Shared.GetVar('CPCastDelay')-delayNecessarioExecucao
           var retornoMagia = waitCast(delay,onMagiaFalhou, onMacroDesabilitado, onCastFinish)
           switch (retornoMagia) {
             case 2: // Falhou
               if (Shared.GetVar('CPCastActive') != 1){
-                desativaLoop();
+                desativaLoop(Shared.GetVar('CPTarget'));
               }
               Orion.ClearJournal(lastCastCAST_local);
               while (Orion.InJournal(lastCastCAST_local)) {
@@ -473,23 +422,25 @@ function loopCastPerfeitoV2() {
               while (Orion.InJournal(last)) {
                 Orion.ClearJournal(last);
               }
+              Orion.CharPrint(self, 906, 'AQUI -'+Shared.GetVar('CPCastCast')+' - '+lastCastCAST_local+ ' - '+last);
               break;
             case 1: // Parou
-              desativaLoop();
+              desativaLoop(Shared.GetVar('CPTarget'));
               break;
           
             default: // Castou
-              if (callback){
-                Orion.CharPrint(self, 906, 'Chamando callback : ' + callback);
-                eval(callback)()
+              if (Shared.GetVar('CPCallbackFunction') != 'nullCallback'){
+                //Orion.CharPrint(self, 906, 'Chamando callback : ' + Shared.GetVar('CPCallbackFunction'));
+                eval(Shared.GetVar('CPCallbackFunction'))()
               }else{
-                desativaLoop();
+                if (!Shared.GetVar('CPisLoop'))
+                desativaLoop(Shared.GetVar('CPTarget'));
               }
               break;
           }
         }
       }
-      castMagiaFunction(back_cast, lastCastUse, lastCastCAST, lastCastMSG, lastCastDelay, target)
+      castMagiaFunction(back_cast, Shared.GetVar('CPUseType'), Shared.GetVar('CPCastCast'), Shared.GetVar('CPCastMSG'), Shared.GetVar('CPCastDelay'), Shared.GetVar('CPTarget'))
     }
   }
 }
@@ -502,21 +453,24 @@ function printPocaoCD(){
   }
 }
 
-function pocaoCd(){
+function pocaoCd(onTempo){
   var msg = Orion.InJournal("Pocao",'self')
+  var tempo = undefined
   if (msg){
     var segs = msg.Text().split(':')[1]
     if (segs){
       segs = segs.split('seg')[0]
       if (segs){
         Orion.ClearJournal(msg.Text(),'self');
-        var tempo = parseInt(segs.trim())
+        tempo = parseInt(segs.trim())
         Orion.AddDisplayTimer(1800, (tempo)*1000, 'Top', 'line|bar', 'Proxima Potion', 0, 0, '0x0058', 0, 'white');
-        return tempo
+        if (onTempo){
+          onTempo(tempo)
+        }
       }
     }
   }
-  return undefined
+  return tempo
 }
 
 function go_casa(){

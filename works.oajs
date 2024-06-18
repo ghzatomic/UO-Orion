@@ -99,7 +99,7 @@ function fazerScrollsLoop() {
     var qtdeLote = 30
     while (true) {
         fazerFS(bauOrigem, bauDestino, qtdeLote)
-        fazerLightning(bauOrigem, bauDestino, qtdeLote)
+        //fazerLightning(bauOrigem, bauDestino, qtdeLote)
     }
 }
 
