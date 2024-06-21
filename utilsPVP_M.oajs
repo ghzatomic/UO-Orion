@@ -135,3 +135,9 @@ function poisonaArma() {
 
   Orion.WaitTargetObject(arma);
 }
+
+function peaceArea() {
+  Orion.UseSkill('Peacemaking', 'self');
+  Orion.AddDisplayTimer(550, 7100, 'UnderChar', 'Circle|Bar', 'PEACE', 0, 0, '0x0030', 0, 'blue');
+  Orion.AddDisplayTimer(-2200, 60000, 'UnderChar', 'Circle|Bar', 'PEACE', -540, -400, '0x0033', 1, 'blue');
+}

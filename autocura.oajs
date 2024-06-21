@@ -65,7 +65,6 @@ function curarse(callback_decide_cast, callback_is_envenenado, callback_is_curad
             //Orion.CharPrint(self, 906, "Nao encontrou potion, Curando c magia")
             castCurePreGHZ();
           }
-          castCurePreGHZ();
           Orion.WaitJournal(msg_castando_CURE, Orion.Now() - 500, Orion.Now() + 280);
         }
       }
@@ -84,11 +83,11 @@ function autobands() {
       ManaGHZ();
       Orion.Wait(200);
     }
-    if (Player.Poisoned()) {
+    /*if (Player.Poisoned()) {
       curarse();
     } else {
       Orion.ClearJournal(msg_castando_CURE);
-    }
+    }*/
   }
 }
 
@@ -146,8 +145,16 @@ function meditar() {
 function executaHeal() {
   var execBand = function (){
     if (bandages.length > 0) {
+      lastEnemy = Orion.GetSerial('lastattack');
+      lastEnemy2 = Orion.GetSerial('lasttarget');
       var startTime = Orion.Now();
       Orion.BandageSelf();
+      //Orion.BandageTarget(Player.Serial());
+      Shared.AddVar('CPTarget', lastEnemy);
+      Orion.ClientLastTarget(lastEnemy);
+      Orion.ClientLastAttack(lastEnemy);
+      Orion.Attack(lastEnemy);
+      //Orion.CharPrint(self, 906, 'Inimigo ' + lastEnemy+ ' - '+lastEnemy2);
       Orion.WaitJournal('curou|escorregaram|envenenado|nao precisa', startTime, startTime + 5600);
     } else {
       if (Orion.Count("0x0F0E", "0x00FF", backpack) > 0) {

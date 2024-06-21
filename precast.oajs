@@ -12,7 +12,7 @@ const magias = {
     "cast": 'Flame Strike',
     "delay": 3300,
     "type": '0x1F5F',
-    "delayExec": 1200
+    "delayExec": 1250
   },
   "poison": {
     "msg": 'In Nox',
@@ -40,12 +40,12 @@ const magias = {
     "cast": 'Magic Arrow',
     "delay": 1300,
     "type": '',
-    "delayExec": 200
+    "delayExec": 150
   },
   "cure": {
     "msg": 'An Nox',
     "cast": 'Cure',
-    "delay": 2400,
+    "delay": 2500,
     "type": '',
     "delayExec": 700
   },
@@ -220,50 +220,85 @@ function castMagiaFunction(funct_back, lastCastUse, lastCastCAST, lastCastMSG, l
     enemy = Orion.GetSerial('self');
   }else{
     enemy = Orion.GetSerial('lastattack');//Orion.FindObject('lasttarget');Orion.FindObject('lasttarget');
+    target = enemy
+    lastEnemy = enemy
+    target = enemy
+    //enemy = Orion.FindObject(enemy)
+    if (enemy != null){
+      Shared.AddVar('CPTarget', target);
+      Orion.ClientLastTarget(target);
+      Orion.ClientLastAttack(target);
+      Orion.Attack(target);
+      //Orion.CharPrint(self, 906, 'Inimigo ['+target+'] ' + enemy.Name());
+    }else{
+      Shared.AddVar('CPTarget', 'lasttarget');
+      Orion.ClientLastTarget('lasttarget');
+      Orion.ClientLastAttack('lasttarget');
+      Orion.Attack('lasttarget');
+      //Orion.CharPrint(self, 906, 'Inimigo ['+target+'] ' + enemy.Name());
+      
+    }
+    
   }
-  if (enemy) {
+  if (true) {
     Orion.ClearJournal('A magia falhou')
     var scroll = undefined;
     if (lastCastUse && lastCastUse != '') {
       scroll = Orion.FindType(lastCastUse);
     }
-    if (lastCastCAST != '') {
-      if (scroll && scroll.length > 0) {
-        Orion.UseObject(scroll[0]);
-        if (target == 'explo') {
-          Orion.WaitTargetType('0x0F0E', '0x0015')
-          Orion.TargetObject(lastEnemy);
-        }else{
-          Orion.WaitTargetObject(target)
-        }
-      } else {
-        if (target == 'explo') {
-          Orion.Cast(lastCastCAST);
-          Orion.WaitTargetType('0x0F0E', '0x0015')
-          Orion.Wait(350);
-          Orion.WaitTargetObject('self')
-          
-        }else if (target == 'self') {
-          Orion.WaitTargetObject('self')
-          Orion.Cast(lastCastCAST);
-          Shared.AddVar('CPTarget', lastEnemy);
-          Orion.ClientLastTarget(lastEnemy);
-          Orion.ClientLastAttack(lastEnemy);
-          Orion.Attack(lastEnemy);
-        }else{
-          Orion.WaitTargetObject(target)
-          Orion.Cast(lastCastCAST);
-        }
-        
-      }
-      if (target == 'self' || target == 'explo'){
-        Shared.AddVar('CPTarget', lastEnemy);
+    const ataca = function (){
+      if (target == 'explo') {
+        Orion.WaitTargetType('0x0F0E', '0x0015')
+        Orion.Cast(lastCastCAST);
+        Orion.WaitTargetType('0x0F0E', '0x0015')
+      }else if (target == 'self') {
+        //Orion.CancelTarget()
+        Orion.WaitTargetObject('self')
+        Orion.Cast(lastCastCAST);
+      }else{
+        //Orion.CancelTarget()
+        Orion.Cast(lastCastCAST,lastEnemy);
+        Orion.WaitTargetObject(lastEnemy)
+        //Orion.WaitTargetObject(Shared.GetVar('CPTarget'))
         Orion.ClientLastTarget(lastEnemy);
         Orion.ClientLastAttack(lastEnemy);
         Orion.Attack(lastEnemy);
       }
     }
-    Orion.AddDisplayTimer(100, lastCastDelay, 'UnderChar', 'Circle|Bar', lastCastCAST, 0, 0, '0x00FF', 0, 'white');
+    if (lastCastCAST != '') {
+      if (scroll && scroll.length > 0) {
+        Orion.UseObject(scroll[0]);
+        if (target == 'explo') {
+          //Orion.CancelTarget()
+          Orion.WaitTargetType('0x0F0E', '0x0015')
+          Orion.WaitTargetObject('self')
+        }else if (target == 'self') {
+          //Orion.CancelTarget()
+          Orion.WaitTargetObject('self')
+          Orion.Cast(lastCastCAST);
+        }else{
+          //Orion.CancelTarget()
+          Orion.WaitTargetObject(Shared.GetVar('CPTarget'))
+          Orion.ClientLastTarget(lastEnemy);
+          Orion.Wait(10)
+          Orion.ClientLastAttack(lastEnemy);
+          Orion.Wait(10)
+          Orion.Attack(lastEnemy);
+        }
+      } else {
+        ataca();
+      }
+      if (target == 'self' || target == 'explo'){
+        //Orion.CancelTarget()
+        Shared.AddVar('CPTarget', lastEnemy);
+        Orion.ClientLastTarget(lastEnemy);
+        Orion.Wait(10)
+        Orion.ClientLastAttack(lastEnemy);
+        Orion.Wait(10)
+        Orion.Attack(lastEnemy);
+      }
+      Orion.AddDisplayTimer(100, lastCastDelay, 'UnderChar', 'Circle|Bar', lastCastCAST, 0, 0, '0x00FF', 0, 'white');
+    }
     funct_back(lastCastUse, lastCastCAST, lastCastMSG, lastCastDelay);
     //Orion.Wait(15);
   }
@@ -302,10 +337,23 @@ function waitCast(timeout, onMagiaFalhou, onDesabilitado, onFinish){
   //Orion.CharPrint(self, 906, 'wait'+' - '+ timeout);
   var retorno = 0 // 0 = Castou, 1 = Parou, 2 = Falhou
   for(var i = 0; i<timeout ; i++ ){
-    if (Orion.InJournal("A magia falhou", "cast")) {
-      Orion.ClearJournal("A magia falhou", "cast");
-      while (Orion.InJournal("A magia falhou", "cast")) {
-        Orion.ClearJournal("A magia falhou", "cast");
+    if (Orion.InJournal("A magia falhou")) {
+      Orion.ClearJournal("A magia falhou");
+      Orion.ClearJournal("Skill Magery cancelada");
+      while (Orion.InJournal("A magia falhou")) {
+        Orion.ClearJournal("A magia falhou");
+      }
+      retorno = 2
+      if (onMagiaFalhou){
+        onMagiaFalhou()
+      }
+      return retorno;
+    }
+    if (Orion.InJournal("Skill Magery cancelada")){
+      Orion.ClearJournal("Skill Magery cancelada");
+      Orion.ClearJournal("Skill Magery cancelada");
+      while (Orion.InJournal("Skill Magery cancelada")) {
+        Orion.ClearJournal("Skill Magery cancelada");
       }
       retorno = 2
       if (onMagiaFalhou){
@@ -422,7 +470,18 @@ function loopCastPerfeitoV2() {
               while (Orion.InJournal(last)) {
                 Orion.ClearJournal(last);
               }
-              Orion.CharPrint(self, 906, 'AQUI -'+Shared.GetVar('CPCastCast')+' - '+lastCastCAST_local+ ' - '+last);
+              //Orion.CancelTarget()
+              Orion.CharPrint(self, 906, 'Aqui x - '+Shared.GetVar('CPTarget'));
+              Orion.Wait(25)
+              Orion.ClientLastTarget(Shared.GetVar('CPTarget'));
+              Orion.Wait(10)
+              Orion.ClientLastAttack(Shared.GetVar('CPTarget'));
+              Orion.Wait(10)
+              Orion.Attack(Shared.GetVar('CPTarget'));
+              if (Shared.GetVar('CPCallbackFunction') != 'nullCallback'){
+                Orion.CharPrint(self, 906, 'Chamando callback : ' + Shared.GetVar('CPCallbackFunction'));
+                eval(Shared.GetVar('CPCallbackFunction'))()
+              }
               break;
             case 1: // Parou
               desativaLoop(Shared.GetVar('CPTarget'));
@@ -433,13 +492,15 @@ function loopCastPerfeitoV2() {
                 //Orion.CharPrint(self, 906, 'Chamando callback : ' + Shared.GetVar('CPCallbackFunction'));
                 eval(Shared.GetVar('CPCallbackFunction'))()
               }else{
-                if (!Shared.GetVar('CPisLoop'))
-                desativaLoop(Shared.GetVar('CPTarget'));
+                if (!Shared.GetVar('CPisLoop')){
+                  desativaLoop(Shared.GetVar('CPTarget'));
+                }
               }
               break;
           }
         }
       }
+      
       castMagiaFunction(back_cast, Shared.GetVar('CPUseType'), Shared.GetVar('CPCastCast'), Shared.GetVar('CPCastMSG'), Shared.GetVar('CPCastDelay'), Shared.GetVar('CPTarget'))
     }
   }
