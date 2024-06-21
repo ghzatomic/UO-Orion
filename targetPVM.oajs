@@ -31,6 +31,8 @@ function TargetNextEnemy_PvM() {
         Orion.CharPrint(serial, notoColor, '>>> ' + enemy.Name() + ' <<<');
         Orion.SetGlobal('global_enemy', serial);
         Orion.ClientLastTarget(serial);
+        Orion.ClientLastAttack(serial);
+        Orion.Attack(serial);
         Orion.TargetSystemSerial(serial);
         Orion.Ignore(serial);
     }
