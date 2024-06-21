@@ -145,16 +145,9 @@ function meditar() {
 function executaHeal() {
   var execBand = function (){
     if (bandages.length > 0) {
-      lastEnemy = Orion.GetSerial('lastattack');
-      lastEnemy2 = Orion.GetSerial('lasttarget');
       var startTime = Orion.Now();
       Orion.BandageSelf();
       //Orion.BandageTarget(Player.Serial());
-      Shared.AddVar('CPTarget', lastEnemy);
-      Orion.ClientLastTarget(lastEnemy);
-      Orion.ClientLastAttack(lastEnemy);
-      Orion.Attack(lastEnemy);
-      //Orion.CharPrint(self, 906, 'Inimigo ' + lastEnemy+ ' - '+lastEnemy2);
       Orion.WaitJournal('curou|escorregaram|envenenado|nao precisa', startTime, startTime + 5600);
     } else {
       if (Orion.Count("0x0F0E", "0x00FF", backpack) > 0) {
