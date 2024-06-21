@@ -58,7 +58,7 @@ function FindNearestEnemy_PvP(a) //subfunction
         Orion.IgnoreReset();
     }
     Orion.Ignore('self');
-    var enemy = Orion.FindType("-1", "-1", "ground", "human|near|mobile|ignorefriends", 18, "gray|criminal|orange|red|blue");
+    var enemy = Orion.FindType("-1", "-1", "ground", "human|near|mobile|ignorefriends", 18, "any");
     if (!enemy.length) {
         Orion.Print('-1', 'no enemy found, resetting ignore list');
         Orion.IgnoreReset();
