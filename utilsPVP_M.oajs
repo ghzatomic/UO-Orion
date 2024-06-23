@@ -91,8 +91,8 @@ function ArmarBow() {
   Orion.UseType('0xf4f')
   Orion.UseType('0x0F50')
   // Bow    
-  Orion.UseType('0x13b1')
-  Orion.UseType('0x13b2')
+  Orion.UseType('0x13B1')
+  Orion.UseType('0x13B1')
 
   Orion.Attack('lasttarget');
 }

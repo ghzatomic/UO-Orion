@@ -1,0 +1,90 @@
+/*
+
+
+informacoes para o gpt : mas a linguagem é javascript e nao pode usar funções que nao seja estritamente nativas, nao consegue usar let, não consegue usar a biblioteca arrays, nem math, ou qualquer outra do genero
+
+
+*/
+
+
+// Função para obter a posição atual do jogador
+function CharPos() {
+    var player = Player;
+    return {
+        X: player.X(),
+        Y: player.Y(),
+        Z: player.Z()
+    };
+}
+
+// Função para verificar se um tile é passável
+function isTilePassable(x, y, z) {
+    return Orion.CanWalk('North', x, y, z);
+}
+
+// Função para determinar o status de um tile
+function getTileStatus(x, y, z, playerPos) {
+    if (playerPos.X == x && playerPos.Y == y) {
+        return 'P'; // Posição do jogador
+    }
+    
+    // Verifica se há um jogador inimigo no tile
+    var enemies = Orion.FindTypeEx("-1", "-1", "ground", "human|near|mobile|ignorefriends", 18, "any");
+    for (var i = 0; i < enemies.length; i++) {
+        if (enemies[i].X() == x && enemies[i].Y() == y) {
+            return 'E'; // Jogador inimigo
+        }
+    }
+
+    if (isTilePassable(x, y, z)) {
+        return '.'; // Tile passável
+    } else {
+        return 'T'; // Tile bloqueado
+    }
+}
+
+// Função para varrer uma área ao redor do jogador
+function scanArea(radius) {
+    var playerPos = CharPos();
+    var areaMap = [];
+    var i, j;
+
+    for (i = -radius; i <= radius; i++) {
+        var row = [];
+        for (j = -radius; j <= radius; j++) {
+            var x = playerPos.X + i;
+            var y = playerPos.Y + j;
+            var z = playerPos.Z;
+            var status = getTileStatus(x, y, z, playerPos);
+            row.push(status);
+        }
+        areaMap.push(row);
+    }
+
+    return areaMap;
+}
+
+// Função para salvar o mapa em um arquivo de texto
+function saveMapToFile(areaMap, fileName) {
+    var file = Orion.NewFile(fileName);
+    var create = file.Open(fileName);
+    if (create) {
+        var i, j;
+        for (i = 0; i < areaMap.length; i++) {
+            var row = '';
+            for (j = 0; j < areaMap[i].length; j++) {
+                row += areaMap[i][j];
+            }
+            file.Write(row + "\n");
+        }
+        file.Close();
+    }
+}
+
+function teste1() {
+    var radius = 10;
+    var fileName = 'D:/git/UO Orion Macros/map.txt';
+    var areaMap = scanArea(radius);
+    saveMapToFile(areaMap, fileName);
+    Orion.Print(null, "Mapa salvo em " + fileName);
+}

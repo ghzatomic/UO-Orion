@@ -8,7 +8,7 @@
 var varadepesca = '0x40138662' // ID da vara de pesca
 var baubarco = '0x4013880A'; // ID do bau do barco
 var pesodefinido = 400; // Peso para guardar itens
-var xmaximo = 5100; // Posição em X para voltar
+var xmaximo = 4133; // Posição em X para voltar
 //-----------------------------------------------------------------
 
 var time = 500;
