@@ -16,8 +16,8 @@ function armamentoGHZ() {
   }
 }
 
-function execCura(){
-  curarse(undefined,undefined,undefined)
+function execCura() {
+  curarse(undefined, undefined, undefined)
 }
 
 function curarse(callback_decide_cast, callback_is_envenenado, callback_is_curado) {
@@ -56,12 +56,12 @@ function curarse(callback_decide_cast, callback_is_envenenado, callback_is_curad
         if (Orion.Count("0x0F0E", "0x002C", backpack) > 0) {
           Orion.UseType("0x0F0E", "0x002C")
           Orion.Wait(25)
-          if (Player.Poisoned()){
+          if (Player.Poisoned()) {
             castCurePreGHZ();
           }
-          
+
         } else {
-          if (!Orion.InJournal(msg_castando_CURE, 'cast',0,'any',Orion.Now() - 500, Orion.Now() + 280)) {
+          if (!Orion.InJournal(msg_castando_CURE, 'cast', 0, 'any', Orion.Now() - 500, Orion.Now() + 280)) {
             //Orion.CharPrint(self, 906, "Nao encontrou potion, Curando c magia")
             castCurePreGHZ();
           }
@@ -88,6 +88,9 @@ function autobands() {
     } else {
       Orion.ClearJournal(msg_castando_CURE);
     }*/
+    if (Player.Paralyzed()) {
+      castMAPreGHZExplosion();
+    }
   }
 }
 
@@ -143,7 +146,7 @@ function meditar() {
 }
 
 function executaHeal() {
-  var execBand = function (){
+  var execBand = function () {
     if (bandages.length > 0) {
       var startTime = Orion.Now();
       Orion.BandageSelf();
@@ -164,7 +167,7 @@ function executaHeal() {
     if (Orion.Count("0x0F0E", "0x00FF", backpack) > 0) {
       Orion.CharPrint(self, 906, "Socorro !! bebendo potion")
       Orion.UseType("0x0F0E", "0x00FF")
-    } 
+    }
     execBand();
   } else {
     execBand();

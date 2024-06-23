@@ -90,10 +90,6 @@ function castMAPreGHZExplosion() {
     Orion.Cast(magia.cast);
     Orion.AddDisplayTimer(100, magia.delay+200, 'UnderChar', 'Circle|Bar', magia.cast, 0, 0, '0x00FF', 0, 'white');
     Orion.Wait(magia.delay+200)
-        
-    Orion.ClientLastTarget(lastEnemy);
-    Orion.ClientLastAttack(lastEnemy);
-    Orion.Attack(lastEnemy);
   }else{
     Orion.CharPrint(self, 906, 'Sem Explo !! ' );
   }
