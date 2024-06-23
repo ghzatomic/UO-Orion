@@ -1077,51 +1077,61 @@ function moveToHideout(hideout) {
 function isEnemyWithinDistance(enemies, distance) {
   var playerPos = CharPos();
   for (var i = 0; i < enemies.length; i++) {
-    var enemy = enemies[i];
-    var dist = Orion.GetDistance(enemy.X(), enemy.Y());
-    if (dist <= distance) {
-      return true;
-    }
+      var enemy = enemies[i];
+      var dist = Orion.GetDistance(enemy.X(), enemy.Y());
+      if (dist <= distance) {
+          return true;
+      }
   }
   return false;
 }
 
-function moveToSafeDistanceFromEnemies(mainEnemy, otherEnemies, safeDistance) {
+function moveToSafeDistanceFromEnemies(mainEnemy, otherEnemies, safeDistance, closeDistance) {
   var playerPos = CharPos();
   var bestPosition = null;
   var bestDistance = -9999;
 
   for (var dx = -safeDistance; dx <= safeDistance; dx++) {
-    for (var dy = -safeDistance; dy <= safeDistance; dy++) {
-      var newX = playerPos.X + dx;
-      var newY = playerPos.Y + dy;
-      if (isTilePassable(newX, newY)) {
-        var minEnemyDistance = Infinity;
-        var allInLOS = true;
-        for (var j = 0; j < otherEnemies.length; j++) {
-          var enemy = otherEnemies[j];
-          var distance = Orion.GetDistance(newX, newY);
-          if (!Orion.InLOS(newX, newY, enemy.X(), enemy.Y())) {
-            allInLOS = false;
-            break;
+      for (var dy = -safeDistance; dy <= safeDistance; dy++) {
+          var newX = playerPos.X + dx;
+          var newY = playerPos.Y + dy;
+          if (isTilePassable(newX, newY)) {
+              var minDistanceToEnemies = Infinity;
+              var allEnemiesFarEnough = true;
+
+              // Distância do inimigo principal
+              var mainEnemyDistance = Orion.GetDistance(newX, newY);
+              if (mainEnemyDistance < closeDistance || mainEnemyDistance > safeDistance || !Orion.InLOS(newX, newY, mainEnemy.X(), mainEnemy.Y())) {
+                  continue;
+              }
+
+              for (var j = 0; j < otherEnemies.length; j++) {
+                  var enemy = otherEnemies[j];
+                  var distance = Orion.GetDistance(newX, newY);
+                  if (distance < closeDistance || distance > safeDistance) {
+                      allEnemiesFarEnough = false;
+                      break;
+                  }
+                  if (distance < minDistanceToEnemies) {
+                      minDistanceToEnemies = distance;
+                  }
+              }
+
+              if (allEnemiesFarEnough && mainEnemyDistance <= safeDistance && minDistanceToEnemies > bestDistance) {
+                  bestDistance = minDistanceToEnemies;
+                  bestPosition = { X: newX, Y: newY };
+              }
           }
-          if (distance < minEnemyDistance) {
-            minEnemyDistance = distance;
-          }
-        }
-        if (allInLOS && minEnemyDistance >= safeDistance && minEnemyDistance > bestDistance && Orion.InLOS(newX, newY, mainEnemy.X(), mainEnemy.Y())) {
-          bestDistance = minEnemyDistance;
-          bestPosition = { X: newX, Y: newY };
-        }
       }
-    }
   }
 
   if (bestPosition) {
-    Orion.StopWalking();
-    Orion.WalkTo(bestPosition.X, bestPosition.Y, Player.Z(), 1, Player.Z(), 1, 1, 3000);
-    Orion.Wait(4000);
-    Orion.Print(null, "Movendo para posição segura em " + bestPosition.X + ", " + bestPosition.Y);
+      Orion.StopWalking();
+      Orion.WalkTo(bestPosition.X, bestPosition.Y, Player.Z(), 1, Player.Z(), 1, 1, 3000);
+      Orion.Wait(4000);
+      Orion.Print(null, "Movendo para posição segura em " + bestPosition.X + ", " + bestPosition.Y);
+  } else {
+      Orion.Print(null, "Nenhuma posição segura encontrada.");
   }
 }
 
@@ -1145,11 +1155,11 @@ function materDistanciaComVisao(mainTarget, print) {
     Orion.Print(null, "Inimigo principal não encontrado.");
   }
 
-  var otherEnemies = Orion.FindTypeEx("any", "any", "ground", "mobile|near|ignorefriends|ignoreself", 18, "any");
-  var safeDistance = 10;
-  var closeDistance = 3;
+  var otherEnemies = []//Orion.FindTypeEx("any", "any", "ground", "mobile|near|ignorefriends|ignoreself", 18, "any");
+  var safeDistance = 7;
+  var closeDistance = 2;
 
-  if (isEnemyWithinDistance(mainEnemy?[mainEnemy].concat(otherEnemies):otherEnemies, closeDistance)) {
+  if (isEnemyWithinDistance(mainEnemy ? [mainEnemy].concat(otherEnemies) : otherEnemies, closeDistance)) {
     if (print) {
       Orion.Print(null, "Inimigo a 5 tiles de distância, mantendo distância segura.");
     }
@@ -1165,15 +1175,15 @@ function flexadaPVM() {
   var target = Orion.FindObject(Orion.ClientLastAttack());
   if (target) {
     while (!target.Dead()) {
-      if (!Shared.GetVar('CPIsCasting')){
-        materDistanciaComVisao(Orion.ClientLastAttack(),true);
+      if (!Shared.GetVar('CPIsCasting')) {
+        materDistanciaComVisao(Orion.ClientLastAttack(), true);
         ArmarBow();
         Orion.Attack(target)
         Orion.Wait(2000)
         target = Orion.FindObject(Orion.ClientLastAttack());
         Orion.Wait(500)
       }
-      
+
     }
   }
 }
