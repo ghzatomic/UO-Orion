@@ -1074,7 +1074,6 @@ function moveToHideout(hideout) {
 }
 
 // ------------------------------- Manter Distancia -------------------------------
-
 function isEnemyWithinDistance(enemies, distance) {
   var playerPos = CharPos();
   for (var i = 0; i < enemies.length; i++) {
@@ -1087,7 +1086,7 @@ function isEnemyWithinDistance(enemies, distance) {
   return false;
 }
 
-function moveToSafeDistanceFromEnemies(enemies, safeDistance) {
+function moveToSafeDistanceFromEnemies(mainEnemy, otherEnemies, safeDistance) {
   var playerPos = CharPos();
   var bestPosition = null;
   var bestDistance = -9999;
@@ -1099,8 +1098,8 @@ function moveToSafeDistanceFromEnemies(enemies, safeDistance) {
       if (isTilePassable(newX, newY)) {
         var minEnemyDistance = Infinity;
         var allInLOS = true;
-        for (var j = 0; j < enemies.length; j++) {
-          var enemy = enemies[j];
+        for (var j = 0; j < otherEnemies.length; j++) {
+          var enemy = otherEnemies[j];
           var distance = Orion.GetDistance(newX, newY);
           if (!Orion.InLOS(newX, newY, enemy.X(), enemy.Y())) {
             allInLOS = false;
@@ -1110,9 +1109,7 @@ function moveToSafeDistanceFromEnemies(enemies, safeDistance) {
             minEnemyDistance = distance;
           }
         }
-        //Orion.CharPrint(self, 906, 'AX '+minEnemyDistance+' - '+safeDistance);
-        if (allInLOS && minEnemyDistance >= safeDistance && minEnemyDistance > bestDistance) {
-          Orion.CharPrint(self, 906, 'A3 ');
+        if (allInLOS && minEnemyDistance >= safeDistance && minEnemyDistance > bestDistance && Orion.InLOS(newX, newY, mainEnemy.X(), mainEnemy.Y())) {
           bestDistance = minEnemyDistance;
           bestPosition = { X: newX, Y: newY };
         }
@@ -1123,46 +1120,57 @@ function moveToSafeDistanceFromEnemies(enemies, safeDistance) {
   if (bestPosition) {
     Orion.StopWalking();
     Orion.WalkTo(bestPosition.X, bestPosition.Y, Player.Z(), 1, Player.Z(), 1, 1, 3000);
-    Orion.Wait(4000)
-    //Orion.WalkTo(bestPosition.X, bestPosition.Y, 0, 1, 5, 1, 2); // Ignorando Z
+    Orion.Wait(4000);
     Orion.Print(null, "Movendo para posição segura em " + bestPosition.X + ", " + bestPosition.Y);
   }
 }
 
-function materDistanciaComVisao(target,print) {
-  if (print == undefined) {
-    print = true
-  }
-  if (target == undefined) {
-    target = "any"
-  }
-  var enemies = Orion.FindTypeEx(target, "any", "ground", "mobile|near|ignorefriends|ignoreself", gridSize, "any");
-  var safeDistance = 10;
-  var closeDistance = 5;
+function materDistanciaComVisao() {
+  materDistanciaComVisao(Orion.ClientLastAttack(), true)
+}
 
-  if (isEnemyWithinDistance(enemies, closeDistance)) {
+function materDistanciaComVisao(mainTarget, print) {
+  if (print == undefined) {
+    print = true;
+  }
+  if (mainTarget == undefined) {
+    mainTarget = Orion.ClientLastAttack();
+    if (mainTarget == undefined) {
+      mainTarget = "any";
+    }
+  }
+  Orion.Print(null, mainTarget);
+  var mainEnemy = Orion.FindObject(mainTarget);
+  if (!mainEnemy || !mainEnemy.Exists()) {
+    Orion.Print(null, "Inimigo principal não encontrado.");
+  }
+
+  var otherEnemies = Orion.FindTypeEx("any", "any", "ground", "mobile|near|ignorefriends|ignoreself", 18, "any");
+  var safeDistance = 10;
+  var closeDistance = 3;
+
+  if (isEnemyWithinDistance(mainEnemy?[mainEnemy].concat(otherEnemies):otherEnemies, closeDistance)) {
     if (print) {
       Orion.Print(null, "Inimigo a 5 tiles de distância, mantendo distância segura.");
     }
-    moveToSafeDistanceFromEnemies(enemies, safeDistance);
+    moveToSafeDistanceFromEnemies(mainEnemy, otherEnemies, safeDistance);
   } else {
     if (print) {
       Orion.Print(null, "Nenhum inimigo próximo.");
     }
-
   }
 }
 
 function flexadaPVM() {
-  var target = Orion.FindObject(Orion.GetGlobal('global_enemy'));
+  var target = Orion.FindObject(Orion.ClientLastAttack());
   if (target) {
     while (!target.Dead()) {
-      if (Shared.GetVar('CPCastActive') != 1){
-        materDistanciaComVisao(undefined,true);
+      if (!Shared.GetVar('CPIsCasting')){
+        materDistanciaComVisao(Orion.ClientLastAttack(),true);
         ArmarBow();
         Orion.Attack(target)
         Orion.Wait(2000)
-        target = Orion.FindObject(Orion.GetGlobal('global_enemy'));
+        target = Orion.FindObject(Orion.ClientLastAttack());
         Orion.Wait(500)
       }
       

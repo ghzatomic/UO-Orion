@@ -87,6 +87,7 @@ function castMAPreGHZExplosion() {
   if (countPotion> 0){
     Orion.WaitTargetType('0x0F0E', '0x0015')
     //Orion.WaitTargetObject('0x0F0E', '0x0015')
+    Shared.AddVar('CPIsCasting', true);
     Orion.Cast(magia.cast);
     Orion.AddDisplayTimer(100, magia.delay+200, 'UnderChar', 'Circle|Bar', magia.cast, 0, 0, '0x00FF', 0, 'white');
     Orion.Wait(magia.delay+200)
@@ -123,6 +124,7 @@ function castCurePreGHZ() {
   lastEnemy = Orion.GetSerial('lastattack');
   Orion.WaitTargetObject('self')
   Orion.Wait(20)
+  Shared.AddVar('CPIsCasting', true);
   Orion.Cast(magia.cast);
   Orion.AddDisplayTimer(100, magia.delay, 'UnderChar', 'Circle|Bar', magia.cast, 0, 0, '0x00FF', 0, 'white');
   Orion.Wait(magia.delay)
