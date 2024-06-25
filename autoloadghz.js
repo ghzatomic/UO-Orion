@@ -34,11 +34,11 @@ function setaVariaveisImportantes(){
 
 function selectionaObjESetaVariavel(nameVar,msg,type){
     Orion.CancelTarget();
-    Orion.Wait(1000)
+    Orion.Wait(100)
     Orion.ClientLastTarget('');
-    Orion.Wait(1000)
+    Orion.Wait(100)
     Orion.ClearJournal()
-    Orion.Wait(1000)
+    Orion.Wait(100)
     Orion.ClearJournal('self');
     if (!type){
         type =''
@@ -56,7 +56,7 @@ function selectionaObjESetaVariavel(nameVar,msg,type){
         while(!variavel){
             if (type == 'mostrauid'){
                 Orion.Say('.mostraruid')
-                Orion.Wait(1000)
+                Orion.Wait(500)
                 Orion.WaitJournal('UID', Orion.Now(), Orion.Now()+10000, 'sys');
                 if (Orion.InJournal('UID', 'sys')){
                     var jorMSG = Orion.InJournal('UID', 'sys')
@@ -81,7 +81,7 @@ function selectionaObjESetaVariavel(nameVar,msg,type){
                 Orion.WaitTargetObject('lasttarget');
                 var target = undefined
                 while(Orion.ClientLastTarget()==0){
-                    Orion.Wait(1000)
+                    Orion.Wait(500)
                 }
                 target = Orion.ClientLastTarget();
                 TextWindow.Close();
@@ -95,11 +95,11 @@ function selectionaObjESetaVariavel(nameVar,msg,type){
                     }
                     Orion.CharPrint(self,906,'Setando id : '+variavel);
                     TextWindow.Close();
-                    Orion.Wait(1000)
+                    Orion.Wait(500)
                     Orion.CancelTarget();
                     Orion.ClientLastTarget('');
                     Orion.ClearJournal()
-                    Orion.Wait(1000)
+                    Orion.Wait(500)
                     return variavel
                 }
                 

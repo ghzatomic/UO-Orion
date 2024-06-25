@@ -9,6 +9,12 @@ var varadepesca = '0x40138662' // ID da vara de pesca
 var baubarco = '0x4013880A'; // ID do bau do barco
 var pesodefinido = 400; // Peso para guardar itens
 var xmaximo = 4133; // Posição em X para voltar
+var ymaximo = 4000; // Posição em y para voltar
+var xminimo = 20; // Posição em X para voltar
+var yminimo = 10; // Posição em y para voltar
+var visitedPositions = [];
+var maxVisitedPositions = 1000;
+var directions = ['left', 'right', 'forward', 'back','Forward left','Forward right','Backward left','Backward right'];
 //-----------------------------------------------------------------
 
 var time = 500;
@@ -71,19 +77,90 @@ function pescar() {
 
 function navegar() {
     Orion.ClearJournal();
-    Orion.Say('right'); Orion.Wait(1600);
-    Orion.Say('stop'); Orion.Wait(time);
-    if (Orion.InJournal('barco parou')) { voltar(); }
-    if ((Player.X() > xmaximo)) { voltar(); }
+    
+    var initialX = Player.X();
+    var initialY = Player.Y();
+    
+    while (true) {
+        var direction = directions[Orion.Random(0, directions.length - 1)];
+        moveInDirection(direction);
+        
+        var currentX = Player.X();
+        var currentY = Player.Y();
+        
+        if (currentX != initialX || currentY != initialY) {
+            if (!hasVisited(currentX, currentY)) {
+                addVisitedPosition(currentX, currentY);
+                break;  // Movimento detectado e posição nova, sai do loop
+            }
+        }
+    }
+
+    if (Orion.InJournal('barco parou')) {
+        verificarLimites();
+    }
+    if (Player.X() > xmaximo || Player.Y() > ymaximo || Player.X() < xminimo || Player.Y() < yminimo) {
+        voltar();
+    }
+}
+
+function moveInDirection(direction) {
+    Orion.Say(direction);
+    Orion.Wait(1600);
+    Orion.Say('stop');
+    Orion.Wait(time);
+}
+
+function hasVisited(x, y) {
+    for (var i = 0; i < visitedPositions.length; i++) {
+        if (visitedPositions[i].x == x && visitedPositions[i].y == y) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function addVisitedPosition(x, y) {
+    visitedPositions.push({x: x, y: y});
+    if (visitedPositions.length > maxVisitedPositions) {
+        visitedPositions.shift();  // Remove a posição mais antiga para manter o tamanho da lista
+    }
+}
+
+function verificarLimites() {
+    if (Player.X() > xmaximo || Player.Y() > ymaximo || Player.X() < xminimo || Player.Y() < yminimo) {
+        voltar();
+    }
 }
 
 function voltar() {
     Orion.ClearJournal();
-    Orion.Say('left'); Orion.Wait(5000);
-    Orion.Say('turn left'); Orion.Wait(time);
-    Orion.Say('forward'); Orion.Wait(time);
+    Orion.Say('left'); 
+    Orion.Wait(5000);
+    Orion.Say('turn left'); 
+    Orion.Wait(time);
+    Orion.Say('forward'); 
+    Orion.Wait(time);
     Orion.WaitJournal('barco parou', Orion.Now(), Orion.Now() + 1000000);
-    Orion.Say('back'); Orion.Wait(5000);
-    Orion.Say('stop'); Orion.Wait(time);
-    Orion.Say('turn right'); Orion.Wait(time);
+    Orion.Say('back'); 
+    Orion.Wait(5000);
+    Orion.Say('stop'); 
+    Orion.Wait(time);
+    Orion.Say('turn right'); 
+    Orion.Wait(time);
+}
+
+function pescar() {
+    Orion.CharPrint(self, '70', 'start');
+    for (var x = 2; x <= 4; x++) {
+        for (var y = -4; y <= 4; y++) {
+            Orion.ClearJournal();
+            Orion.UseObject(varadepesca);
+            if (Orion.WaitForTarget(time))
+                Orion.TargetTileRelative('any', x, y, 65533);
+            Orion.WaitJournal('Nao ha|Tente pescar', Orion.Now(), Orion.Now() + 1000, 'my|sys');
+            if (Orion.InJournal('Nao ha|Tente pescar', 'my|sys')) { }
+            else { Orion.WaitJournal('Voce pescou', Orion.Now(), Orion.Now() + 11000, 'my|sys'); }
+        }
+    }
 }

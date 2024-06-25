@@ -1,5 +1,5 @@
 const algoritimo_caminho = 'balanced'
-const gridSize = 40;
+const gridSize = 20;
 
 
 function auto_pvm() {
@@ -12,10 +12,18 @@ function auto_pvm() {
     TargetNextEnemy_PvM()
     Orion.Wait(500)
     var enemy = Orion.FindObject('lasttarget');
-    Orion.CharPrint(self, 906, 'Mudando ');
-    Orion.Wait(1500)
+    lastX = enemy.X()
+    lastY = enemy.Y()
+    lastZ = enemy.Z()
+    Orion.CharPrint(self, 906, 'Mudando '+enemy.Name());
+    Orion.Wait(500)
     while (!enemy.Dead()) {
-      enemy = Orion.FindObject('lasttarget');
+      if (Orion.FindObject('lasttarget') == null){
+        enemy = Orion.FindObject('lasttarget');
+        Orion.Wait(100)
+        Orion.CharPrint(self, 906, 'Morreu ! ');
+        break
+      }
       if (!enemy) {
         Orion.CharPrint(self, 906, 'Nao Enemy ');
         break
@@ -26,18 +34,23 @@ function auto_pvm() {
         break
       }
 
-      if (Player.X() != enemy.X() && Player.Y() != enemy.Y()) {
-        var distancia = 1
-        Orion.WalkTo(enemy.X(), enemy.Y(), Player.Z(), distancia, Player.Z(), 1, 1);
+      if (Shared.GetVar('AUTOPVM_FUNCTION')) {
+        eval(Shared.GetVar('AUTOPVM_FUNCTION'))(enemy)
+      }else{
+        if (Player.X() != enemy.X() && Player.Y() != enemy.Y()) {
+          var distancia = 1
+          Orion.WalkTo(enemy.X(), enemy.Y(), Player.Z(), distancia, Player.Z(), 1, 1);
+        }
       }
-      lastX = enemy.X()
-      lastY = enemy.Y()
-      lastZ = enemy.Z()
+      
       if (enemy.Dead()) {
         Orion.CharPrint(self, 906, 'Morreu ! ');
         break
       }
 
+    }
+    if (Shared.GetVar('AUTOPVM_DEAD_FUNCTION')) {
+      eval(Shared.GetVar('AUTOPVM_DEAD_FUNCTION'))(enemy,lastX,lastY,lastZ)
     }
   }
 
@@ -954,11 +967,12 @@ function findPositionBehindObject(object, enemies) {
   for (var i = 0; i < directions.length; i++) {
     var newX = object.X + directions[i].dx;
     var newY = object.Y + directions[i].dy;
-    if (isTilePassable(newX, newY) && !enemiesInLOS(newX, newY, enemies)) {
+    var newZ = object.Z;
+    if (isTileAndavel(newX, newY,newZ) && !enemiesInLOS(newX, newY, enemies)) {
       var distance = Orion.GetDistance(newX, newY);
       if (distance < minDistance) {
         minDistance = distance;
-        bestPosition = { X: newX, Y: newY };
+        bestPosition = { X: newX, Y: newY , Z:newZ};
       }
     }
   }
@@ -975,7 +989,7 @@ function findNearestHideout(enemies) {
 
   for (var i = 0; i < potentialHideouts.length; i++) {
     var hideout = potentialHideouts[i];
-    var positionBehind = findPositionBehindObject({ X: hideout.X(), Y: hideout.Y() }, enemies);
+    var positionBehind = findPositionBehindObject({ X: hideout.X(), Y: hideout.Y(), Z:hideout.Z() }, enemies);
     if (positionBehind) {
       var distance = Orion.GetDistance(positionBehind.X, positionBehind.Y);
       if (distance < minDistance) {
@@ -1075,13 +1089,13 @@ function saveMapToFile(areaMap, fileName) {
 }
 
 function runEsconderSe() {
-  var enemies = Orion.FindTypeEx("-1", "-1", "ground", "near|mobile|ignorefriends|ignoreself", gridSize, "any");
+  var enemies = Orion.FindTypeEx("-1", "-1", "ground", "human|mobile|ignoreself", gridSize, "any");
   var fileName = 'D:/git/UO Orion Macros/map.txt';
   var hideout = findNearestHideout(enemies);
-  var areaMap = scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null,enemies);
-  saveMapToFile(areaMap, fileName);
+  //var areaMap = scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null,enemies);
+  //saveMapToFile(areaMap, fileName);
   if (hideout) {
-    Orion.Print(null, "Esconderijo encontrado em " + hideout.X + ", " + hideout.Y);
+    Orion.Print(null, "Esconderijo encontrado em " + hideout.X + ", " + hideout.Y+", "+hideout.Z);
     moveToHideout(hideout);
   } else {
     Orion.Print(null, "Nenhum esconderijo seguro encontrado.");
@@ -1092,9 +1106,9 @@ function runEsconderSe() {
 function moveToHideout(hideout) {
   if (hideout) {
     Orion.StopWalking();
-    Orion.WalkTo(hideout.X, hideout.Y, Player.Z(), 1, Player.Z(), 1, 1);
+    Orion.WalkTo(hideout.X, hideout.Y, hideout.Z, 0, hideout.Z, 1, 1);
     //Orion.WalkTo(hideout.X, hideout.Y, 0, 255, 1, 1); // Ignorando Z
-    Orion.Print(null, "Movendo para o esconderijo em " + hideout.X + ", " + hideout.Y);
+    Orion.Print(null, "Movendo para o esconderijo em " + hideout.X + ", " + hideout.Y+", "+hideout.Z);
   } else {
     Orion.Print(null, "Nenhum esconderijo seguro encontrado.");
   }
@@ -1176,15 +1190,16 @@ function materDistanciaComVisao(mainTarget, print) {
       mainTarget = "any";
     }
   }
-  Orion.Print(null, mainTarget);
   var mainEnemy = Orion.FindObject(mainTarget);
   if (!mainEnemy || !mainEnemy.Exists()) {
-    Orion.Print(null, "Inimigo principal não encontrado.");
+    if (print) {
+      Orion.Print(null, "Inimigo principal não encontrado.");
+    }
   }
 
-  var otherEnemies = Orion.FindTypeEx("any", "any", "ground", "mobile|near|ignorefriends|ignoreself", 5, "any");
+  var otherEnemies = Orion.FindTypeEx("any", "any", "ground", "human|mobile|ignoreself", 5, "any");
   var safeDistance = 7;
-  var closeDistance = 2;
+  var closeDistance = 3;
 
   if (isEnemyWithinDistance(mainEnemy ? [mainEnemy].concat(otherEnemies) : otherEnemies, closeDistance)) {
     if (print) {
@@ -1198,23 +1213,63 @@ function materDistanciaComVisao(mainTarget, print) {
   }
 }
 
+
+function autoPVMBowFunction(enemy){
+  if (!isPathClear(Player.X(),Player.Y(),enemy.X(),enemy.Y())){
+      var distancia = 0
+      Orion.WalkTo(enemy.X(), enemy.Y(), Player.Z(), distancia, enemy.Z(), 1, 1,2000);
+  }
+  materDistanciaComVisao(Orion.ClientLastAttack(), false);
+}
+
+function autoPVMDeadFunction(enemy,x,y,z){
+  Orion.CharPrint(self, 906,"Buscando dinheiro")
+  Orion.WalkTo(x, y, z, 1, z, 1, 1,3000);
+  Orion.Wait(2000)
+  
+}
+
 function flexadaPVM() {
+  Orion.Exec('auto_pvm')
+  Shared.AddVar('AUTOPVM_FUNCTION', "autoPVMBowFunction");
+  Shared.AddVar('AUTOPVM_DEAD_FUNCTION', "autoPVMDeadFunction");
   var target = Orion.FindObject(Orion.ClientLastAttack());
   if (target) {
     while (!target.Dead()) {
       if (!Shared.GetVar('CPIsCasting')) {
-        materDistanciaComVisao(Orion.ClientLastAttack(), true);
         ArmarBow();
-        Orion.Attack(target)
-        Orion.Wait(2000)
-        target = Orion.FindObject(Orion.ClientLastAttack());
         Orion.Wait(500)
+        materDistanciaComVisao(target.Serial(), false);
+        Orion.Attack(target)
+        for (var index = 0; index < 10; index++) {
+          if (!Shared.GetVar('RMCancelRun')) {
+            return
+          }
+          Orion.Wait(100)
+          if (!Shared.GetVar('RMCancelRun')) {
+            return
+          }
+          materDistanciaComVisao(target.Serial(), false);
+        }
+        target = Orion.FindObject(Orion.ClientLastAttack());
+        Orion.Wait(100)
+        if (!Shared.GetVar('RMCancelRun')) {
+          return
+        }
       }
 
     }
   }
 }
 
+function testeCall(){
+  var find = Orion.FindTypeEx("-1", "-1", "ground", "human|mobile|ignoreself", gridSize, "any")
+  for (var index = 0; index < find.length; index++) {
+    const element = find[index];
+    Orion.Print("Nome: "+element.Name())
+  }
+}
+
 function testeLOS(){
-  Orion.Print(null, ""+isPathClear(Player.X(),Player.Y(),4527,1339))
+  
 }

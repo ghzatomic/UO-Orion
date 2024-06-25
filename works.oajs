@@ -606,6 +606,161 @@ function selectionaObjESetaVariavelWorks(nameVar, msg) {
 }
 
 
+function fazPergunta(msg){
+    Orion.CharPrint(self,906,msg)
+    var lastMSGObj = Orion.LastJournalMessage()
+    var lastMSG = lastMSGObj!=null?lastMSGObj.Text():""
+    var currMSG = lastMSGObj!=null?lastMSGObj.Text():""
+    Orion.Wait(100)
+    while(lastMSG == currMSG){
+        Orion.Wait(100)
+        var currMSGObj = Orion.LastJournalMessage()
+        currMSG = currMSGObj!=null?currMSGObj.Text():""
+    }
+    return currMSG;
+}
+
+function fazerObjetosLoop() {
+    Orion.ClearJournal()
+    Bank();
+    Orion.Wait(3000)
+    var itemProducao = selectionaObjESetaVariavelWorks(undefined, 'Selecione item que produz')
+    Orion.Wait(3000)
+    var bauDestino = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau de destino')
+    Orion.Wait(500)
+    Orion.UseObject(bauDestino);
+    var itensOrigem = {}
+    var ultimaMSG = ""
+    var ultimaMSGControle
+    Orion.CharPrint(self,906,"Digite a quantidade (-1 para cancelar), selecione o bau e o item")
+    var index= 0
+    while(ultimaMSG != "-1"){
+        ultimaMSG = fazPergunta("Digite a quantidade do item")
+        Orion.Wait(100)
+        if (ultimaMSG == "-1"){
+            break
+        }
+        var bau = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau com recursos')
+        Orion.UseObject(bau);
+        Orion.Wait(300)
+        var itemSerial = selectionaObjESetaVariavelWorks(undefined, 'Selecione o item')
+        var item = Orion.FindObject(itemSerial);
+        Orion.Wait(50)
+        itensOrigem[index] = {
+            "bau": bau,
+            "item": item.Graphic(),
+            "cor": item.Color(),
+            "qtde": parseInt(ultimaMSG.trim()),
+        }
+        index++
+    }
+    moveItensDicionario(itensOrigem,1,0)
+    Orion.CharPrint(self,906,"Tente fazer 1 item desejado e feche o menu")
+    Orion.Wait(2000)
+    Orion.UseObject(itemProducao);
+    Orion.Wait(200)
+    Orion.WaitForGump(5000);
+    var gump0 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID())
+    Orion.WaitForGump(5000);
+    const inicio = Date.now();
+    while(gump0 !== null){
+        Orion.Wait(250)
+        Orion.WaitForGump(500);
+        gump0 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID())
+        Orion.WaitForGump(500);
+        if (gump0 != null && gump0.Replayed()){
+            Orion.Print(null,"Respondido !")
+            break
+        }else if (gump0 == null){
+            break
+        }
+        Orion.Wait(200)
+    }
+    const fim = Date.now();
+    const tempoProducao = fim - inicio;
+    Orion.CharPrint(self,906,"Timeout registrado ("+tempoProducao+")")
+    if (!Orion.InJournal('Voce pos')){
+        Orion.CharPrint(self,906,"Tentando fazer o item para seleção")
+    }
+    Orion.UseObject(itemProducao);
+    while(!Orion.InJournal('Voce pos')){
+        var gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID());
+        if (gump1 !== null || Orion.WaitForGump(1000)) {
+            if (gump1 === null) {
+                gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID());
+            }
+            if ((gump1 !== null) && (!gump1.Replayed())) {
+                gump1.Select(Orion.CreateGumpHook(5008));
+                Orion.Wait(100);
+            }
+        }
+        Orion.Wait(tempoProducao)
+    }
+    
+    var itemProduzidoSerial = selectionaObjESetaVariavelWorks(undefined, 'Selecione Item produzido')
+    var itemProduzidoObj = Orion.FindObject(itemProduzidoSerial)
+    var itemProduzidoGraph = itemProduzidoObj.Graphic()
+    var itemProduzidoColor = itemProduzidoObj.Color()
+    var qtdeLote = 3
+    var qtdeFeitos = 0
+    if (itemProduzidoObj){
+        Orion.CharPrint(self,906,"Iniciando producao em massa do item ("+itemProduzidoGraph+")!")
+        while (true) {
+            Orion.UseObject(itemProducao);
+            Orion.WaitForGump(250);
+            var findItems0 = Orion.FindTypeEx(itemProduzidoGraph, itemProduzidoColor, 'backpack');
+            Orion.Wait(25)
+            if (findItems0.length > 0) {
+                qtdeFeitos = findItems0[0].Count()
+            }
+            moveItensDicionario(itensOrigem,qtdeLote,qtdeFeitos)
+            var gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID());
+            if (gump1 !== null || Orion.WaitForGump(1000)) {
+                if (gump1 === null) {
+                    gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID());
+                }
+                if ((gump1 !== null) && (!gump1.Replayed())) {
+                    gump1.Select(Orion.CreateGumpHook(5008));
+                    Orion.Wait(100);
+                }
+            }
+            Orion.Wait(tempoProducao)
+            Orion.Print(null, "Qtde feitas: "+qtdeFeitos+" lote: "+qtdeLote)
+            findItems0 = Orion.FindTypeEx(itemProduzidoGraph, itemProduzidoColor, 'backpack');
+            Orion.Wait(25)
+            if (findItems0.length > 0) {
+                qtdeFeitos = findItems0[0].Count()
+                if (qtdeFeitos >= qtdeLote) {
+                    //Guarda bank
+                    Orion.CharPrint(self,906,"Guardando ... ")
+                    guardaItem(itemProduzidoGraph, itemProduzidoColor, 'backpack', bauDestino, -1)
+                    Orion.Wait(500)
+                    qtdeFeitos = 0
+                }
+            }
+
+        }
+    }
+    
+}
+
+function moveItensDicionario(itensOrigem,qtdeLote,qtdeFeitos){
+    for(var key in itensOrigem) {
+        var itemOrigem = itensOrigem[key];
+        Orion.Wait(25)
+        // Move itens
+        var findItems0 = Orion.FindTypeEx(itemOrigem.item, itemOrigem.cor, 'backpack', '');
+        if (findItems0.length == 0) {
+            moveItem(itemOrigem.item, itemOrigem.cor, itemOrigem.bau, 'item|fast|recurse', (qtdeLote - qtdeFeitos > 0)?qtdeLote - qtdeFeitos:qtdeLote, 'backpack')
+        } else {
+            if (findItems0[0].Count() < qtdeLote - qtdeFeitos) {
+                moveItem(itemOrigem.item, itemOrigem.cor, itemOrigem.bau, 'item|fast|recurse', (qtdeLote - qtdeFeitos) - findItems0[0].Count(), 'backpack')
+            }
+        } 
+
+    }
+}
+
 ///////////////////////////// Taming
 
 
