@@ -926,29 +926,7 @@ function enemiesInLOS(x, y, enemies) {
   return false;
 }
 
-// Função para encontrar a posição atrás de um objeto
 function findPositionBehindObject_old(object, enemies) {
-  var directions = [
-    { dx: 1, dy: 0 },   // Direita
-    { dx: -1, dy: 0 },  // Esquerda
-    { dx: 0, dy: 1 },   // Baixo
-    { dx: 0, dy: -1 },  // Cima
-    { dx: 1, dy: 1 },   // Diagonal Baixo-Direita
-    { dx: 1, dy: -1 },  // Diagonal Cima-Direita
-    { dx: -1, dy: 1 },  // Diagonal Baixo-Esquerda
-    { dx: -1, dy: -1 }  // Diagonal Cima-Esquerda
-  ];
-  for (var i = 0; i < directions.length; i++) {
-    var newX = object.X + directions[i].dx;
-    var newY = object.Y + directions[i].dy;
-    if (isTilePassable(newX, newY) && !enemiesInLOS(newX, newY, enemies)) {
-      return { X: newX, Y: newY };
-    }
-  }
-  return null;
-}
-
-function findPositionBehindObject(object, enemies) {
   var directions = [
     { dx: 1, dy: 0 },   // Direita
     { dx: -1, dy: 0 },  // Esquerda
@@ -976,6 +954,39 @@ function findPositionBehindObject(object, enemies) {
       }
     }
   }
+  return bestPosition;
+}
+
+function findPositionBehindObject(object, enemies) {
+  var directions = [
+    { dx: 1, dy: 0 },   // Direita
+    { dx: -1, dy: 0 },  // Esquerda
+    { dx: 0, dy: 1 },   // Baixo
+    { dx: 0, dy: -1 },  // Cima
+    { dx: 1, dy: 1 },   // Diagonal Baixo-Direita
+    { dx: 1, dy: -1 },  // Diagonal Cima-Direita
+    { dx: -1, dy: 1 },  // Diagonal Baixo-Esquerda
+    { dx: -1, dy: -1 }  // Diagonal Cima-Esquerda
+  ];
+
+  var playerPos = CharPos();
+  var bestPosition = null;
+  var minDistance = Infinity;
+
+  for (var i = 0; i < directions.length; i++) {
+    var newX = object.X + directions[i].dx;
+    var newY = object.Y + directions[i].dy;
+    var newZ = object.Z;
+
+    if (isTileAndavel(newX, newY, newZ) && !enemiesInLOS(newX, newY, enemies)&& getTileStatus(newX, newY, playerPos, null, enemies) === '.') {
+      var distance = (playerPos.X - newX) * (playerPos.X - newX) + (playerPos.Y - newY) * (playerPos.Y - newY);
+      if (distance < minDistance) {
+        minDistance = distance;
+        bestPosition = { X: newX, Y: newY, Z: newZ };
+      }
+    }
+  }
+
   return bestPosition;
 }
 
@@ -1092,8 +1103,8 @@ function runEsconderSe() {
   var enemies = Orion.FindTypeEx("-1", "-1", "ground", "human|mobile|ignoreself", gridSize, "any");
   var fileName = 'D:/git/UO Orion Macros/map.txt';
   var hideout = findNearestHideout(enemies);
-  //var areaMap = scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null,enemies);
-  //saveMapToFile(areaMap, fileName);
+  var areaMap = scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null,enemies);
+  saveMapToFile(areaMap, fileName);
   if (hideout) {
     Orion.Print(null, "Esconderijo encontrado em " + hideout.X + ", " + hideout.Y+", "+hideout.Z);
     moveToHideout(hideout);
@@ -1106,7 +1117,7 @@ function runEsconderSe() {
 function moveToHideout(hideout) {
   if (hideout) {
     Orion.StopWalking();
-    Orion.WalkTo(hideout.X, hideout.Y, hideout.Z, 0, hideout.Z, 1, 1);
+    Orion.WalkTo(hideout.X, hideout.Y, Player.Z(), 0, hideout.Z, 1, 1);
     //Orion.WalkTo(hideout.X, hideout.Y, 0, 255, 1, 1); // Ignorando Z
     Orion.Print(null, "Movendo para o esconderijo em " + hideout.X + ", " + hideout.Y+", "+hideout.Z);
   } else {
