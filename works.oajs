@@ -606,16 +606,16 @@ function selectionaObjESetaVariavelWorks(nameVar, msg) {
 }
 
 
-function fazPergunta(msg){
-    Orion.CharPrint(self,906,msg)
+function fazPergunta(msg) {
+    Orion.CharPrint(self, 906, msg)
     var lastMSGObj = Orion.LastJournalMessage()
-    var lastMSG = lastMSGObj!=null?lastMSGObj.Text():""
-    var currMSG = lastMSGObj!=null?lastMSGObj.Text():""
+    var lastMSG = lastMSGObj != null ? lastMSGObj.Text() : ""
+    var currMSG = lastMSGObj != null ? lastMSGObj.Text() : ""
     Orion.Wait(100)
-    while(lastMSG == currMSG){
+    while (lastMSG == currMSG) {
         Orion.Wait(100)
         var currMSGObj = Orion.LastJournalMessage()
-        currMSG = currMSGObj!=null?currMSGObj.Text():""
+        currMSG = currMSGObj != null ? currMSGObj.Text() : ""
     }
     return currMSG;
 }
@@ -632,12 +632,12 @@ function fazerObjetosLoop() {
     var itensOrigem = {}
     var ultimaMSG = ""
     var ultimaMSGControle
-    Orion.CharPrint(self,906,"Digite a quantidade (-1 para cancelar), selecione o bau e o item")
-    var index= 0
-    while(ultimaMSG != "-1"){
+    Orion.CharPrint(self, 906, "Digite a quantidade (-1 para cancelar), selecione o bau e o item")
+    var index = 0
+    while (ultimaMSG != "-1") {
         ultimaMSG = fazPergunta("Digite a quantidade do item")
         Orion.Wait(100)
-        if (ultimaMSG == "-1"){
+        if (ultimaMSG == "-1") {
             break
         }
         var bau = selectionaObjESetaVariavelWorks(undefined, 'Selecione o bau com recursos')
@@ -654,40 +654,40 @@ function fazerObjetosLoop() {
         }
         index++
     }
-    moveItensDicionario(itensOrigem,1,0)
-    Orion.CharPrint(self,906,"Tente fazer 1 item desejado e feche o menu")
+    moveItensDicionario(itensOrigem, 1, 0)
+    Orion.CharPrint(self, 906, "Tente fazer 1 item desejado e feche o menu")
     Orion.Wait(2000)
     Orion.UseObject(itemProducao);
     Orion.Wait(200)
     Orion.WaitForGump(5000);
-    var gump0 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID())
-    Orion.WaitForGump(5000);
+    var gump0 = Orion.GetGump(Orion.GetGump('lastgump').Serial(), Orion.GetGump('lastgump').ID())
     const inicio = Date.now();
-    while(gump0 !== null){
+    Orion.WaitForGump(5000);
+    while (gump0 !== null) {
         Orion.Wait(250)
         Orion.WaitForGump(500);
-        gump0 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID())
+        gump0 = Orion.GetGump(Orion.GetGump('lastgump').Serial(), Orion.GetGump('lastgump').ID())
         Orion.WaitForGump(500);
-        if (gump0 != null && gump0.Replayed()){
-            Orion.Print(null,"Respondido !")
+        if (gump0 != null && gump0.Replayed()) {
+            Orion.Print(null, "Respondido !")
             break
-        }else if (gump0 == null){
+        } else if (gump0 == null) {
             break
         }
         Orion.Wait(200)
     }
     const fim = Date.now();
     const tempoProducao = fim - inicio;
-    Orion.CharPrint(self,906,"Timeout registrado ("+tempoProducao+")")
-    if (!Orion.InJournal('Voce pos')){
-        Orion.CharPrint(self,906,"Tentando fazer o item para seleção")
+    Orion.CharPrint(self, 906, "Timeout registrado (" + tempoProducao + ")")
+    if (!Orion.InJournal('Voce pos')) {
+        Orion.CharPrint(self, 906, "Tentando fazer o item para seleção")
     }
     Orion.UseObject(itemProducao);
-    while(!Orion.InJournal('Voce pos')){
-        var gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID());
+    while (!Orion.InJournal('Voce pos')) {
+        var gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(), Orion.GetGump('lastgump').ID());
         if (gump1 !== null || Orion.WaitForGump(1000)) {
             if (gump1 === null) {
-                gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID());
+                gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(), Orion.GetGump('lastgump').ID());
             }
             if ((gump1 !== null) && (!gump1.Replayed())) {
                 gump1.Select(Orion.CreateGumpHook(5008));
@@ -696,15 +696,15 @@ function fazerObjetosLoop() {
         }
         Orion.Wait(tempoProducao)
     }
-    
+
     var itemProduzidoSerial = selectionaObjESetaVariavelWorks(undefined, 'Selecione Item produzido')
     var itemProduzidoObj = Orion.FindObject(itemProduzidoSerial)
     var itemProduzidoGraph = itemProduzidoObj.Graphic()
     var itemProduzidoColor = itemProduzidoObj.Color()
     var qtdeLote = 3
     var qtdeFeitos = 0
-    if (itemProduzidoObj){
-        Orion.CharPrint(self,906,"Iniciando producao em massa do item ("+itemProduzidoGraph+")!")
+    if (itemProduzidoObj) {
+        Orion.CharPrint(self, 906, "Iniciando producao em massa do item (" + itemProduzidoGraph + ")!")
         while (true) {
             Orion.UseObject(itemProducao);
             Orion.WaitForGump(250);
@@ -713,11 +713,11 @@ function fazerObjetosLoop() {
             if (findItems0.length > 0) {
                 qtdeFeitos = findItems0[0].Count()
             }
-            moveItensDicionario(itensOrigem,qtdeLote,qtdeFeitos)
-            var gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID());
+            moveItensDicionario(itensOrigem, qtdeLote, qtdeFeitos)
+            var gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(), Orion.GetGump('lastgump').ID());
             if (gump1 !== null || Orion.WaitForGump(1000)) {
                 if (gump1 === null) {
-                    gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(),Orion.GetGump('lastgump').ID());
+                    gump1 = Orion.GetGump(Orion.GetGump('lastgump').Serial(), Orion.GetGump('lastgump').ID());
                 }
                 if ((gump1 !== null) && (!gump1.Replayed())) {
                     gump1.Select(Orion.CreateGumpHook(5008));
@@ -725,14 +725,14 @@ function fazerObjetosLoop() {
                 }
             }
             Orion.Wait(tempoProducao)
-            Orion.Print(null, "Qtde feitas: "+qtdeFeitos+" lote: "+qtdeLote)
+            Orion.Print(null, "Qtde feitas: " + qtdeFeitos + " lote: " + qtdeLote)
             findItems0 = Orion.FindTypeEx(itemProduzidoGraph, itemProduzidoColor, 'backpack');
             Orion.Wait(25)
             if (findItems0.length > 0) {
                 qtdeFeitos = findItems0[0].Count()
                 if (qtdeFeitos >= qtdeLote) {
                     //Guarda bank
-                    Orion.CharPrint(self,906,"Guardando ... ")
+                    Orion.CharPrint(self, 906, "Guardando ... ")
                     guardaItem(itemProduzidoGraph, itemProduzidoColor, 'backpack', bauDestino, -1)
                     Orion.Wait(500)
                     qtdeFeitos = 0
@@ -741,22 +741,22 @@ function fazerObjetosLoop() {
 
         }
     }
-    
+
 }
 
-function moveItensDicionario(itensOrigem,qtdeLote,qtdeFeitos){
-    for(var key in itensOrigem) {
+function moveItensDicionario(itensOrigem, qtdeLote, qtdeFeitos) {
+    for (var key in itensOrigem) {
         var itemOrigem = itensOrigem[key];
         Orion.Wait(25)
         // Move itens
         var findItems0 = Orion.FindTypeEx(itemOrigem.item, itemOrigem.cor, 'backpack', '');
         if (findItems0.length == 0) {
-            moveItem(itemOrigem.item, itemOrigem.cor, itemOrigem.bau, 'item|fast|recurse', (qtdeLote - qtdeFeitos > 0)?qtdeLote - qtdeFeitos:qtdeLote, 'backpack')
+            moveItem(itemOrigem.item, itemOrigem.cor, itemOrigem.bau, 'item|fast|recurse', (qtdeLote - qtdeFeitos > 0) ? qtdeLote - qtdeFeitos : qtdeLote, 'backpack')
         } else {
             if (findItems0[0].Count() < qtdeLote - qtdeFeitos) {
                 moveItem(itemOrigem.item, itemOrigem.cor, itemOrigem.bau, 'item|fast|recurse', (qtdeLote - qtdeFeitos) - findItems0[0].Count(), 'backpack')
             }
-        } 
+        }
 
     }
 }
@@ -767,55 +767,188 @@ function moveItensDicionario(itensOrigem,qtdeLote,qtdeFeitos){
 function tamingpro() {
     Orion.UseType('0x1088');
     if (!Orion.ObjAtLayer('TamingPro')) {
-      if (!Orion.FindObject('TamingPro')) {
-        Orion.AddObject('TamingPro');
-        Orion.Print('-1', 'Target yout Taming')
-        Orion.WaitForTarget(1000);
-      }
+        if (!Orion.FindObject('TamingPro')) {
+            Orion.AddObject('TamingPro');
+            Orion.Print('-1', 'Target yout Taming')
+            Orion.WaitForTarget(1000);
+        }
     }
     Orion.ClearJournal();
     Orion.Wait(100);
     Orion.UseSkill('Animal Taming', 'TamingPro');
     Orion.Wait(1000);
     while (!Orion.ObjAtLayer('TamingPro')) {
-      Orion.Wait(1000);
-      if (Orion.InJournal('nao conseguiu domesticar')) {
-        tamingpro();
-      }
-      if (Orion.InJournal('linha visao')) {
-        tamingpro();
-      }
-      if (Orion.InJournal('feroz')) {
-        peace();
-        tamingpro();
-      }
-      if (Orion.InJournal('aceitou voce')) {
-        Orion.Say('.drink Shrink');
-        Orion.WaitTargetObject('TamingPro');
-        Orion.UseType('0x1413'); // Gorget
-        Orion.Terminate('tamingpro');
-      }
-      if (Orion.InJournal('domesticado')) {
-        Orion.UseType('0x1413'); // Gorget
-        Orion.Terminate('tamingpro');
-      }
+        Orion.Wait(1000);
+        if (Orion.InJournal('nao conseguiu domesticar')) {
+            tamingpro();
+        }
+        if (Orion.InJournal('linha visao')) {
+            tamingpro();
+        }
+        if (Orion.InJournal('feroz')) {
+            peace();
+            tamingpro();
+        }
+        if (Orion.InJournal('aceitou voce')) {
+            Orion.Say('.drink Shrink');
+            Orion.WaitTargetObject('TamingPro');
+            Orion.UseType('0x1413'); // Gorget
+            Orion.Terminate('tamingpro');
+        }
+        if (Orion.InJournal('domesticado')) {
+            Orion.UseType('0x1413'); // Gorget
+            Orion.Terminate('tamingpro');
+        }
     }
-  }
-  
-  function peace() {
+}
+
+function peace() {
     Orion.ClearJournal();
     Orion.Wait(100);
     Orion.UseSkill('Peacemaking', 'TamingPro')
     Orion.Wait(100);
     while (!Orion.InJournal('se acalmou')) {
-      Orion.Wait(1000);
-      if (Orion.InJournal('falhou')) {
-        peace();
-      }
-      if (Orion.InJournal('tocou mal')) {
-        peace();
-      }
+        Orion.Wait(1000);
+        if (Orion.InJournal('falhou')) {
+            peace();
+        }
+        if (Orion.InJournal('tocou mal')) {
+            peace();
+        }
     }
-  }
+}
 
-  //////////////////////////////////////
+//////////////////////////////////////
+
+var gumpIndexBSIngot = {
+    "0x0000": 5020,//Iron
+    "0x09B3": 5021,//Bronze
+    "0x09B4": 5022,//Silver
+    "0x09B5": 5023,//Gold 
+    "0x09B7": 5024,//Radio
+    "0x09B9": 5025,//Order
+    "0x09BA": 5026,//Chaos
+    "0x09BC": 5027,//Infernal
+    "0x09BD": 5028,//Celestial
+
+}
+
+var listaDeLayersReparo = [
+    "Arms",
+    "Helmet",
+    "Gloves",
+    "Legs",
+    "InnerTorso",
+    "Necklace",
+    "LeftHand",
+    "RightHand",
+]
+
+function repararArmaduraLayer(layer, martelo, idBauIngots){
+    Orion.Print(null, "Reparando - "+layer)
+    var objeto = Orion.ObjAtLayer(layer);
+    var objetoMaoDireita = Orion.ObjAtLayer("RightHand");
+    if (objeto) {
+        var tipo = objeto.Graphic()
+        var cor = objeto.Color()
+        Orion.Unequip(layer);
+        Orion.Wait(1000)
+        Orion.Unequip(layer);
+        Orion.Wait(1000)
+        Orion.UseObject(idBauIngots)
+        var ingots = Orion.FindTypeEx('0x1BF2', cor, idBauIngots, '')
+        Orion.Wait(100)
+        if (ingots && ingots.length > 0) {
+            Orion.Wait(500)
+            Orion.MoveItem(ingots[0].Serial(), 150, 'backpack')
+            Orion.Wait(800);
+            Orion.UseType(martelo)
+            selectionaOre(gumpIndexBSIngot[cor])
+            Orion.ClearJournal()
+            // Seleciona reparar
+            var gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+            while (true) {
+                if (gump0 !== null || Orion.WaitForGump(1000)) {
+                    if (gump0 === null) {
+                        gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+                    }
+                    if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x00000485')) {
+                        gump0.Select(Orion.CreateGumpHook(5006));
+                        Orion.Wait(100);
+                    }
+                }
+                //Clica no equipamento
+                if (Orion.WaitForTarget(1000))
+                    Orion.TargetObject(objeto.Serial());
+                Orion.Wait(2000)
+                if (Orion.InJournal("nao necessita ser reparado")) {
+                    Orion.ClearJournal()
+                    break;
+                }
+                if(Orion.InJournal("reparou o item")){
+                    Orion.ClearJournal()
+                    break
+                }
+                Orion.ClearJournal()
+            }
+            //Fecha o gump
+            if (gump0 !== null || Orion.WaitForGump(1000)) {
+                if (gump0 === null) {
+                    gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+                }
+                if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x00000485')) {
+                    gump0.Select(Orion.CreateGumpHook(0));
+                    Orion.Wait(100);
+                }
+            }
+            Orion.MoveItem(ingots[0].Serial(), 0, idBauIngots)
+            Orion.Wait(800)
+        }
+        Orion.Wait(200)
+        if (objetoMaoDireita){
+            Orion.Equip(objetoMaoDireita.Serial())
+            Orion.Wait(1000)
+        }
+        
+        Orion.Equip(objeto.Serial())
+        Orion.Wait(1000)
+    }
+
+}
+
+function desequiparEArrumarArmaduras() {
+    var idBauIngots = "0x401DF280"
+    var martelo = "0x0FB4"
+    Bank();
+    for (var index = 0; index < listaDeLayersReparo.length; index++) {
+        const element = listaDeLayersReparo[index];
+        repararArmaduraLayer(element, martelo, idBauIngots)
+    }
+}
+
+function selectionaOre(id) {
+    var gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+    if (gump0 !== null || Orion.WaitForGump(1000)) {
+        if (gump0 === null) {
+            gump0 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+        }
+        if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x00000485')) {
+            gump0.Select(Orion.CreateGumpHook(5005));
+            Orion.Wait(100);
+        }
+    }
+    var gump1 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+    if (gump1 !== null || Orion.WaitForGump(1000)) {
+        if (gump1 === null) {
+            gump1 = Orion.GetGump('0xFFFFFFFF', '0x00000485');
+        }
+        if ((gump1 !== null) && (!gump1.Replayed()) && (gump1.ID() === '0x00000485')) {
+            gump1.Select(Orion.CreateGumpHook(id));
+            Orion.Wait(100);
+        }
+    }
+}
+
+function desequiparEArrumarArmadurasTests() {
+    Orion.Unequip('InnerTorso');
+}

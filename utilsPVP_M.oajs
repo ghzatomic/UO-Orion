@@ -65,19 +65,6 @@ function ArmarArma() {
   Orion.Attack('lasttarget');
 }
 
-function armamentoGHZ() {
-  if (Shared.GetVar('armamento') == 0) {
-    ArmarArma();
-    Shared.AddVar('armamento', 1);
-  } else if (Shared.GetVar('armamento') == 1) {
-    ArmarBow();
-    Shared.AddVar('armamento', 2);
-  } else {
-    Orion.Say('.Disarm');
-    Shared.AddVar('armamento', 0);
-  }
-}
-
 
 function ArmarBow() {
   Orion.UseType('0x140E') // Capacete

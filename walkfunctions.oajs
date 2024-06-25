@@ -1287,6 +1287,7 @@ function moveToSafeDistanceFromEnemies(mainEnemy, otherEnemies, safeDistance, cl
 }
 
 function materDistanciaComVisao() {
+  Orion.Print(null,"Aqui")
   materDistanciaComVisao(Orion.ClientLastAttack(), true)
 }
 
@@ -1313,7 +1314,7 @@ function materDistanciaComVisao(mainTarget, print) {
   }
 
   var safeDistance = 7;
-  var closeDistance = 3;
+  var closeDistance = 4;
   var otherEnemies = Orion.FindTypeEx("any", "any", "ground", "mobile|ignoreself", safeDistance, "any");
 
   if (isEnemyWithinDistance(mainEnemy ? [mainEnemy].concat(otherEnemies) : otherEnemies, closeDistance)) {
@@ -1351,14 +1352,14 @@ function flexadaPVM() {
     while (!target.Dead()) {
       if (!Shared.GetVar('CPIsCasting')) {
         ArmarBow();
-        Orion.Wait(500)
+        Orion.Wait(100)
         materDistanciaComVisao(target.Serial(), false);
         Orion.Attack(target)
-        for (var index = 0; index < 10; index++) {
+        for (var index = 0; index < 100; index++) {
           if (!Shared.GetVar('RMCancelRun')) {
             return
           }
-          Orion.Wait(100)
+          Orion.Wait(10)
           if (!Shared.GetVar('RMCancelRun')) {
             return
           }
