@@ -999,8 +999,8 @@ function runEsconderSe() {
   Orion.Print("Inimigos : "+enemies.length)
   var fileName = 'D:/git/UO Orion Macros/map.txt';
   var hideout = findNearestHideout(enemies);
-  var areaMap = scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null, enemies);
-  saveMapToFile(areaMap, fileName);
+  //var areaMap = scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null, enemies);
+  //saveMapToFile(areaMap, fileName);
   if (hideout) {
     Orion.Print(null, "Esconderijo encontrado em " + hideout.X + ", " + hideout.Y + ", " + hideout.Z);
     moveToHideout(hideout);
