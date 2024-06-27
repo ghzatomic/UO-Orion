@@ -847,7 +847,8 @@ function CharPos() {
   var player = Player;
   return {
     X: player.X(),
-    Y: player.Y()
+    Y: player.Y(),
+    Z: player.Z(),
   };
 }
 var tileMap = {};
@@ -871,7 +872,7 @@ function isTileAndavelCached(x, y) {
 
 function isTileAndavelCached(x, y) {
   var key = x + ',' + y;
-  return tileMap[key] !== undefined ? tileMap[key] : false;
+  return tileMap[key] !== undefined ? tileMap[key] : isTileAndavel(x, y,Player.Z());
 }
 
 var losCache = {}; // Cache para linha de visão de inimigos
@@ -971,14 +972,13 @@ function findNearestHideout(enemies) {
   var nearestHideout = null;
   var minDistance = Infinity;
   var tileMapKeys = Object.keys(tileMap); // Cache keys para evitar chamadas repetitivas
-
   // Use o cache de tiles gerado anteriormente
   for (var i = 0; i < tileMapKeys.length; i++) {
     var key = tileMapKeys[i];
     var coords = key.split(',');
     var x = parseInt(coords[0]);
     var y = parseInt(coords[1]);
-    if (tileMap[key] && /*Quando coloca true aqui ele pega os mobs*/!enemiesInLOS(x, y, enemies, true)) {
+    if (tileMap[key] && !enemiesInLOS(x, y, enemies, true)) {
       var hideoutPosition = findPositionBehindObject({ X: x, Y: y, Z: playerZ }, enemies);
 
       if (hideoutPosition) {
@@ -1005,7 +1005,7 @@ function findNearestHideout(enemies) {
 var tileStatusCache = {};
 
 // Função para determinar o status de um tile com cache
-function getTileStatus(x, y, playerPos, hideoutPos, enemies) {
+function getTileStatus(x, y, playerPos, hideoutPos, enemies,tilesdata) {
   //return getTileStatus2(x, y, playerPos, hideoutPos, enemies)
   // Chave para o cache baseada nas coordenadas
   var cacheKey = x + ',' + y;
@@ -1026,7 +1026,6 @@ function getTileStatus(x, y, playerPos, hideoutPos, enemies) {
     // Verifica se há um jogador inimigo no tile
     var isEnemy = false;
     for (var i = 0; i < enemies.length; i++) {
-      //Orion.Print("enemies[i] - "+enemies[i].X()+","+enemies[i].Y()+" - "+x+","+y)
       if (enemies[i].X() == x && enemies[i].Y() == y) {
         status = 'E'; // Jogador inimigo
         isEnemy = true;
@@ -1035,7 +1034,7 @@ function getTileStatus(x, y, playerPos, hideoutPos, enemies) {
     }
 
     if (!isEnemy) {
-      if (isTileAndavelNova(x, y,Player.Z())) {
+      if (isTileAndavelNova(x, y,Player.Z(),tilesdata)) {
         status = '.'; // Tile passável
       } else {
         status = 'T'; // Tile bloqueado
@@ -1073,8 +1072,8 @@ function runEsconderSe() {
   var hideout = findNearestHideout(enemies);
   const fim2 = Date.now();
   Orion.Print("findNearestHideout executou em : " + (fim2 - inicio2))
-  var areaMap = scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null, enemies);
-  saveMapToFile(areaMap, fileName);
+  //var areaMap = scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null, enemies);
+  //saveMapToFile(areaMap, fileName);
   if (hideout) {
     Orion.Print(null, "Esconderijo encontrado em " + hideout.X + ", " + hideout.Y + ", " + hideout.Z);
     moveToHideout(hideout);
@@ -1088,116 +1087,15 @@ function runEsconderSe() {
   tileStatusCache = {}
 }
 
-var pathCache = {};
-
-function isPathClear(x1, y1, x2, y2, cached) {
-  var cacheKey = x1 + ',' + y1 + '-' + x2 + ',' + y2;
-  if (cached && pathCache[cacheKey] !== undefined) {
-      return pathCache[cacheKey];
-  }
-
-  var dx = Math.abs(x2 - x1);
-  var dy = Math.abs(y2 - y1);
-  var sx = (x1 < x2) ? 1 : -1;
-  var sy = (y1 < y2) ? 1 : -1;
-  var err = dx - dy;
-
-  while (true) {
-      if (cached) {
-          if (!isTileAndavelCached(x1, y1,Player.Z())) {
-              pathCache[cacheKey] = false;
-              return false;
-          }
-      } else {
-          if (!isTileAndavel(x1, y1)) {
-              pathCache[cacheKey] = false;
-              return false;
-          }
-      }
-      if (x1 === x2 && y1 === y2) {
-          break;
-      }
-      var e2 = err * 2;
-      if (e2 > -dy) {
-          err -= dy;
-          x1 += sx;
-      }
-      if (e2 < dx) {
-          err += dx;
-          y1 += sy;
-      }
-  }
-
-  pathCache[cacheKey] = true;
-  return true;
-}
-
 function isTileAndavel(x, y, z) {
   return isTileAndavelNova(x, y, z)
-  var containsObj = false
-  var objContains = undefined
-  var objList = Orion.FindType('any', 'any', 'ground', 'ignoreself', 'xyz: ' + x + ',' + y + ',' + z);
-
-  for (i = 0; i < objList.length; i++) {
-    var o = Orion.FindObject(objList[i]);
-    if (o.X() == x && o.Y() == y && o.Z() <= z && !o.IsMulti()) {
-      containsObj = true
-      objContains = o
-    }
-  }
-
-  //var arr = Orion.GetPathArray(x,y,z);
-  //Orion.Wait(1000)
-  var pathOk = true//arr.length <= 0
-  /*if (isOutsideRegion(x, y, Player.X(), Player.Y(), 1)){
-    //Implementar o CanWalk
-    pathOk = true
-  }*/
-  var tilesAt = Orion.GetTiles('any', x, y, z, 255)
-  var tileAndavel = true
-  if (tilesAt) {
-    /*if (tilesAt.length == 0){
-      tileAndavel = false //Verificar na caverna e nas dungeons
-    }*/
-    for (var i = 0; i < tilesAt.length; i++) {
-      var data = tilesAt[i]
-      var strFlag = data.Flags().toString(16)
-      if (strFlag[strFlag.length - 2] + strFlag[strFlag.length - 1] === "40" || strFlag[strFlag.length - 2] + strFlag[strFlag.length - 1] === "50") {
-        tileAndavel = false
-        break
-      } else {
-        var strFlag = Orion.GetLandTiledata(data.Graphic()).Flags().toString(16)
-        if (strFlag[strFlag.length - 2] + strFlag[strFlag.length - 1] === "40") {
-          tileAndavel = false
-          break
-        }
-      }
-    }
-
-  } else {
-    return !containsObj // N tem tile eh pq nao existe nada
-  }
-  if (tileAndavel) {
-    var testaTileNegra = Orion.GetTiles('land', x, y)
-    if (testaTileNegra && testaTileNegra.length > 0) {
-      if (Orion.GetTiles('land', x, y)[0].Flags().toString() == '80') {
-        tileAndavel = false
-      } else {
-        /*if (Player.Z()<0 && Orion.GetTiles('land', x, y)[0].Z()>Player.Z()){
-          tileAndavel = false // Caso da parte preta da cave
-        }*/
-      }
-    }
-  }
-  //Orion.CharPrint(self, 906, 'eee '+pathOk+","+tileAndavel+","+containsObj);
-  return tileAndavel && !containsObj
 }
 
 // Função para mover o jogador para o esconderijo
 function moveToHideout(hideout) {
   if (hideout) {
     Orion.StopWalking();
-    Orion.WalkTo(hideout.X, hideout.Y, Player.Z(), 0, 255, 1, 1);
+    Orion.WalkTo(hideout.X, hideout.Y, Player.Z(),Player.Z()-5, Player.Z()+5, 1, 1);
     Orion.Print(null, "Movendo para o esconderijo em " + hideout.X + ", " + hideout.Y + ", " + hideout.Z);
   } else {
     Orion.Print(null, "Nenhum esconderijo seguro encontrado.");
@@ -1374,7 +1272,7 @@ function flexadaPVM() {
   }
 }
 
-function testeCall() {
+function testeCall_old() {
   pathCache = {}
   losCache = {}; // Cache para linha de visão de inimigos
   tileCache = {}
@@ -1402,7 +1300,11 @@ function testeCall() {
   tileMap = {};
 }
 
-function testeScan() {
+function testeCall(){
+  Orion.Print(null, "R : "+Orion.FindObject("0x0038ADAC").InLOS())
+}
+
+function testeCall2() {
   pathCache = {}
   losCache = {}; // Cache para linha de visão de inimigos
   tileCache = {}
@@ -1449,7 +1351,7 @@ var tileCache = {};
 var tileCache = {};
 
 // Função para verificar se uma coordenada é andável com cache
-function isTileAndavelNova(x, y, z) {
+function isTileAndavelNova(x, y, z,tilesdata) {
     // Chave para o cache baseada nas coordenadas
     var cacheKey = x + ',' + y;
 
@@ -1468,7 +1370,17 @@ function isTileAndavelNova(x, y, z) {
         objContains = o
       }
     }*/
-    var tilesAt = Orion.GetTiles('any', x, y, (z == undefined?Player.Z()-10:Player.Z()+10), 255)//Orion.GetTiles('any', x, y, z, z);
+    var tilesAt = []
+    if (tilesdata){
+      for (var i = 0; i < tilesAt.length; i++) {
+        var data = tilesAt[i];
+        if (data.x() == x && data.y() == y && data.Z() < (z == undefined?Player.Z()-2:z-2) &&  data.Z() > (z == undefined?Player.Z()+2:z+2)){
+          tilesAt.push(data)
+        }
+      }
+    }else{
+      tilesAt = Orion.GetTiles('any', x, y, (z == undefined?Player.Z()-13:z-13), (z == undefined?Player.Z()+23:z+23))//Orion.GetTiles('any', x, y, z, z);
+    }
     var tileAndavel = true;
 
     if (tilesAt) {
@@ -1496,7 +1408,7 @@ function isTileAndavelNova(x, y, z) {
     }
 
     if (tileAndavel) {
-        var testaTileNegra = Orion.GetTiles('land', x, y);
+        var testaTileNegra = Orion.GetTiles('land', x, y, (z == undefined?Player.Z()-3:z-3), (z == undefined?Player.Z()+3:z+3));
         if (testaTileNegra && testaTileNegra.length > 0) {
             if (testaTileNegra[0].Flags().toString() === '80') {
                 tileAndavel = false;
@@ -1591,4 +1503,52 @@ function findNearestHideout_recuperado(enemies) {
   }
 
   return nearestHideout;
+}
+
+
+var pathCache = {};
+
+function isPathClear(x1, y1, x2, y2, cached) {
+  var cacheKey = x1 + ',' + y1 + '-' + x2 + ',' + y2;
+  if (cached && pathCache[cacheKey] !== undefined) {
+    return pathCache[cacheKey];
+  }
+
+  var dx = Math.abs(x2 - x1);
+  var dy = Math.abs(y2 - y1);
+  var sx = (x1 < x2) ? 1 : -1;
+  var sy = (y1 < y2) ? 1 : -1;
+  var err = dx - dy;
+  var maxIterations = dx + dy; // Número máximo de iterações para evitar loop infinito
+  var iterations = 0;
+
+  while (iterations <= maxIterations) {
+    iterations++;
+    if (cached) {
+      if (!isTileAndavelCached(x1, y1,Player.Z())) {
+        pathCache[cacheKey] = false;
+        return false;
+      }
+    } else {
+      if (!isTileAndavel(x1, y1)) {
+        pathCache[cacheKey] = false;
+        return false;
+      }
+    }
+    if (x1 === x2 && y1 === y2) {
+      break;
+    }
+    var e2 = 2 * err;
+    if (e2 > -dy) {
+      err -= dy;
+      x1 += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      y1 += sy;
+    }
+  }
+
+  pathCache[cacheKey] = true;
+  return true;
 }
