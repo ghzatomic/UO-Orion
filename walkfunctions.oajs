@@ -864,7 +864,7 @@ function generateTileMap(radius) {
 }
 
 function isTileAndavel(x, y) {
-  return isTileAndavel(x, y,Player.Z()) // Ignorando Z
+  return isTileAndavel(x, y, Player.Z()) // Ignorando Z
 }
 function isTileAndavelCached(x, y) {
   return isTileAndavelCached(x, y) // Ignorando Z
@@ -872,7 +872,7 @@ function isTileAndavelCached(x, y) {
 
 function isTileAndavelCached(x, y) {
   var key = x + ',' + y;
-  return tileMap[key] !== undefined ? tileMap[key] : isTileAndavel(x, y,Player.Z());
+  return tileMap[key] !== undefined ? tileMap[key] : isTileAndavel(x, y, Player.Z());
 }
 
 var losCache = {}; // Cache para linha de visão de inimigos
@@ -1005,13 +1005,13 @@ function findNearestHideout(enemies) {
 var tileStatusCache = {};
 
 // Função para determinar o status de um tile com cache
-function getTileStatus(x, y, playerPos, hideoutPos, enemies,tilesdata) {
+function getTileStatus(x, y, playerPos, hideoutPos, enemies, tilesdata) {
   //return getTileStatus2(x, y, playerPos, hideoutPos, enemies)
   // Chave para o cache baseada nas coordenadas
   var cacheKey = x + ',' + y;
 
   // Verifica se a chave já está no cache
-  if (hideoutPos == null){
+  if (hideoutPos == null) {
     if (tileStatusCache.hasOwnProperty(cacheKey)) {
       return tileStatusCache[cacheKey];
     }
@@ -1034,7 +1034,7 @@ function getTileStatus(x, y, playerPos, hideoutPos, enemies,tilesdata) {
     }
 
     if (!isEnemy) {
-      if (isTileAndavelNova(x, y,Player.Z(),tilesdata)) {
+      if (isTileAndavelNova(x, y, Player.Z(), tilesdata)) {
         status = '.'; // Tile passável
       } else {
         status = 'T'; // Tile bloqueado
@@ -1065,7 +1065,7 @@ function runEsconderSe() {
   Orion.IgnoreReset();
   var enemies = Orion.FindTypeEx("-1", "-1", "ground", "mobile|ignorefriends", 10, "any");
   var humans = Orion.FindTypeEx("any", "any", "ground", "human|ignoreself", 10, "any")
-  enemies =  enemies.concat(humans)
+  enemies = enemies.concat(humans)
   Orion.Print("Inimigos : " + enemies.length)
   const inicio2 = Date.now();
   var fileName = 'D:/git/UO Orion Macros/map.txt';
@@ -1095,7 +1095,7 @@ function isTileAndavel(x, y, z) {
 function moveToHideout(hideout) {
   if (hideout) {
     Orion.StopWalking();
-    Orion.WalkTo(hideout.X, hideout.Y, Player.Z(),Player.Z()-5, Player.Z()+5, 1, 1);
+    Orion.WalkTo(hideout.X, hideout.Y, Player.Z(), Player.Z() - 5, Player.Z() + 5, 1, 1);
     Orion.Print(null, "Movendo para o esconderijo em " + hideout.X + ", " + hideout.Y + ", " + hideout.Z);
   } else {
     Orion.Print(null, "Nenhum esconderijo seguro encontrado.");
@@ -1133,55 +1133,6 @@ function isEnemyWithinDistance(enemies, distance) {
   return false;
 }
 
-function moveToSafeDistanceFromEnemies(mainEnemy, otherEnemies, safeDistance, closeDistance) {
-  var playerPos = CharPos();
-  var playerX = playerPos.X;
-  var playerY = playerPos.Y;
-  var bestPosition = null;
-  var bestDistance = -9999;
-
-  for (var dx = -safeDistance; dx <= safeDistance; dx++) {
-      for (var dy = -safeDistance; dy <= safeDistance; dy++) {
-          var newX = playerX + dx;
-          var newY = playerY + dy;
-
-          if (isTileAndavel(newX, newY)) {
-              var mainEnemyDistance = Orion.GetDistance(mainEnemy.X(), mainEnemy.Y(), newX, newY);
-              if (mainEnemyDistance < closeDistance || mainEnemyDistance > safeDistance || !isPathClear(newX, newY, mainEnemy.X(), mainEnemy.Y(), false)) {
-                  continue;
-              }
-              var allEnemiesFarEnough = true;
-              var minDistanceToEnemies = Infinity;
-
-              for (var j = 0; j < otherEnemies.length; j++) {
-                  var enemy = otherEnemies[j];
-                  var distance = Orion.GetDistance(enemy.X(), enemy.Y(), newX, newY);
-                  if (distance < closeDistance) {
-                      allEnemiesFarEnough = false;
-                      break;
-                  }
-                  if (distance < minDistanceToEnemies) {
-                      minDistanceToEnemies = distance;
-                  }
-              }
-
-              if (allEnemiesFarEnough && mainEnemyDistance <= safeDistance && minDistanceToEnemies > bestDistance) {
-                  bestDistance = minDistanceToEnemies;
-                  bestPosition = { X: newX, Y: newY };
-              }
-          }
-      }
-  }
-
-  if (bestPosition) {
-      Orion.StopWalking();
-      Orion.WalkTo(bestPosition.X, bestPosition.Y, Player.Z(), 0, 255, 1, 1);
-      Orion.Print(null, "Movendo para posição segura em " + bestPosition.X + ", " + bestPosition.Y);
-  } else {
-      Orion.Print(null, "Nenhuma posição segura encontrada.");
-  }
-}
-
 function materDistanciaComVisao() {
   materDistanciaComVisao(Orion.ClientLastAttack(), true)
 }
@@ -1212,7 +1163,7 @@ function materDistanciaComVisao(mainTarget, print) {
   var closeDistance = 4;
   var otherEnemies = Orion.FindTypeEx("any", "any", "ground", "mobile|ignoreself", safeDistance, "any");
   var humans = Orion.FindTypeEx("any", "any", "ground", "human|ignoreself", safeDistance, "any")
-  otherEnemies =  otherEnemies.concat(humans)
+  otherEnemies = otherEnemies.concat(humans)
   if (isEnemyWithinDistance(mainEnemy ? [mainEnemy].concat(otherEnemies) : otherEnemies, closeDistance)) {
     if (print) {
       Orion.Print(null, "Inimigo a 5 tiles de distância, mantendo distância segura.");
@@ -1229,14 +1180,15 @@ function materDistanciaComVisao(mainTarget, print) {
 function autoPVMBowFunction(enemy) {
   if (!isPathClear(Player.X(), Player.Y(), enemy.X(), enemy.Y())) {
     var distancia = 0
-    Orion.WalkTo(enemy.X(), enemy.Y(), Player.Z(), distancia, enemy.Z(), 1, 1, 2000);
+    Orion.WalkTo(enemy.X(), enemy.Y(), Player.Z(), distancia, enemy.Z(), 1, 1);
   }
   materDistanciaComVisao(Orion.ClientLastAttack(), false);
 }
 
 function autoPVMDeadFunction(enemy, x, y, z) {
   Orion.CharPrint(self, 906, "Buscando dinheiro")
-  Orion.WalkTo(x, y, z, 1, z, 1, 1, 3000);
+  Orion.WalkTo(x, y, z, z-5, z+5, 1, 1);
+  Orion.Wait(1000)
 }
 
 function flexadaPVM() {
@@ -1290,18 +1242,18 @@ function testeCall_old() {
   Orion.IgnoreReset();
   var enemies = Orion.FindTypeEx("-1", "-1", "ground", "mobile|ignorefriends", 10, "any");
   var humans = Orion.FindTypeEx("any", "any", "ground", "human|ignoreself", 10, "any")
-  enemies =  enemies.concat(humans)
+  enemies = enemies.concat(humans)
   //var enemies = Orion.FindTypeEx("-1", "-1", "ground", flag + "|ignoreself", 20, "any");
-  Orion.Print(null, "Qtde: "+enemies.length)
-  Orion.Print(null, "LOS: "+enemiesInLOS(4535, 1334, enemies, false))
+  Orion.Print(null, "Qtde: " + enemies.length)
+  Orion.Print(null, "LOS: " + enemiesInLOS(4535, 1334, enemies, false))
   pathCache = {}
   losCache = {}; // Cache para linha de visão de inimigos
   tileCache = {}
   tileMap = {};
 }
 
-function testeCall(){
-  Orion.Print(null, "R : "+Orion.FindObject("0x0038ADAC").InLOS())
+function testeCall() {
+  Orion.Print(null, "R : " + Orion.FindObject("0x0038ADAC").InLOS())
 }
 
 function testeCall2() {
@@ -1351,76 +1303,76 @@ var tileCache = {};
 var tileCache = {};
 
 // Função para verificar se uma coordenada é andável com cache
-function isTileAndavelNova(x, y, z,tilesdata) {
-    // Chave para o cache baseada nas coordenadas
-    var cacheKey = x + ',' + y;
+function isTileAndavelNova(x, y, z, tilesdata) {
+  // Chave para o cache baseada nas coordenadas
+  var cacheKey = x + ',' + y;
 
-    // Verifica se a chave já está no cache
-    if (tileCache.hasOwnProperty(cacheKey)) {
-        return tileCache[cacheKey];
+  // Verifica se a chave já está no cache
+  if (tileCache.hasOwnProperty(cacheKey)) {
+    return tileCache[cacheKey];
+  }
+  var containsObj = false
+  /*var objContains = undefined
+  var objList = Orion.FindTypeEx('any', 'any', 'ground', 'ignoreself', 'xyz: ' + x + ',' + y + ',' + z);
+
+  for (i = 0; i < objList.length; i++) {
+    var o = objList[i];
+    if (o.X() == x && o.Y() == y && o.Z() <= z && !o.IsMulti()) {
+      containsObj = true
+      objContains = o
     }
-    var containsObj = false
-    /*var objContains = undefined
-    var objList = Orion.FindTypeEx('any', 'any', 'ground', 'ignoreself', 'xyz: ' + x + ',' + y + ',' + z);
-
-    for (i = 0; i < objList.length; i++) {
-      var o = objList[i];
-      if (o.X() == x && o.Y() == y && o.Z() <= z && !o.IsMulti()) {
-        containsObj = true
-        objContains = o
+  }*/
+  var tilesAt = []
+  if (tilesdata) {
+    for (var i = 0; i < tilesAt.length; i++) {
+      var data = tilesAt[i];
+      if (data.x() == x && data.y() == y && data.Z() < (z == undefined ? Player.Z() - 2 : z - 2) && data.Z() > (z == undefined ? Player.Z() + 2 : z + 2)) {
+        tilesAt.push(data)
       }
-    }*/
-    var tilesAt = []
-    if (tilesdata){
-      for (var i = 0; i < tilesAt.length; i++) {
-        var data = tilesAt[i];
-        if (data.x() == x && data.y() == y && data.Z() < (z == undefined?Player.Z()-2:z-2) &&  data.Z() > (z == undefined?Player.Z()+2:z+2)){
-          tilesAt.push(data)
+    }
+  } else {
+    tilesAt = Orion.GetTiles('any', x, y, (z == undefined ? Player.Z() - 13 : z - 13), (z == undefined ? Player.Z() + 23 : z + 23))//Orion.GetTiles('any', x, y, z, z);
+  }
+  var tileAndavel = true;
+
+  if (tilesAt) {
+    for (var i = 0; i < tilesAt.length; i++) {
+      var data = tilesAt[i];
+      var strFlag = data.Flags().toString(16);
+      var lastTwoChars = strFlag.slice(-2);
+      if (lastTwoChars === "40" || lastTwoChars === "50") {
+        tileAndavel = false;
+        break;
+      } else {
+        var landStrFlag = Orion.GetLandTiledata(data.Graphic()).Flags().toString(16);
+        if (landStrFlag.slice(-2) === "40") {
+          tileAndavel = false;
+          break;
         }
       }
-    }else{
-      tilesAt = Orion.GetTiles('any', x, y, (z == undefined?Player.Z()-13:z-13), (z == undefined?Player.Z()+23:z+23))//Orion.GetTiles('any', x, y, z, z);
     }
-    var tileAndavel = true;
-
-    if (tilesAt) {
-        for (var i = 0; i < tilesAt.length; i++) {
-            var data = tilesAt[i];
-            var strFlag = data.Flags().toString(16);
-            var lastTwoChars = strFlag.slice(-2);
-            if (lastTwoChars === "40" || lastTwoChars === "50") {
-                tileAndavel = false;
-                break;
-            } else {
-                var landStrFlag = Orion.GetLandTiledata(data.Graphic()).Flags().toString(16);
-                if (landStrFlag.slice(-2) === "40") {
-                    tileAndavel = false;
-                    break;
-                }
-            }
-        }
-    } else {
-        // Armazena o resultado no cache
-        //tileCache[cacheKey] = true;
-        //return true; // Não tem tile, então considera-se andável
-        tileCache[cacheKey] = !containsObj;
-        return !containsObj
-    }
-
-    if (tileAndavel) {
-        var testaTileNegra = Orion.GetTiles('land', x, y, (z == undefined?Player.Z()-3:z-3), (z == undefined?Player.Z()+3:z+3));
-        if (testaTileNegra && testaTileNegra.length > 0) {
-            if (testaTileNegra[0].Flags().toString() === '80') {
-                tileAndavel = false;
-            }
-        }
-    }
-
+  } else {
     // Armazena o resultado no cache
-    //tileCache[cacheKey] = tileAndavel;
-    //return tileAndavel;
-    tileCache[cacheKey] = tileAndavel && !containsObj
-    return tileAndavel && !containsObj
+    //tileCache[cacheKey] = true;
+    //return true; // Não tem tile, então considera-se andável
+    tileCache[cacheKey] = !containsObj;
+    return !containsObj
+  }
+
+  if (tileAndavel) {
+    var testaTileNegra = Orion.GetTiles('land', x, y, (z == undefined ? Player.Z() - 3 : z - 3), (z == undefined ? Player.Z() + 3 : z + 3));
+    if (testaTileNegra && testaTileNegra.length > 0) {
+      if (testaTileNegra[0].Flags().toString() === '80') {
+        tileAndavel = false;
+      }
+    }
+  }
+
+  // Armazena o resultado no cache
+  //tileCache[cacheKey] = tileAndavel;
+  //return tileAndavel;
+  tileCache[cacheKey] = tileAndavel && !containsObj
+  return tileAndavel && !containsObj
 }
 // Função para varrer uma área ao redor do jogador
 function scanArea(radius, hideoutPos, enemies) {
@@ -1525,7 +1477,7 @@ function isPathClear(x1, y1, x2, y2, cached) {
   while (iterations <= maxIterations) {
     iterations++;
     if (cached) {
-      if (!isTileAndavelCached(x1, y1,Player.Z())) {
+      if (!isTileAndavelCached(x1, y1, Player.Z())) {
         pathCache[cacheKey] = false;
         return false;
       }
@@ -1551,4 +1503,107 @@ function isPathClear(x1, y1, x2, y2, cached) {
 
   pathCache[cacheKey] = true;
   return true;
+}
+
+function moveToSafeDistanceFromEnemies_inimigos_tantofaz(mainEnemy, otherEnemies, safeDistance, closeDistance) {
+  var playerPos = CharPos();
+  var playerX = playerPos.X;
+  var playerY = playerPos.Y;
+  var bestPosition = null;
+  var bestDistance = -9999;
+
+  for (var dx = -safeDistance; dx <= safeDistance; dx++) {
+    for (var dy = -safeDistance; dy <= safeDistance; dy++) {
+      var newX = playerX + dx;
+      var newY = playerY + dy;
+
+      if (isTileAndavel(newX, newY)) {
+        var mainEnemyDistance = Orion.GetDistance(mainEnemy.X(), mainEnemy.Y(), newX, newY);
+        if (mainEnemyDistance < closeDistance || mainEnemyDistance > safeDistance || !isPathClear(newX, newY, mainEnemy.X(), mainEnemy.Y(), false)) {
+          continue;
+        }
+        var allEnemiesFarEnough = true;
+        var minDistanceToEnemies = Infinity;
+
+        for (var j = 0; j < otherEnemies.length; j++) {
+          var enemy = otherEnemies[j];
+          var distance = Orion.GetDistance(enemy.X(), enemy.Y(), newX, newY);
+          if (distance < closeDistance) {
+            allEnemiesFarEnough = false;
+            break;
+          }
+          if (distance < minDistanceToEnemies) {
+            minDistanceToEnemies = distance;
+          }
+        }
+
+        if (allEnemiesFarEnough && mainEnemyDistance <= safeDistance && minDistanceToEnemies > bestDistance) {
+          bestDistance = minDistanceToEnemies;
+          bestPosition = { X: newX, Y: newY };
+        }
+      }
+    }
+  }
+
+  if (bestPosition) {
+    Orion.StopWalking();
+    Orion.WalkTo(bestPosition.X, bestPosition.Y, Player.Z(), 0, 255, 1, 1);
+    Orion.Print(null, "Movendo para posição segura em " + bestPosition.X + ", " + bestPosition.Y);
+  } else {
+    Orion.Print(null, "Nenhuma posição segura encontrada.");
+  }
+}
+
+function moveToSafeDistanceFromEnemies(mainEnemy, otherEnemies, safeDistance, closeDistance) {
+  var playerPos = CharPos();
+  var playerX = playerPos.X;
+  var playerY = playerPos.Y;
+  var bestPosition = null;
+  var bestDistance = -9999;
+
+  for (var dx = -safeDistance; dx <= safeDistance; dx++) {
+      for (var dy = -safeDistance; dy <= safeDistance; dy++) {
+          var newX = playerX + dx;
+          var newY = playerY + dy;
+
+          if (isTileAndavel(newX, newY)) {
+              var mainEnemyDistance = Orion.GetDistance(mainEnemy.X(), mainEnemy.Y(), newX, newY);
+              if (mainEnemyDistance < closeDistance || mainEnemyDistance > safeDistance || !isPathClear(newX, newY, mainEnemy.X(), mainEnemy.Y(), false)) {
+                  continue;
+              }
+
+              var allEnemiesFarEnough = true;
+              var minDistanceToEnemies = Infinity;
+              var outOfSightOfOtherEnemies = true;
+
+              for (var j = 0; j < otherEnemies.length; j++) {
+                  var enemy = otherEnemies[j];
+                  var distance = Orion.GetDistance(enemy.X(), enemy.Y(), newX, newY);
+                  if (distance < closeDistance) {
+                      allEnemiesFarEnough = false;
+                      break;
+                  }
+                  if (distance < minDistanceToEnemies) {
+                      minDistanceToEnemies = distance;
+                  }
+                  if (isPathClear(enemy.X(), enemy.Y(), newX, newY, true)) {
+                      outOfSightOfOtherEnemies = false;
+                  }
+              }
+
+              if (allEnemiesFarEnough && mainEnemyDistance <= safeDistance && (outOfSightOfOtherEnemies || minDistanceToEnemies > bestDistance)) {
+                  bestDistance = minDistanceToEnemies;
+                  bestPosition = { X: newX, Y: newY };
+              }
+          }
+      }
+  }
+
+  if (bestPosition) {
+      Orion.StopWalking();
+      Orion.WalkTo(bestPosition.X, bestPosition.Y, Player.Z(), 0, 255, 1, 1);
+      Orion.Print(null, "Movendo para posição segura em " + bestPosition.X + ", " + bestPosition.Y);
+  } else {
+      Orion.Print(null, "Nenhuma posição segura encontrada.");
+  }
 }
