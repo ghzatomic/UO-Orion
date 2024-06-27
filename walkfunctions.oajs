@@ -1063,8 +1063,8 @@ function runEsconderSe() {
   Orion.Print("Tiles Mapeadas")
   Orion.Ignore('self');
   Orion.IgnoreReset();
-  var enemies = Orion.FindTypeEx("-1", "-1", "ground", "mobile|ignorefriends", 10, "any");
-  var humans = Orion.FindTypeEx("any", "any", "ground", "human|ignoreself", 10, "any")
+  var enemies = Orion.FindTypeEx("-1", "-1", "ground", "mobile|ignorefriends|ignoreself", gridSize, "any");
+  var humans = Orion.FindTypeEx("any", "any", "ground", "human|ignoreself", gridSize, "any")
   enemies = enemies.concat(humans)
   Orion.Print("Inimigos : " + enemies.length)
   const inicio2 = Date.now();
@@ -1072,8 +1072,7 @@ function runEsconderSe() {
   var hideout = findNearestHideout(enemies);
   const fim2 = Date.now();
   Orion.Print("findNearestHideout executou em : " + (fim2 - inicio2))
-  //var areaMap = scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null, enemies);
-  //saveMapToFile(areaMap, fileName);
+  //saveMapToFile(scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null, enemies), fileName);
   if (hideout) {
     Orion.Print(null, "Esconderijo encontrado em " + hideout.X + ", " + hideout.Y + ", " + hideout.Z);
     moveToHideout(hideout);
