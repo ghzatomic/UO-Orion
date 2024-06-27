@@ -1,5 +1,5 @@
 const algoritimo_caminho = 'balanced'
-const gridSize = 8;
+const gridSize = 12;
 
 
 function auto_pvm() {
@@ -500,7 +500,7 @@ function createGrid(gridString, gridSizeLocal) {
 }
 
 function abs(value) {
-  return value < 0 ? -value : value;
+  return Math.abs(value < 0 ? -value : value);
 }
 
 function distance(x1, y1, x2, y2) {
@@ -862,10 +862,10 @@ function generateTileMap(radius) {
   }
 }
 
-function isTilePassable(x, y) {
-  return isTileAndavel(x, y) // Ignorando Z
+function isTileAndavel(x, y) {
+  return isTileAndavel(x, y,Player.Z()) // Ignorando Z
 }
-function isTilePassableCached(x, y) {
+function isTileAndavelCached(x, y) {
   return isTileAndavelCached(x, y) // Ignorando Z
 }
 
@@ -884,7 +884,8 @@ function enemiesInLOS(x, y, enemies, useCache) {
   }
 
   for (var i = 0; i < enemies.length; i++) {
-    if (isPathClear(x, y, enemies[i].X(), enemies[i].Y(), true)) {
+    //Possivelmente verificar se tem inimigo na X,Y
+    if (isPathClear(x, y, enemies[i].X(), enemies[i].Y(), useCache)) {
       losCache[cacheKey] = true;
       return true;
     }
@@ -894,7 +895,7 @@ function enemiesInLOS(x, y, enemies, useCache) {
 }
 
 
-function findPositionBehindObject(object, enemies) {
+function findPositionBehindObject2(object, enemies) {
   var directions = [
     { dx: 1, dy: 0 },   // Direita
     { dx: -1, dy: 0 },  // Esquerda
@@ -915,8 +916,43 @@ function findPositionBehindObject(object, enemies) {
     var newY = object.Y + directions[i].dy;
     var newZ = object.Z;
 
-    if (!enemiesInLOS(newX, newY, enemies,true) && getTileStatus(newX, newY, playerPos, null, enemies) === '.') {
+    if (!enemiesInLOS(newX, newY, enemies, true) && getTileStatus(newX, newY, playerPos, null, enemies) === '.') {
       var distance = (playerPos.X - newX) * (playerPos.X - newX) + (playerPos.Y - newY) * (playerPos.Y - newY);
+      if (distance < minDistance) {
+        minDistance = distance;
+        bestPosition = { X: newX, Y: newY, Z: newZ };
+      }
+    }
+  }
+
+  return bestPosition;
+}
+
+function findPositionBehindObject(object, enemies) {
+  var directions = [
+    { dx: 1, dy: 0 }, { dx: -1, dy: 0 },
+    { dx: 0, dy: 1 }, { dx: 0, dy: -1 },
+    { dx: 1, dy: 1 }, { dx: 1, dy: -1 },
+    { dx: -1, dy: 1 }, { dx: -1, dy: -1 }
+  ];
+
+  var playerPos = CharPos();
+  var playerX = playerPos.X;
+  var playerY = playerPos.Y;
+  var bestPosition = null;
+  var minDistance = Infinity;
+
+  for (var i = 0; i < directions.length; i++) {
+    var direction = directions[i];
+    var newX = object.X + direction.dx;
+    var newY = object.Y + direction.dy;
+    var newZ = object.Z;
+
+    var tileStatus = getTileStatus(newX, newY, playerPos, null, enemies);
+    if (tileStatus === '.' && !enemiesInLOS(newX, newY, enemies, true)) {
+      var dx = playerX - newX;
+      var dy = playerY - newY;
+      var distance = dx * dx + dy * dy;
       if (distance < minDistance) {
         minDistance = distance;
         bestPosition = { X: newX, Y: newY, Z: newZ };
@@ -929,25 +965,35 @@ function findPositionBehindObject(object, enemies) {
 
 function findNearestHideout(enemies) {
   var playerPos = CharPos();
+  var playerX = playerPos.X;
+  var playerY = playerPos.Y;
+  var playerZ = playerPos.Z;
   var nearestHideout = null;
   var minDistance = Infinity;
+  var tileMapKeys = Object.keys(tileMap); // Cache keys para evitar chamadas repetitivas
 
   // Use o cache de tiles gerado anteriormente
-  for (var key in tileMap) {
+  for (var i = 0; i < tileMapKeys.length; i++) {
+    var key = tileMapKeys[i];
     var coords = key.split(',');
     var x = parseInt(coords[0]);
     var y = parseInt(coords[1]);
+    if (tileMap[key] && /*Quando coloca true aqui ele pega os mobs*/!enemiesInLOS(x, y, enemies, true)) {
+      var hideoutPosition = findPositionBehindObject({ X: x, Y: y, Z: playerZ }, enemies);
 
-    if (tileMap[key] && !enemiesInLOS(x, y, enemies, true)) {
-      var object = { X: x, Y: y, Z: playerPos.Z };
-      var hideoutPosition = findPositionBehindObject(object, enemies);
+      if (hideoutPosition) {
+        var hideoutX = hideoutPosition.X;
+        var hideoutY = hideoutPosition.Y;
 
-      if (hideoutPosition && !enemiesInLOS(hideoutPosition.X, hideoutPosition.Y, enemies, true)) {
-        var distance = (playerPos.X - hideoutPosition.X) * (playerPos.X - hideoutPosition.X) + 
-                       (playerPos.Y - hideoutPosition.Y) * (playerPos.Y - hideoutPosition.Y);
-        if (distance < minDistance) {
-          minDistance = distance;
-          nearestHideout = hideoutPosition;
+        if (!enemiesInLOS(hideoutX, hideoutY, enemies, true)) {
+          var dx = playerX - hideoutX;
+          var dy = playerY - hideoutY;
+          var distance = dx * dx + dy * dy;
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            nearestHideout = hideoutPosition;
+          }
         }
       }
     }
@@ -956,51 +1002,79 @@ function findNearestHideout(enemies) {
   return nearestHideout;
 }
 
-// Função para determinar o status de um tile
-function getTileStatus(x, y, playerPos, hideoutPos, enemies) {
-  if (playerPos.X == x && playerPos.Y == y) {
-    return 'P'; // Posição do jogador
-  } else if (hideoutPos && hideoutPos.X == x && hideoutPos.Y == y) {
-    return 'H'; // Posição do esconderijo
-  }
+var tileStatusCache = {};
 
-  // Verifica se há um jogador inimigo no tile
-  for (var i = 0; i < enemies.length; i++) {
-    if (enemies[i].X() == x && enemies[i].Y() == y) {
-      return 'E'; // Jogador inimigo
+// Função para determinar o status de um tile com cache
+function getTileStatus(x, y, playerPos, hideoutPos, enemies) {
+  //return getTileStatus2(x, y, playerPos, hideoutPos, enemies)
+  // Chave para o cache baseada nas coordenadas
+  var cacheKey = x + ',' + y;
+
+  // Verifica se a chave já está no cache
+  if (hideoutPos == null){
+    if (tileStatusCache.hasOwnProperty(cacheKey)) {
+      return tileStatusCache[cacheKey];
+    }
+  }
+  var status;
+
+  if (playerPos.X == x && playerPos.Y == y) {
+    status = 'P'; // Posição do jogador
+  } else if (hideoutPos && hideoutPos.X == x && hideoutPos.Y == y) {
+    status = 'H'; // Posição do esconderijo
+  } else {
+    // Verifica se há um jogador inimigo no tile
+    var isEnemy = false;
+    for (var i = 0; i < enemies.length; i++) {
+      //Orion.Print("enemies[i] - "+enemies[i].X()+","+enemies[i].Y()+" - "+x+","+y)
+      if (enemies[i].X() == x && enemies[i].Y() == y) {
+        status = 'E'; // Jogador inimigo
+        isEnemy = true;
+        break;
+      }
+    }
+
+    if (!isEnemy) {
+      if (isTileAndavelNova(x, y,Player.Z())) {
+        status = '.'; // Tile passável
+      } else {
+        status = 'T'; // Tile bloqueado
+      }
     }
   }
 
-  if (isTileAndavelCached(x, y)) {
-    return '.'; // Tile passável
-  } else {
-    return 'T'; // Tile bloqueado
-  }
+  // Armazena o resultado no cache
+  tileStatusCache[cacheKey] = status;
+
+  return status;
 }
 
 // Função principal para executar a lógica
 function runEsconderSe() {
-  flag = "mobile";
-  var mainTarget = Orion.ClientLastAttack();
-  if (mainTarget != undefined) {
-    var mainEnemy = Orion.FindObject(mainTarget);
-    if (mainEnemy && mainEnemy.Exists()) {
-      if (mainEnemy.IsHuman()) {
-        flag = "human";
-      }
-    }
-  }
   pathCache = {}
   losCache = {}; // Cache para linha de visão de inimigos
-
+  tileCache = {}
+  tileMap = {};
+  tileStatusCache = {}
+  const inicio1 = Date.now();
   generateTileMap(gridSize); // Gera o mapa de tiles andáveis
+  const fim1 = Date.now();
+  const tempoProducao1 = fim1 - inicio1;
+  Orion.Print("generateTileMap executou em : " + tempoProducao1)
   Orion.Print("Tiles Mapeadas")
-  var enemies = Orion.FindTypeEx("-1", "-1", "ground", flag + "|ignoreself", gridSize, "any");
-  Orion.Print("Inimigos : "+enemies.length)
+  Orion.Ignore('self');
+  Orion.IgnoreReset();
+  var enemies = Orion.FindTypeEx("-1", "-1", "ground", "mobile|ignorefriends", 10, "any");
+  var humans = Orion.FindTypeEx("any", "any", "ground", "human|ignoreself", 10, "any")
+  enemies =  enemies.concat(humans)
+  Orion.Print("Inimigos : " + enemies.length)
+  const inicio2 = Date.now();
   var fileName = 'D:/git/UO Orion Macros/map.txt';
   var hideout = findNearestHideout(enemies);
-  //var areaMap = scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null, enemies);
-  //saveMapToFile(areaMap, fileName);
+  const fim2 = Date.now();
+  Orion.Print("findNearestHideout executou em : " + (fim2 - inicio2))
+  var areaMap = scanArea(gridSize, hideout ? { X: hideout.X, Y: hideout.Y } : null, enemies);
+  saveMapToFile(areaMap, fileName);
   if (hideout) {
     Orion.Print(null, "Esconderijo encontrado em " + hideout.X + ", " + hideout.Y + ", " + hideout.Z);
     moveToHideout(hideout);
@@ -1008,15 +1082,18 @@ function runEsconderSe() {
     Orion.Print(null, "Nenhum esconderijo seguro encontrado.");
   }
   pathCache = {}
-  losCache = {};
+  losCache = {}; // Cache para linha de visão de inimigos
+  tileCache = {}
+  tileMap = {};
+  tileStatusCache = {}
 }
 
 var pathCache = {};
 
 function isPathClear(x1, y1, x2, y2, cached) {
   var cacheKey = x1 + ',' + y1 + '-' + x2 + ',' + y2;
-  if (pathCache[cacheKey] !== undefined) {
-    return pathCache[cacheKey];
+  if (cached && pathCache[cacheKey] !== undefined) {
+      return pathCache[cacheKey];
   }
 
   var dx = Math.abs(x2 - x1);
@@ -1024,34 +1101,31 @@ function isPathClear(x1, y1, x2, y2, cached) {
   var sx = (x1 < x2) ? 1 : -1;
   var sy = (y1 < y2) ? 1 : -1;
   var err = dx - dy;
-  var maxIterations = dx + dy; // Número máximo de iterações para evitar loop infinito
-  var iterations = 0;
 
-  while (iterations <= maxIterations) {
-    iterations++;
-    if (cached) {
-      if (!isTileAndavelCached(x1, y1)) {
-        pathCache[cacheKey] = false;
-        return false;
+  while (true) {
+      if (cached) {
+          if (!isTileAndavelCached(x1, y1,Player.Z())) {
+              pathCache[cacheKey] = false;
+              return false;
+          }
+      } else {
+          if (!isTileAndavel(x1, y1)) {
+              pathCache[cacheKey] = false;
+              return false;
+          }
       }
-    } else {
-      if (!isTilePassable(x1, y1)) {
-        pathCache[cacheKey] = false;
-        return false;
+      if (x1 === x2 && y1 === y2) {
+          break;
       }
-    }
-    if (x1 === x2 && y1 === y2) {
-      break;
-    }
-    var e2 = 2 * err;
-    if (e2 > -dy) {
-      err -= dy;
-      x1 += sx;
-    }
-    if (e2 < dx) {
-      err += dx;
-      y1 += sy;
-    }
+      var e2 = err * 2;
+      if (e2 > -dy) {
+          err -= dy;
+          x1 += sx;
+      }
+      if (e2 < dx) {
+          err += dx;
+          y1 += sy;
+      }
   }
 
   pathCache[cacheKey] = true;
@@ -1059,10 +1133,11 @@ function isPathClear(x1, y1, x2, y2, cached) {
 }
 
 function isTileAndavel(x, y, z) {
+  return isTileAndavelNova(x, y, z)
   var containsObj = false
   var objContains = undefined
   var objList = Orion.FindType('any', 'any', 'ground', 'ignoreself', 'xyz: ' + x + ',' + y + ',' + z);
-  
+
   for (i = 0; i < objList.length; i++) {
     var o = Orion.FindObject(objList[i]);
     if (o.X() == x && o.Y() == y && o.Z() <= z && !o.IsMulti()) {
@@ -1122,33 +1197,13 @@ function isTileAndavel(x, y, z) {
 function moveToHideout(hideout) {
   if (hideout) {
     Orion.StopWalking();
-    Orion.WalkTo(hideout.X, hideout.Y, Player.Z(), 0, hideout.Z, 1, 1);
+    Orion.WalkTo(hideout.X, hideout.Y, Player.Z(), 0, 255, 1, 1);
     Orion.Print(null, "Movendo para o esconderijo em " + hideout.X + ", " + hideout.Y + ", " + hideout.Z);
   } else {
     Orion.Print(null, "Nenhum esconderijo seguro encontrado.");
   }
 }
 
-
-// Função para varrer uma área ao redor do jogador
-function scanArea(radius, hideoutPos, enemies) {
-  var playerPos = CharPos();
-  var areaMap = [];
-  var i, j;
-
-  for (i = -radius; i <= radius; i++) {
-    var row = [];
-    for (j = -radius; j <= radius; j++) {
-      var x = playerPos.X + i;
-      var y = playerPos.Y + j;
-      var status = getTileStatus(x, y, playerPos, hideoutPos, enemies);
-      row.push(status);
-    }
-    areaMap.push(row);
-  }
-
-  return areaMap;
-}
 
 // Função para salvar o mapa em um arquivo de texto
 function saveMapToFile(areaMap, fileName) {
@@ -1167,63 +1222,6 @@ function saveMapToFile(areaMap, fileName) {
   }
 }
 
-
-function findPositionBehindObject_old(object, enemies) {
-  var directions = [
-    { dx: 1, dy: 0 },   // Direita
-    { dx: -1, dy: 0 },  // Esquerda
-    { dx: 0, dy: 1 },   // Baixo
-    { dx: 0, dy: -1 },  // Cima
-    { dx: 1, dy: 1 },   // Diagonal Baixo-Direita
-    { dx: 1, dy: -1 },  // Diagonal Cima-Direita
-    { dx: -1, dy: 1 },  // Diagonal Baixo-Esquerda
-    { dx: -1, dy: -1 }  // Diagonal Cima-Esquerda
-  ];
-
-  var playerPos = CharPos();
-  var bestPosition = null;
-  var minDistance = Infinity;
-
-  for (var i = 0; i < directions.length; i++) {
-    var newX = object.X + directions[i].dx;
-    var newY = object.Y + directions[i].dy;
-    var newZ = object.Z;
-    if (isTileAndavel(newX, newY, newZ) && !enemiesInLOS(newX, newY, enemies)) {
-      var distance = (playerPos.X - newX) * (playerPos.X - newX) + (playerPos.Y - newY) * (playerPos.Y - newY);
-      //var distance = Orion.GetDistance(newX, newY);
-      if (distance < minDistance) {
-        minDistance = distance;
-        bestPosition = { X: newX, Y: newY, Z: newZ };
-      }
-    }
-  }
-  return bestPosition;
-}
-
-// Função para encontrar o esconderijo mais próximo
-function findNearestHideout_old(enemies) {
-  // Procurando por objetos que podem servir como esconderijo
-  var potentialHideouts = Orion.FindTypeEx("any", "any", "ground", "static|item", gridSize, "any");
-  var playerPos = CharPos();
-  var nearestHideout = null;
-  var minDistance = Infinity;
-
-  for (var i = 0; i < potentialHideouts.length; i++) {
-    var hideout = potentialHideouts[i];
-    var positionBehind = findPositionBehindObject({ X: hideout.X(), Y: hideout.Y(), Z: hideout.Z() }, enemies);
-    if (positionBehind) {
-      var distance = (playerPos.X - newX) * (playerPos.X - newX) + (playerPos.Y - newY) * (playerPos.Y - newY);
-      //var distance = Orion.GetDistance(positionBehind.X, positionBehind.Y);
-      if (distance < minDistance) {
-        nearestHideout = positionBehind;
-        minDistance = distance;
-      }
-    }
-  }
-
-  return nearestHideout;
-}
-
 // ------------------------------- Manter Distancia -------------------------------
 function isEnemyWithinDistance(enemies, distance) {
   var playerPos = CharPos();
@@ -1239,55 +1237,54 @@ function isEnemyWithinDistance(enemies, distance) {
 
 function moveToSafeDistanceFromEnemies(mainEnemy, otherEnemies, safeDistance, closeDistance) {
   var playerPos = CharPos();
+  var playerX = playerPos.X;
+  var playerY = playerPos.Y;
   var bestPosition = null;
   var bestDistance = -9999;
 
   for (var dx = -safeDistance; dx <= safeDistance; dx++) {
-    for (var dy = -safeDistance; dy <= safeDistance; dy++) {
-      var newX = playerPos.X + dx;
-      var newY = playerPos.Y + dy;
-      if (isTilePassable(newX, newY)) {
-        var minDistanceToEnemies = Infinity;
-        var allEnemiesFarEnough = true;
+      for (var dy = -safeDistance; dy <= safeDistance; dy++) {
+          var newX = playerX + dx;
+          var newY = playerY + dy;
 
-        // Distância do inimigo principal
-        var mainEnemyDistance = Orion.GetDistance(newX, newY);
-        if (mainEnemyDistance < closeDistance || mainEnemyDistance > safeDistance || !isPathClear(newX, newY, mainEnemy.X(), mainEnemy.Y())) {
-          continue;
-        }
+          if (isTileAndavel(newX, newY)) {
+              var mainEnemyDistance = Orion.GetDistance(mainEnemy.X(), mainEnemy.Y(), newX, newY);
+              if (mainEnemyDistance < closeDistance || mainEnemyDistance > safeDistance || !isPathClear(newX, newY, mainEnemy.X(), mainEnemy.Y(), false)) {
+                  continue;
+              }
+              var allEnemiesFarEnough = true;
+              var minDistanceToEnemies = Infinity;
 
-        for (var j = 0; j < otherEnemies.length; j++) {
-          var enemy = otherEnemies[j];
-          var distance = Orion.GetDistance(newX, newY);
-          if (distance < closeDistance || distance > safeDistance) {
-            allEnemiesFarEnough = false;
-            break;
+              for (var j = 0; j < otherEnemies.length; j++) {
+                  var enemy = otherEnemies[j];
+                  var distance = Orion.GetDistance(enemy.X(), enemy.Y(), newX, newY);
+                  if (distance < closeDistance) {
+                      allEnemiesFarEnough = false;
+                      break;
+                  }
+                  if (distance < minDistanceToEnemies) {
+                      minDistanceToEnemies = distance;
+                  }
+              }
+
+              if (allEnemiesFarEnough && mainEnemyDistance <= safeDistance && minDistanceToEnemies > bestDistance) {
+                  bestDistance = minDistanceToEnemies;
+                  bestPosition = { X: newX, Y: newY };
+              }
           }
-          if (distance < minDistanceToEnemies) {
-            minDistanceToEnemies = distance;
-          }
-        }
-
-        if (allEnemiesFarEnough && mainEnemyDistance <= safeDistance && minDistanceToEnemies > bestDistance) {
-          bestDistance = minDistanceToEnemies;
-          bestPosition = { X: newX, Y: newY };
-        }
       }
-    }
   }
 
   if (bestPosition) {
-    Orion.StopWalking();
-    Orion.WalkTo(bestPosition.X, bestPosition.Y, Player.Z(), 1, Player.Z(), 1, 1, 3000);
-    Orion.Wait(4000);
-    Orion.Print(null, "Movendo para posição segura em " + bestPosition.X + ", " + bestPosition.Y);
+      Orion.StopWalking();
+      Orion.WalkTo(bestPosition.X, bestPosition.Y, Player.Z(), 0, 255, 1, 1);
+      Orion.Print(null, "Movendo para posição segura em " + bestPosition.X + ", " + bestPosition.Y);
   } else {
-    Orion.Print(null, "Nenhuma posição segura encontrada.");
+      Orion.Print(null, "Nenhuma posição segura encontrada.");
   }
 }
 
 function materDistanciaComVisao() {
-  Orion.Print(null,"Aqui")
   materDistanciaComVisao(Orion.ClientLastAttack(), true)
 }
 
@@ -1307,8 +1304,8 @@ function materDistanciaComVisao(mainTarget, print) {
     if (print) {
       Orion.Print(null, "Inimigo principal não encontrado.");
     }
-  }else{
-    if (mainEnemy.IsHuman){
+  } else {
+    if (mainEnemy.IsHuman) {
       flag = "human"
     }
   }
@@ -1316,7 +1313,8 @@ function materDistanciaComVisao(mainTarget, print) {
   var safeDistance = 7;
   var closeDistance = 4;
   var otherEnemies = Orion.FindTypeEx("any", "any", "ground", "mobile|ignoreself", safeDistance, "any");
-
+  var humans = Orion.FindTypeEx("any", "any", "ground", "human|ignoreself", safeDistance, "any")
+  otherEnemies =  otherEnemies.concat(humans)
   if (isEnemyWithinDistance(mainEnemy ? [mainEnemy].concat(otherEnemies) : otherEnemies, closeDistance)) {
     if (print) {
       Orion.Print(null, "Inimigo a 5 tiles de distância, mantendo distância segura.");
@@ -1377,13 +1375,220 @@ function flexadaPVM() {
 }
 
 function testeCall() {
-  var find = Orion.FindTypeEx("any", "any", "ground", "mobile|ignoreself", 7, "any")
-  for (var index = 0; index < find.length; index++) {
-    const element = find[index];
-    Orion.Print("Nome: " + element.Name())
+  pathCache = {}
+  losCache = {}; // Cache para linha de visão de inimigos
+  tileCache = {}
+  tileMap = {};
+  flag = "mobile";
+  var mainTarget = Orion.ClientLastAttack();
+  if (mainTarget != undefined) {
+    var mainEnemy = Orion.FindObject(mainTarget);
+    if (mainEnemy && mainEnemy.Exists()) {
+      if (mainEnemy.IsHuman()) {
+        flag = "human";
+      }
+    }
+  }
+  Orion.IgnoreReset();
+  var enemies = Orion.FindTypeEx("-1", "-1", "ground", "mobile|ignorefriends", 10, "any");
+  var humans = Orion.FindTypeEx("any", "any", "ground", "human|ignoreself", 10, "any")
+  enemies =  enemies.concat(humans)
+  //var enemies = Orion.FindTypeEx("-1", "-1", "ground", flag + "|ignoreself", 20, "any");
+  Orion.Print(null, "Qtde: "+enemies.length)
+  Orion.Print(null, "LOS: "+enemiesInLOS(4535, 1334, enemies, false))
+  pathCache = {}
+  losCache = {}; // Cache para linha de visão de inimigos
+  tileCache = {}
+  tileMap = {};
+}
+
+function testeScan() {
+  pathCache = {}
+  losCache = {}; // Cache para linha de visão de inimigos
+  tileCache = {}
+  tileMap = {};
+  tileStatusCache = {}
+  var enemies = [];
+  Orion.Print("Inimigos : " + enemies.length)
+  var fileName = 'D:/git/UO Orion Macros/map.txt';
+  var areaMap = scanArea(gridSize, null, enemies);
+  saveMapToFile(areaMap, fileName);
+  pathCache = {}
+  losCache = {}; // Cache para linha de visão de inimigos
+  tileCache = {}
+  tileMap = {};
+  tileStatusCache = {}
+}
+
+function getTileStatus2(x, y, playerPos, hideoutPos, enemies) {
+  if (playerPos.X == x && playerPos.Y == y) {
+    return 'P'; // Posição do jogador
+  } else if (hideoutPos && hideoutPos.X == x && hideoutPos.Y == y) {
+    return 'H'; // Posição do esconderijo
+  }
+
+  // Verifica se há um jogador inimigo no tile
+  for (var i = 0; i < enemies.length; i++) {
+    if (enemies[i].X() == x && enemies[i].Y() == y) {
+      return 'E'; // Jogador inimigo
+    }
+  }
+
+  if (isTileAndavelNova(x, y, Player.Z())) {
+    return '.'; // Tile passável
+  } else {
+    return 'T'; // Tile bloqueado
   }
 }
 
-function testeLOS() {
 
+var tileCache = {};
+
+// Função para verificar se uma coordenada é andável com cache
+// Cache para armazenar os resultados das verificações de coordenadas
+var tileCache = {};
+
+// Função para verificar se uma coordenada é andável com cache
+function isTileAndavelNova(x, y, z) {
+    // Chave para o cache baseada nas coordenadas
+    var cacheKey = x + ',' + y;
+
+    // Verifica se a chave já está no cache
+    if (tileCache.hasOwnProperty(cacheKey)) {
+        return tileCache[cacheKey];
+    }
+    var containsObj = false
+    /*var objContains = undefined
+    var objList = Orion.FindTypeEx('any', 'any', 'ground', 'ignoreself', 'xyz: ' + x + ',' + y + ',' + z);
+
+    for (i = 0; i < objList.length; i++) {
+      var o = objList[i];
+      if (o.X() == x && o.Y() == y && o.Z() <= z && !o.IsMulti()) {
+        containsObj = true
+        objContains = o
+      }
+    }*/
+    var tilesAt = Orion.GetTiles('any', x, y, (z == undefined?Player.Z()-10:Player.Z()+10), 255)//Orion.GetTiles('any', x, y, z, z);
+    var tileAndavel = true;
+
+    if (tilesAt) {
+        for (var i = 0; i < tilesAt.length; i++) {
+            var data = tilesAt[i];
+            var strFlag = data.Flags().toString(16);
+            var lastTwoChars = strFlag.slice(-2);
+            if (lastTwoChars === "40" || lastTwoChars === "50") {
+                tileAndavel = false;
+                break;
+            } else {
+                var landStrFlag = Orion.GetLandTiledata(data.Graphic()).Flags().toString(16);
+                if (landStrFlag.slice(-2) === "40") {
+                    tileAndavel = false;
+                    break;
+                }
+            }
+        }
+    } else {
+        // Armazena o resultado no cache
+        //tileCache[cacheKey] = true;
+        //return true; // Não tem tile, então considera-se andável
+        tileCache[cacheKey] = !containsObj;
+        return !containsObj
+    }
+
+    if (tileAndavel) {
+        var testaTileNegra = Orion.GetTiles('land', x, y);
+        if (testaTileNegra && testaTileNegra.length > 0) {
+            if (testaTileNegra[0].Flags().toString() === '80') {
+                tileAndavel = false;
+            }
+        }
+    }
+
+    // Armazena o resultado no cache
+    //tileCache[cacheKey] = tileAndavel;
+    //return tileAndavel;
+    tileCache[cacheKey] = tileAndavel && !containsObj
+    return tileAndavel && !containsObj
+}
+// Função para varrer uma área ao redor do jogador
+function scanArea(radius, hideoutPos, enemies) {
+  var playerPos = CharPos();
+  var areaMap = [];
+  var i, j;
+
+  for (i = -radius; i <= radius; i++) {
+    var row = [];
+    for (j = -radius; j <= radius; j++) {
+      var x = playerPos.X + i;
+      var y = playerPos.Y + j;
+      var status = getTileStatus(x, y, playerPos, hideoutPos, enemies);
+      row.push(status);
+    }
+    areaMap.push(row);
+  }
+
+  return areaMap;
+}
+
+
+function findPositionBehindObject_recuperado(object, enemies) {
+  var directions = [
+    { dx: 1, dy: 0 },   // Direita
+    { dx: -1, dy: 0 },  // Esquerda
+    { dx: 0, dy: 1 },   // Baixo
+    { dx: 0, dy: -1 },  // Cima
+    { dx: 1, dy: 1 },   // Diagonal Baixo-Direita
+    { dx: 1, dy: -1 },  // Diagonal Cima-Direita
+    { dx: -1, dy: 1 },  // Diagonal Baixo-Esquerda
+    { dx: -1, dy: -1 }  // Diagonal Cima-Esquerda
+  ];
+
+  var playerPos = CharPos();
+  var bestPosition = null;
+  var minDistance = Infinity;
+
+  for (var i = 0; i < directions.length; i++) {
+    var newX = object.X + directions[i].dx;
+    var newY = object.Y + directions[i].dy;
+    var newZ = object.Z;
+
+    if (!enemiesInLOS(newX, newY, enemies, true) && getTileStatus(newX, newY, playerPos, null, enemies) === '.') {
+      var distance = (playerPos.X - newX) * (playerPos.X - newX) + (playerPos.Y - newY) * (playerPos.Y - newY);
+      if (distance < minDistance) {
+        minDistance = distance;
+        bestPosition = { X: newX, Y: newY, Z: newZ };
+      }
+    }
+  }
+
+  return bestPosition;
+}
+
+function findNearestHideout_recuperado(enemies) {
+  var playerPos = CharPos();
+  var nearestHideout = null;
+  var minDistance = Infinity;
+
+  // Use o cache de tiles gerado anteriormente
+  for (var key in tileMap) {
+    var coords = key.split(',');
+    var x = parseInt(coords[0]);
+    var y = parseInt(coords[1]);
+
+    if (tileMap[key] && !enemiesInLOS(x, y, enemies, true)) {
+      var object = { X: x, Y: y, Z: playerPos.Z };
+      var hideoutPosition = findPositionBehindObject(object, enemies);
+
+      if (hideoutPosition && !enemiesInLOS(hideoutPosition.X, hideoutPosition.Y, enemies, true)) {
+        var distance = (playerPos.X - hideoutPosition.X) * (playerPos.X - hideoutPosition.X) +
+          (playerPos.Y - hideoutPosition.Y) * (playerPos.Y - hideoutPosition.Y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestHideout = hideoutPosition;
+        }
+      }
+    }
+  }
+
+  return nearestHideout;
 }
