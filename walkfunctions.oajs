@@ -22,6 +22,7 @@ function auto_pvm() {
         enemy = Orion.FindObject('lasttarget');
         Orion.Wait(100)
         Orion.CharPrint(self, 906, 'Morreu ! ');
+        eval(Shared.GetVar('AUTOPVM_DEAD_FUNCTION'))(enemy, lastX, lastY, lastZ)
         break
       }
       if (!enemy) {
@@ -45,6 +46,7 @@ function auto_pvm() {
 
       if (enemy.Dead()) {
         Orion.CharPrint(self, 906, 'Morreu ! ');
+        eval(Shared.GetVar('AUTOPVM_DEAD_FUNCTION'))(enemy, lastX, lastY, lastZ)
         break
       }
 
@@ -1094,7 +1096,7 @@ function isTileAndavel(x, y, z) {
 function moveToHideout(hideout) {
   if (hideout) {
     Orion.StopWalking();
-    Orion.WalkTo(hideout.X, hideout.Y, Player.Z(), Player.Z() - 5, Player.Z() + 5, 1, 1);
+    Orion.WalkTo(hideout.X, hideout.Y, Player.Z(), 0, Player.Z() + 15, 1, 1);
     Orion.Print(null, "Movendo para o esconderijo em " + hideout.X + ", " + hideout.Y + ", " + hideout.Z);
   } else {
     Orion.Print(null, "Nenhum esconderijo seguro encontrado.");
@@ -1179,14 +1181,14 @@ function materDistanciaComVisao(mainTarget, print) {
 function autoPVMBowFunction(enemy) {
   if (!isPathClear(Player.X(), Player.Y(), enemy.X(), enemy.Y())) {
     var distancia = 0
-    Orion.WalkTo(enemy.X(), enemy.Y(), Player.Z(), distancia, enemy.Z(), 1, 1);
+    Orion.WalkTo(enemy.X(), enemy.Y(), Player.Z(), distancia, Player.Z()+10, 1, 1);
   }
   materDistanciaComVisao(Orion.ClientLastAttack(), false);
 }
 
 function autoPVMDeadFunction(enemy, x, y, z) {
-  Orion.CharPrint(self, 906, "Buscando dinheiro")
-  Orion.WalkTo(x, y, z, z-5, z+5, 1, 1);
+  Orion.CharPrint(self, 906, "Buscando dinheiro "+x+","+y+","+z)
+  Orion.WalkTo(x, y, z, 1, z+5, 1, 1);
   Orion.Wait(1000)
 }
 
@@ -1252,7 +1254,7 @@ function testeCall_old() {
 }
 
 function testeCall() {
-  Orion.Print(null, "R : " + Orion.FindObject("0x0038ADAC").InLOS())
+  Orion.Print(null, "R : " + Shared.GetVar('idRunebook'))
 }
 
 function testeCall2() {
@@ -1359,11 +1361,13 @@ function isTileAndavelNova(x, y, z, tilesdata) {
   }
 
   if (tileAndavel) {
-    var testaTileNegra = Orion.GetTiles('land', x, y, (z == undefined ? Player.Z() - 3 : z - 3), (z == undefined ? Player.Z() + 3 : z + 3));
+    var testaTileNegra = Orion.GetTiles('land', x, y, 0, Player.Z() + 10); // (z == undefined ? Player.Z() + 3 : z + 3)
     if (testaTileNegra && testaTileNegra.length > 0) {
       if (testaTileNegra[0].Flags().toString() === '80') {
         tileAndavel = false;
-      }
+      }/*else if(testaTileNegra[0].Flags().toString(16).indexOf("40")!== -1 || testaTileNegra[0].Flags().toString(16).indexOf("50")!== -1 ) {
+        tileAndavel = false;
+      }*/
     }
   }
 
@@ -1560,8 +1564,8 @@ function moveToSafeDistanceFromEnemies(mainEnemy, otherEnemies, safeDistance, cl
   var bestPosition = null;
   var bestDistance = -9999;
 
-  for (var dx = -safeDistance; dx <= safeDistance; dx++) {
-      for (var dy = -safeDistance; dy <= safeDistance; dy++) {
+  for (var dx = -safeDistance; dx <= safeDistance+10; dx++) {
+      for (var dy = -safeDistance; dy <= safeDistance+10; dy++) {
           var newX = playerX + dx;
           var newY = playerY + dy;
 

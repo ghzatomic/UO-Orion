@@ -10,7 +10,7 @@ const magias = {
   "fs": {
     "msg": 'Kal Vas Flam',
     "cast": 'Flame Strike',
-    "delay": 3300,
+    "delay": 3400,
     "type": '0x1F5F',
     "delayExec": 1250
   },
@@ -581,8 +581,13 @@ function go_casa(){
   var onHide = function (){
     interromperCast();
     desativaCast();
-    castMagiaFunction(nullCallback,'0x1F4C','Recall',"Kal Ort Por",10500,Shared.GetVar('idRunebook'))
-    Orion.Wait(200)
+    Orion.WarMode(0)
+    //castMagiaFunction(nullCallback,'0x1F4C','Recall',"Kal Ort Por",10500,Shared.GetVar('idRunebook'))
+    Orion.WaitTargetObject(Shared.GetVar('idRunebook'))
+    Orion.Cast('Recall');
+    Orion.WaitTargetObject(Shared.GetVar('idRunebook'))
+    Orion.AddDisplayTimer(100, 10500, 'UnderChar', 'Circle|Bar', 'Recall', 0, 0, '0x00FF', 0, 'white');
+    Orion.Wait(100)
   }
   //onHide();
   executa_skill_hiding_stealth(onHide);
